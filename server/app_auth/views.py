@@ -84,19 +84,6 @@ def login(request):
     else:
         return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
-# @api_view(['GET'])
-# @permission_classes([AdminPermission])
-# def get_users(request):
-#     users = User.objects.all()
-#     serializer = UserSerializer(users, many=True)
-#     return Response(serializer.data, status=status.HTTP_200_OK)
-
-# Create your views here.
-# class UserRolesViewSet(viewsets.ModelViewSet):
-#     queryset = UserRoles.objects.all()
-#     serializer_class = UserRolesSerializer
-#     permission_classes = [AdminPermission]
-
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
