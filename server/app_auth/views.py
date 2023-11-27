@@ -74,7 +74,13 @@ def login(request):
         }
         token = jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
         
-        return Response({'token': token}, status=status.HTTP_200_OK)
+        try:
+            user_roles = UserRoles.objects.get(user=user)
+            roles = [role.role for role in user_roles.roles.all()]
+        except UserRoles.DoesNotExist:
+            roles = []
+        
+        return Response({'token': token, 'roles': roles}, status=status.HTTP_200_OK)
     else:
         return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
