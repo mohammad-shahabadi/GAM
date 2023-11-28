@@ -18,9 +18,10 @@ export default function UsersTable({t}) {
     useEffect(()=>{
         getUsersReq().then((res)=>{
             console.log(res)
-            const tempUsers = res.result.map(user => {
+            const tempUsers = res.results.map(user => {
                 return {...user,role:"student"}
             })
+            setUsers(tempUsers)
         })
     },[])
     const handleDelete = () => {
