@@ -5,13 +5,20 @@ import Select from '@mui/material/Select';
 import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
 import Button from "@/components/global/Button";
+import {useRequest} from "@/hooks/useRequest";
+import {LOGIN, SIGNUP} from "@/apiList";
+import Typography from "@mui/material/Typography";
+import {router} from "next/client";
+import {useRouter} from "@/navigation";
 
 const AddForm = ({t}) => {
+    const router = useRouter()
     const [formData, setFormData] = useState({
         email: '',
         password: '',
         userType: 'student',
     });
+    const [signupReq, signupLoader] = useRequest(SIGNUP, "POST");
 
     const handleChange = (event) => {
         setFormData({ ...formData, [event.target.name]: event.target.value });
@@ -19,21 +26,22 @@ const AddForm = ({t}) => {
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        // You can handle form submission logic here
-        console.log(formData);
+        signupReq({email:formData.email,password:formData.password,roles:[formData.userType]}).then((res)=>{
+            router.push('/admin/users')
+        })
     };
 
     return (
         <form
-
             style={{
                 display: 'flex',
                 flexDirection: 'column',
-                maxWidth: '300px',
+                maxWidth: '600px',
                 margin: 'auto',
                 marginTop: 2,
             }}
         >
+            <Typography className={"font-bold  text-center text-xl md:text-3xl"}>{t('addUser')}</Typography>
             <TextField
                 label="Email"
                 type="email"
@@ -53,7 +61,7 @@ const AddForm = ({t}) => {
                 sx={{ margin: 1 }}
             />
             <FormControl sx={{ margin: 1, minWidth: 120 }}>
-                <InputLabel id="userTypeLabel">User Type</InputLabel>
+                {/*<InputLabel id="userTypeLabel">User Type</InputLabel>*/}
                 <Select
                     labelId="userTypeLabel"
                     id="userType"
@@ -61,9 +69,9 @@ const AddForm = ({t}) => {
                     value={formData.userType}
                     onChange={handleChange}
                 >
-                    <MenuItem value="admin">Admin</MenuItem>
-                    <MenuItem value="student" selected={true}>Student</MenuItem>
-                    <MenuItem value="teacher">Teacher</MenuItem>
+                    <MenuItem value="admin">{t('admin')}</MenuItem>
+                    <MenuItem value="student" selected={true}>{t('student')}</MenuItem>
+                    <MenuItem value="teacher">{t('teacher')}</MenuItem>
                 </Select>
             </FormControl>
             <Button
@@ -72,6 +80,7 @@ const AddForm = ({t}) => {
                 className="mt-4 md:mt-8"
                 onClick={handleSubmit}
                 disabled={!formData.email || !formData.password}
+                loading={signupLoader}
             />
         </form>
     );

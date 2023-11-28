@@ -1,16 +1,28 @@
 "use client"
 import {DataGrid} from "@mui/x-data-grid";
 import * as React from "react";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {Button} from "@mui/material";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import {Link} from "@/navigation";
 import CustomModal from "@/components/global/Modal";
+import {useRequest} from "@/hooks/useRequest";
+import {GET_ALL_USERS, SIGNUP} from "@/apiList";
 
 export default function UsersTable({t}) {
     const [showDeleteModal, setShowDeleteModal] = useState(false)
     const [selectedUser, setSelectedUser] = useState(null)
+    const [users,setUsers] = useState([])
+    const [getUsersReq, getUsersLoader] = useRequest(GET_ALL_USERS, "GET");
+    useEffect(()=>{
+        getUsersReq().then((res)=>{
+            console.log(res)
+            const tempUsers = res.result.map(user => {
+                return {...user,role:"student"}
+            })
+        })
+    },[])
     const handleDelete = () => {
 
     }
@@ -40,26 +52,16 @@ export default function UsersTable({t}) {
         }
     ];
 
-    const rows = [
-        {email: 'ttt@ttt.com1', role: 'supe'},
-        {email: 'ttt@ttt.com2', role: 'supe'},
-        {email: 'ttt@ttt.com3', role: 'supe'},
-        {email: 'ttt@ttt.com4', role: 'supe'},
-        {email: 'ttt@ttt.com5', role: 'supe'},
-        {email: 'ttt@ttt.com6', role: 'supe'},
-        {email: 'fff@fff.com1', role: 'user'},
-        {email: 'fff@fff.com2', role: 'user'},
-    ];
     return (
         <div>
             <Link className={"bg-blue-600 hover:bg-blue-950 text-white py-2 px-4 mb-4"} href={'/admin/users/add'}>
-                Add New User
+                {t('addUser')}
             </Link>
             <div className={"h-full"} style={{ width: '100%'}}>
 
                 <DataGrid
                     getRowId={(row) => row.email}
-                    rows={rows}
+                    rows={users}
                     columns={columns}
                     initialState={{
                         pagination: {

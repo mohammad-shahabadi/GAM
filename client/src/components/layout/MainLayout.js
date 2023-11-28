@@ -42,6 +42,14 @@ export default function MainLayout({children, locale}) {
             <Toolbar/>
             <Divider/>
             <List>
+                <ListItem disablePadding>
+                    <Link style={pathname === "/admin"? {backgroundColor:"lightskyblue"}:{}} className={"w-full"} href={"/admin"}>
+                        <ListItemButton>
+                            <ListItemText sx={{textAlign: "start"}} primary={t('dashboard')}/>
+                        </ListItemButton>
+                    </Link>
+
+                </ListItem>
                 {['users', 'classes'].map((text, index) => (
                     <ListItem key={index} disablePadding>
                         <Link style={pathname === "/admin/"+text? {backgroundColor:"lightskyblue"}:{}} className={"w-full"} href={"/admin/"+text}>
