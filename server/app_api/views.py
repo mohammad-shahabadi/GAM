@@ -1,10 +1,12 @@
+from app_auth.permissions import TeacherOrAdminPermission, AllAuthenticatedPermission, IsPartOfCourseOrAdmin, \
+    AdminPermission
 from rest_framework import generics
-from rest_framework.permissions import IsAuthenticated
-from .models import Course, Membership
-from .serializers import CourseSerializer, MembershipSerializer, MembershipCreationSerializer , CourseDetailSerializer
-from app_auth.permissions import TeacherOrAdminPermission, AllAuthenticatedPermission, IsPartOfCourseOrAdmin, AdminPermission
-from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.response import Response
+
+from .models import Course, Membership
+from .serializers import CourseSerializer, MembershipSerializer, MembershipCreationSerializer, CourseDetailSerializer
+
 
 class CourseCreateView(generics.CreateAPIView):
     serializer_class = CourseSerializer
@@ -17,7 +19,8 @@ class CourseCreateView(generics.CreateAPIView):
         Membership.objects.create(course=course, user=user, role='teacher')
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-    
+
+
 class CourseListView(generics.ListAPIView):
     serializer_class = CourseSerializer
     permission_classes = [AdminPermission]
@@ -25,26 +28,30 @@ class CourseListView(generics.ListAPIView):
     def get_queryset(self):
         return Course.objects.all()
 
+
 class CourseDetailView(generics.RetrieveAPIView):
     queryset = Course.objects.all()
     serializer_class = CourseDetailSerializer
     permission_classes = [IsPartOfCourseOrAdmin]
+
 
 class CourseUpdateView(generics.UpdateAPIView):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
     permission_classes = [TeacherOrAdminPermission, IsPartOfCourseOrAdmin]
 
+
 class CourseDeleteView(generics.DestroyAPIView):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
     permission_classes = [TeacherOrAdminPermission, IsPartOfCourseOrAdmin]
 
+
 class MembershipCreateView(generics.CreateAPIView):
     serializer_class = MembershipCreationSerializer
     permission_classes = [TeacherOrAdminPermission]
     # todo how do i make it so that the user can only create a membership if they are part of the course?
-    
+
 
 class MembershipUpdateView(generics.UpdateAPIView):
     queryset = Membership.objects.all()

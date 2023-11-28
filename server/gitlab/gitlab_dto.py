@@ -31,4 +31,3 @@ class UserDTO(BaseDTO):
         self.username = username
         self.email = email
         self.password = password
-

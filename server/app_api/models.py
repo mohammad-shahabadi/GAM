@@ -1,5 +1,6 @@
 from django.db import models
 
+
 # Create your models here.
 class Membership(models.Model):
     course = models.ForeignKey('Course', on_delete=models.CASCADE, related_name='memberships')
