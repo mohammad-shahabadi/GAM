@@ -1,9 +1,9 @@
 # yourapp/management/commands/create_default_user.py
 
-from django.core.management.base import BaseCommand
-from django.contrib.auth.models import User
-from django.contrib.auth.hashers import make_password
 from app_auth.models import UserRoles, Role
+from django.contrib.auth.hashers import make_password
+from django.contrib.auth.models import User
+from django.core.management.base import BaseCommand
 
 
 class Command(BaseCommand):
