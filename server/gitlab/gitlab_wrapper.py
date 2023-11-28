@@ -31,9 +31,9 @@ class GitLabWrapper:
 
     # Username, Name and Email is required to update user (IDK WHY ?)
     def update_user(self, user_dto: UserDTO) -> UserDTO:
-        assert user_dto.name is not None ('Name is required for updating user')
-        assert user_dto.username is not None ('Username is required for updating user')
-        assert user_dto.email is not None ('Email is required for updating user')
+        assert user_dto.name is not None, 'Name is required for updating user'
+        assert user_dto.username is not None, 'Username is required for updating user'
+        assert user_dto.email is not None, 'Email is required for updating user'
 
         self._gl.users.update(
             id=user_dto.id,
