@@ -9,8 +9,8 @@ from gitlab import Gitlab
 
 class GitLabWrapper:
     def __init__(self):
-        gitlab_url = config('gitlab_url')
-        access_token = config('access_token')
+        gitlab_url = config('GITLAB_URL')
+        access_token = config('ACCESS_TOKEN')
         self._gl = Gitlab(gitlab_url, private_token=access_token)
 
     '''
