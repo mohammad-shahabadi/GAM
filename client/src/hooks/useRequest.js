@@ -26,7 +26,7 @@ export function useRequest(url, method, token, loaderInitState) {
             }),
             headers: {
                 Authorization:
-                    Cookies.get("accessToken") || token || undefined,
+                    Cookies.get("gam-token") || token || undefined,
             },
         })
             .then((r) => {
@@ -36,7 +36,7 @@ export function useRequest(url, method, token, loaderInitState) {
             })
             .catch((e) => {
                 if (e.code === "ERR_NETWORK") {
-                    toast("Network lost!");
+                    toast.error("Network lost!");
                 }
                 if (e.code === "ERR_CANCELED") {
                     console.log(e.code);
@@ -46,9 +46,9 @@ export function useRequest(url, method, token, loaderInitState) {
                     if (
                         (e.response.status === 401 ||
                             e.response.status === 403) && /// must be unified.
-                        Cookies.get("accessToken")
+                        Cookies.get("gam-token")
                     ) {
-                        Cookies.remove("accessToken")
+                        Cookies.remove("gam-token")
                         window.location.reload();
                     } else {
                         throw e;

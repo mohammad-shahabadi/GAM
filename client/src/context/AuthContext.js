@@ -16,15 +16,15 @@ const isValidToken = () => {
 };
 const isValidAdmin = () => {
     const token = Cookies.get('gam-authorities');
-    return !!(token && token === "admin");
+    return !!(token && token.indexOf('admin') >-1);
 };
 const isValidTeacher = () => {
     const token = Cookies.get('gam-authorities');
-    return !!(token && token === "teacher");
+    return !!(token && token.indexOf('teacher') >-1);
 };
 const isValidUser = () => {
     const token = Cookies.get('gam-authorities');
-    return !!(token && token === "user");
+    return !!(token && token.indexOf('student') >-1);
 };
 
 const AuthProvider = ({children}) => {
@@ -45,30 +45,15 @@ const AuthProvider = ({children}) => {
     const [loginReq, loginLoader] = useRequest(LOGIN, "POST");
 
     async function authenticate({stdNum, password}) {
-        // setLoading(true)
-        // loginReq({email:stdNum,password},null).then((res)=>{
-        //     console.log(res)
-        // }).catch((e)=>{
-        //     console.log(e)
-        // }).finally(()=>{
-        //     setLoading(false)
-        // })
-        if(stdNum == "1"){
-            makeAdmin(true)
-            Cookies.set('gam-token',1,{expires: 1})
-            Cookies.set('gam-authorities','admin',{expires: 1})
-            router.push('/admin')
-        }else if(stdNum == "2") {
-            makeTeacher(true)
-            Cookies.set('gam-token',1,{expires: 1})
-            Cookies.set('gam-authorities','user',{expires: 1})
-            router.push('/user')
-        } else {
-            Cookies.set('gam-token',1,{expires: 1})
-            Cookies.set('gam-authorities','user',{expires: 1})
-            makeUser(true)
-            router.push('/user')
-        }
+        setLoading(true)
+        loginReq({email:stdNum,password},null).then((res)=>{
+            setToken(res.token)
+            Cookies.set('gam-token', res.token, {expires: 1})
+            Cookies.set('gam-authorities', res.roles, {expires: 1})
+            console.log(res)
+        }).finally(()=>{
+            setLoading(false)
+        })
     }
 
 

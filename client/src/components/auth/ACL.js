@@ -10,8 +10,8 @@ const ACL = ({
                  children,
              }) => {
     const router = useRouter();
-    const [authorized, setAuthorized] = useState(true);
-    const {isAdmin, isAuthenticated, isUser} = useContext(AuthContext);
+    const {isAdmin, isAuthenticated, isUser, isTeacher} = useContext(AuthContext);
+    const [authorized, setAuthorized] = useState(isAuthenticated);
     const pathname = usePathname()
 
     useEffect(() => {
@@ -25,6 +25,10 @@ const ACL = ({
             tempAuthorized = false
             router.push('/')
         }
+        if (pathname.startsWith('/teacher') && !isTeacher) {
+            tempAuthorized = false
+            router.push('/')
+        }
         if (pathname === '/' && isAdmin) {
             tempAuthorized = false
             router.push('/admin')
@@ -32,6 +36,10 @@ const ACL = ({
         if (pathname === '/' && isUser) {
             tempAuthorized = false
             router.push('/user')
+        }
+        if (pathname === '/' && isTeacher) {
+            tempAuthorized = false
+            router.push('/teacher')
         }
         setAuthorized(tempAuthorized);
 
@@ -43,7 +51,7 @@ const ACL = ({
                 <>{children}</>
             ) : (
                 <div className={"w-full h-screen flex items-center justify-center"}>
-                    <BeatLoader color="#36d7b7" />
+                    <BeatLoader color="#1976d2" />
                 </div>
             )}
         </>

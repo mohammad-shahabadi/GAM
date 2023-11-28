@@ -9,6 +9,7 @@
   },
   "Layout": {
     "title": "همیار تمرین گیت",
+    "dashboard": "خانه",
     "users": "کاربران",
     "classes": "کلاس ها",
     "settings": "تنظیمات",
@@ -23,6 +24,10 @@
     "deleteText": "آیا از حذف این کاربر مطمئن هستید؟",
     "deleteConfirm": "تایید",
     "deleteCancel": "انصراف",
-    "submit": "تایید"
+    "submit": "تایید",
+    "admin": "ادمین",
+    "teacher": "استاد",
+    "student": "دانشجو",
+    "addUser": "اضافه کردن کاربر جدید"
   }
 }
