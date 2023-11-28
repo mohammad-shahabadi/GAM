@@ -1,0 +1,33 @@
+{
+  "Login": {
+    "title": "Git assignment Manager",
+    "studentNumber": "Student Number",
+    "password": "Password",
+    "studentNumberError": "Student Number can not be empty.",
+    "passwordError": "Password can not be empty.",
+    "login": "Login"
+  },
+  "Layout": {
+    "title": "Git assignment Manager",
+    "dashboard": "Dashboard",
+    "users": "Users",
+    "classes": "Classes",
+    "settings": "Settings",
+    "passwordError": "Password can not be empty.",
+    "login": "Login"
+  },
+  "Users": {
+    "email": "Email",
+    "role": "Role",
+    "edit": "Edit",
+    "delete": "Delete",
+    "deleteText": "Are you sure you want to delete this user?",
+    "deleteConfirm": "Confirm",
+    "deleteCancel": "Cancel",
+    "submit": "Submit",
+    "admin": "Admin",
+    "teacher": "Teacher",
+    "student": "Student",
+    "addUser": "Add A New User"
+  }
+}

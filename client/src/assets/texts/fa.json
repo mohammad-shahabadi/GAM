@@ -1,0 +1,33 @@
+{
+  "Login": {
+    "title": "همیار تمرین گیت",
+    "studentNumber": "شماره دانشجویی",
+    "password": "رمز عبور",
+    "studentNumberError": "شماره دانشجویی نمی تواند خالی باشد",
+    "passwordError": "رمز عبور نمیتواند خالی باشد",
+    "login": "ورود"
+  },
+  "Layout": {
+    "title": "همیار تمرین گیت",
+    "dashboard": "خانه",
+    "users": "کاربران",
+    "classes": "کلاس ها",
+    "settings": "تنظیمات",
+    "passwordError": "گذرواژه نمیتواند خالی باشد",
+    "login": "Login"
+  },
+  "Users": {
+    "email": "ایمیل",
+    "role": "سمت",
+    "edit": "ویرایش",
+    "delete": "حذف",
+    "deleteText": "آیا از حذف این کاربر مطمئن هستید؟",
+    "deleteConfirm": "تایید",
+    "deleteCancel": "انصراف",
+    "submit": "تایید",
+    "admin": "ادمین",
+    "teacher": "استاد",
+    "student": "دانشجو",
+    "addUser": "اضافه کردن کاربر جدید"
+  }
+}
