@@ -1,25 +1,26 @@
-from rest_framework import status
-from rest_framework.response import Response
-from rest_framework.decorators import api_view, permission_classes
-# from rest_framework.permissions import IsAuthenticated
-from .authentication import JWTAuthentication
-from django.contrib.auth.hashers import make_password, check_password
-from .models import UserRoles, Role
-from django.contrib.auth.models import User
+from datetime import datetime, timedelta
+
 import jwt
 from django.conf import settings
-from datetime import datetime, timedelta
-from .serializers import UserRolesSerializer, UserSerializer
-from .permissions import AdminPermission, SelfOrAdminPermission, UnauthenticatedPermission
+# from rest_framework.permissions import IsAuthenticated
+from django.contrib.auth.hashers import make_password, check_password
+from django.contrib.auth.models import User
+from rest_framework import status
 from rest_framework import viewsets
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.response import Response
 
-    
+from .models import UserRoles, Role
+from .permissions import AdminPermission, SelfOrAdminPermission, UnauthenticatedPermission
+from .serializers import UserSerializer
+
+
 @api_view(['POST'])
 @permission_classes([AdminPermission])
 def signup(request):
     email = request.data.get('email')
     password = request.data.get('password')
-    role_names = request.data.get('roles',[])  # List of role names
+    role_names = request.data.get('roles', [])  # List of role names
 
     try:
         user = User.objects.get(email=email)
@@ -36,7 +37,7 @@ def signup(request):
         # Create UserRoles instance and assign roles
         user_roles = UserRoles(user=user)
         user_roles.save()
-        
+
         for role_name in role_names:
             try:
                 role = Role.objects.get(role=role_name)
@@ -44,17 +45,18 @@ def signup(request):
             except Role.DoesNotExist:
                 # Handle the case where the specified role does not exist
                 return Response({'error': f'Role "{role_name}" does not exist'}, status=status.HTTP_400_BAD_REQUEST)
-        user_roles.save() # do we really need this here as well?
+        user_roles.save()  # do we really need this here as well?
 
         payload = {
             'user_id': user.id,
             'exp': datetime.utcnow() + timedelta(days=1)  # Token expiration time
         }
         token = jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
-    
+
         return Response({'token': token}, status=status.HTTP_201_CREATED)
     else:
         return Response({'error': 'Missing email or password'}, status=status.HTTP_400_BAD_REQUEST)
+
 
 @api_view(['POST'])
 @permission_classes([UnauthenticatedPermission])
@@ -73,16 +75,17 @@ def login(request):
             'exp': datetime.utcnow() + timedelta(days=1)  # Token expiration time
         }
         token = jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
-        
+
         try:
             user_roles = UserRoles.objects.get(user=user)
             roles = [role.role for role in user_roles.roles.all()]
         except UserRoles.DoesNotExist:
             roles = []
-        
+
         return Response({'token': token, 'roles': roles}, status=status.HTTP_200_OK)
     else:
         return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
