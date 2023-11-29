@@ -29,5 +29,16 @@
     "teacher": "استاد",
     "student": "دانشجو",
     "addUser": "اضافه کردن کاربر جدید"
+  },
+  "Classes": {
+    "name": "اسم",
+    "edit": "ویرایش",
+    "numberOfStudents": "تعداد دانشجویان",
+    "delete": "حذف",
+    "deleteCancel": "انصراف",
+    "deleteConfirm" :"تایید",
+    "deleteText":"آیا از حذف این کلاس مطمئن هستید؟",
+    "submit": "تایید",
+    "addClass": "اضافه کردن کلاس جدید"
   }
 }

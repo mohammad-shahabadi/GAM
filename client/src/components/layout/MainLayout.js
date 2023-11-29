@@ -19,7 +19,7 @@ import {Menu, MenuItem} from "@mui/material";
 import {usePathname} from "@/navigation";
 import {Link} from "@/navigation";
 
-const drawerWidth = 240;
+const drawerWidth = 200;
 
 export default function MainLayout({children, locale}) {
     const [mobileOpen, setMobileOpen] = useState(false);
