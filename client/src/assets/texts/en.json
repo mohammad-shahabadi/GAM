@@ -29,5 +29,16 @@
     "teacher": "Teacher",
     "student": "Student",
     "addUser": "Add A New User"
+  },
+  "Classes": {
+    "name": "Name",
+    "numberOfStudents": "Number of Students",
+    "delete": "Delete",
+    "edit": "Edit",
+    "deleteText": "Are you sure you want to delete this Class?",
+    "deleteConfirm": "Confirm",
+    "deleteCancel": "Cancel",
+    "submit": "Submit",
+    "addClass": "Add A New Class"
   }
 }

@@ -1,3 +1,15 @@
+"use client"
+import * as React from 'react';
+import { DataGrid } from '@mui/x-data-grid';
+import {useTranslations} from "next-intl";
+import ClassesTable from "@/components/classes";
+import AddForm from "@/components/classes/add";
+
+
 export default function Page() {
-    return(<div></div>)
+    const t = useTranslations('Classes')
+
+    return (
+        <AddForm t={t}/>
+    );
 }

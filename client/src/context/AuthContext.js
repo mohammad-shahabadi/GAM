@@ -39,7 +39,7 @@ const AuthProvider = ({children}) => {
 
     useEffect(()=>{
         makeAdmin(isValidAdmin())
-        makeTeacher(isValidAdmin())
+        makeTeacher(isValidTeacher())
         makeUser(isValidUser())
     },[token])
     const [loginReq, loginLoader] = useRequest(LOGIN, "POST");
