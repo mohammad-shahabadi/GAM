@@ -62,6 +62,7 @@ def signup(request):
             gitlab.create_user(user_dto=user_gitlab_dto)
         except Exception as e:
             print(f'User failed to create in gitlab {e}')
+            return Response(f'User failed to create in gitlab {e}', status=status.HTTP_201_CREATED)
 
         return Response({'token': token}, status=status.HTTP_201_CREATED)
     else:
