@@ -17,7 +17,7 @@ export default  function LocaleLayout({children, params: {locale}}) {
     const messages = useMessages();
 
 
-    return (<html dir={locale?.startsWith('fa') ? 'rtl' : 'ltr'} lang={locale}>
+    return (<html suppressHydrationWarning dir={locale?.startsWith('fa') ? 'rtl' : 'ltr'} lang={locale}>
     <body>
     <NextIntlClientProvider locale={locale} messages={messages}>
         <AuthProvider>

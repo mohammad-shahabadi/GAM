@@ -1,7 +1,7 @@
 "use client"
 import {DataGrid} from "@mui/x-data-grid";
 import * as React from "react";
-import {useEffect, useState} from "react";
+import {Suspense, useEffect, useState} from "react";
 import {Button} from "@mui/material";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -28,8 +28,8 @@ export default function UsersTable({t}) {
 
     }
     const columns = [
-        {field: 'email', headerName: t('email'), width: 330},
-        {field: 'role', headerName: t('role'), width: 330},
+        {field: 'email', headerName: t('email')},
+        {field: 'role', headerName: t('role')},
         // {
         //     field: "edit",
         //     headerName: t('edit'),
@@ -58,20 +58,24 @@ export default function UsersTable({t}) {
             <Link className={"bg-blue-600 hover:bg-blue-950 text-white py-2 px-4 mb-4"} href={'/admin/users/add'}>
                 {t('addUser')}
             </Link>
+            <br/>
+            <br/>
             <div className={"h-full"} style={{ width: '100%'}}>
+                <Suspense>
+                    <DataGrid
+                        getRowId={(row) => row.email}
+                        rows={users}
+                        columns={columns}
+                        initialState={{
+                            pagination: {
+                                paginationModel: {page: 0, pageSize: 5},
+                            },
+                        }}
+                        pageSizeOptions={[5, 10]}
 
-                <DataGrid
-                    getRowId={(row) => row.email}
-                    rows={users}
-                    columns={columns}
-                    initialState={{
-                        pagination: {
-                            paginationModel: {page: 0, pageSize: 5},
-                        },
-                    }}
-                    pageSizeOptions={[5, 10]}
+                    />
+                </Suspense>
 
-                />
 
                 <CustomModal btnCancelText={t('deleteCancel')} btnConfirmText={t('deleteConfirm')} onConfirm={handleDelete} bodyText={null} open={showDeleteModal}
                              onCancel={() => setShowDeleteModal(false)} headerText={t('deleteText')}/>

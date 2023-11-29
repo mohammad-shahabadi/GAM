@@ -12,5 +12,12 @@ export const LOGIN = `${HOST}/auth/login`; //POST
 
 // Users
 export const GET_ALL_USERS = `${HOST}/auth/user`; //GET
-export const DELETE_USER = `${HOST}/auth/login`; //DELETE
+//export const DELETE_USER = `${HOST}/???????`; //DELETE
+export const GET_USER_COURSES = `${HOST}/api/memberships/list`; //GET
 
+// Classes
+
+export const CREATE_CLASS = `${HOST}/api/courses/create`; //POST
+export const GET_COURSES = `${HOST}/api/courses/list`; //GET
+export const GET_COURSE = `${HOST}/api/courses/:id`; //GET
+export const CREATE_MEMBERSHIP = `${HOST}/api/memberships/create`; //DELETE

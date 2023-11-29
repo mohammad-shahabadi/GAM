@@ -11,7 +11,7 @@ export function useRequest(url, method, token, loaderInitState) {
         setLoading(true);
         let finalUrl = url;
         if (params) {
-            for (let param of params) {
+            for (let param of params)  {
                 finalUrl = finalUrl.replace(":" + param.name, param.value);
             }
         }
