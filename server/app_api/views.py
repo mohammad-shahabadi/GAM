@@ -7,6 +7,9 @@ from rest_framework.response import Response
 from .models import Course, Membership
 from .serializers import CourseSerializer, MembershipSerializer, MembershipCreationSerializer, CourseDetailSerializer
 
+from gitlab_wrapper.gitlab_wrapper import GitLabWrapper
+from gitlab_wrapper.gitlab_dto import GroupDTO
+
 
 class CourseCreateView(generics.CreateAPIView):
     serializer_class = CourseSerializer
@@ -17,7 +20,13 @@ class CourseCreateView(generics.CreateAPIView):
         course = serializer.save()
         user = self.request.user
         Membership.objects.create(course=course, user=user, role='teacher')
-
+        try:
+            gitlab = GitLabWrapper()
+            group_path = course.title.replace(' ', '-') if ' ' in course.title else course.title
+            group_gitlab_dto = GroupDTO(name=course.title, path=group_path)
+            gitlab.create_group(group_gitlab_dto)
+        except Exception as e:
+            print(f'Failed to create group in gitlab {e}')
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
