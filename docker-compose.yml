@@ -10,6 +10,18 @@ services:
       - "8000:8000"
     environment:
       DJANGO_SETTINGS_MODULE: gam.settings
+#    depends_on:
+#      - postgres
+
+  postgres:
+    image: postgres:latest
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: gam
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
 
   gitlab:
     image: gitlab/gitlab-ce:latest
