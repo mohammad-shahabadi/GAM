@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'app_auth.apps.AppAuthConfig',
     'app_api.apps.AppApiConfig',
+    'gitlab_wrapper.apps.GitlabWrapperConfig',
     'rest_framework',
     'corsheaders'
 ]
@@ -92,6 +93,18 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': os.environ.get('POSTGRES_DB', 'gam'),
+#         'USER': os.environ.get('POSTGRES_USER', 'root'),
+#         'PASSWORD': os.environ.get('POSTGRES_PASSWORD', 'root'),
+#         'HOST': os.environ.get('POSTGRES_HOST', 'postgres'),  # Assuming your PostgreSQL service in Docker Compose is named 'postgres'
+#         'PORT': '5432',
+#     }
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators

@@ -1,4 +1,4 @@
-from base_dto import BaseDTO
+from .base_dto import BaseDTO
 
 
 class GroupDTO(BaseDTO):

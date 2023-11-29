@@ -14,6 +14,8 @@ from .models import UserRoles, Role
 from .permissions import AdminPermission, SelfOrAdminPermission, UnauthenticatedPermission
 from .serializers import UserSerializer
 
+from gitlab_wrapper.gitlab_wrapper import GitLabWrapper
+from gitlab_wrapper.gitlab_dto import UserDTO
 
 @api_view(['POST'])
 @permission_classes([AdminPermission])
@@ -52,6 +54,15 @@ def signup(request):
             'exp': datetime.utcnow() + timedelta(days=1)  # Token expiration time
         }
         token = jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
+
+        # TODO: add exception handling and transaction
+        try:
+            gitlab = GitLabWrapper()
+            user_gitlab_dto = UserDTO(name=email.split('@')[0], username=email.split('@')[0], email=email, password=password)
+            gitlab.create_user(user_dto=user_gitlab_dto)
+        except Exception as e:
+            print(f'User failed to create in gitlab {e}')
+            return Response(f'User failed to create in gitlab {e}', status=status.HTTP_201_CREATED)
 
         return Response({'token': token}, status=status.HTTP_201_CREATED)
     else:

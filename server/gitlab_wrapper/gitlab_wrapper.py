@@ -1,8 +1,8 @@
 from decouple import config
 from gitlab import Gitlab
 
-from gitlab_dto import GroupDTO, UserDTO
-from gitlab_enum import GroupAccessLevel
+from .gitlab_dto import GroupDTO, UserDTO
+from .gitlab_enum import GroupAccessLevel
 
 
 class GitLabWrapper:
