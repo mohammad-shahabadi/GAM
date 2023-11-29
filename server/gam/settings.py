@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'app_auth.apps.AppAuthConfig',
     'app_api.apps.AppApiConfig',
+    'gitlab_wrapper.apps.GitlabWrapperConfig',
     'rest_framework',
     'corsheaders'
 ]
