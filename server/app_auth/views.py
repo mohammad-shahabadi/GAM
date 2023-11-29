@@ -14,9 +14,8 @@ from .models import UserRoles, Role
 from .permissions import AdminPermission, SelfOrAdminPermission, UnauthenticatedPermission
 from .serializers import UserSerializer
 
-from ..gitlab.gitlab_wrapper import GitLabWrapper
-from ..gitlab.gitlab_dto import UserDTO
-
+from gitlab_wrapper.gitlab_wrapper import GitLabWrapper
+from gitlab_wrapper.gitlab_dto import UserDTO
 
 @api_view(['POST'])
 @permission_classes([AdminPermission])
