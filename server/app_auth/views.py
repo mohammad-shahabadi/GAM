@@ -4,13 +4,13 @@ import jwt
 from django.conf import settings
 # from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.hashers import make_password, check_password
-from django.contrib.auth.models import User
+# from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework import viewsets
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 
-from .models import UserRoles, Role
+from .models import UserRoles, Role, User
 from .permissions import AdminPermission, SelfOrAdminPermission, UnauthenticatedPermission
 from .serializers import UserSerializer
 
