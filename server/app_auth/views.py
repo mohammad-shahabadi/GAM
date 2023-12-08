@@ -5,8 +5,7 @@ from django.conf import settings
 # from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.hashers import make_password, check_password
 # from django.contrib.auth.models import User
-from rest_framework import status
-from rest_framework import viewsets
+from rest_framework import status, generics, viewsets
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 
@@ -23,6 +22,7 @@ def signup(request):
     email = request.data.get('email')
     password = request.data.get('password')
     role_names = request.data.get('roles', [])  # List of role names
+    student_number = request.data.get('student_number')
 
     try:
         user = User.objects.get(email=email)
@@ -33,7 +33,7 @@ def signup(request):
 
     if email and password:
         hashed_password = make_password(password)
-        user = User(email=email, password=hashed_password, username=email)
+        user = User(email=email, password=hashed_password, username=email, student_number=student_number)
         user.save()
 
         # Create UserRoles instance and assign roles
@@ -98,12 +98,46 @@ def login(request):
         return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
-class UserViewSet(viewsets.ModelViewSet):
+#todo add role modification
+
+class GetUserByIDView(generics.RetrieveAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [SelfOrAdminPermission]
+
+class GetAllUsersView(generics.ListAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [AdminPermission]
 
-    def get_permissions(self):
-        if self.action == 'retrieve':
-            return [SelfOrAdminPermission()]
-        return super().get_permissions()
+    def get_queryset(self):
+        return User.objects.filter(is_deleted=False)
+
+class DeactivateUserView(generics.UpdateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [AdminPermission]
+
+    def perform_update(self, serializer):
+        if(serializer.instance.email == "admin@admin.com"):
+            return Response({'error': 'Cannot delete admin'}, status=status.HTTP_400_BAD_REQUEST)
+        serializer.instance.is_active = not serializer.instance.is_active
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+class SoftDeleteUserView(generics.UpdateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [AdminPermission]
+
+    def perform_update(self, serializer):
+        if(serializer.instance.email == "admin@admin.com"):
+            return Response({'error': 'Cannot delete admin'}, status=status.HTTP_400_BAD_REQUEST)
+        serializer.instance.is_deleted = True
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+class ModifyUserView(generics.UpdateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [AdminPermission]

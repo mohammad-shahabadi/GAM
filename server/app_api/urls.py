@@ -7,7 +7,7 @@ from .views import (
     CourseUpdateView,
     CourseDeleteView,
     MembershipCreateView,
-    MembershipUpdateView,
+    MembershipDeleteView,
     MembershipListForUser,
 
 )
@@ -19,6 +19,6 @@ urlpatterns = [
     path('courses/update/<int:pk>', CourseUpdateView.as_view(), name='course-update'),
     path('courses/delete/<int:pk>', CourseDeleteView.as_view(), name='course-delete'),
     path('memberships/create', MembershipCreateView.as_view(), name='membership-create'),
-    path('memberships/update/<int:pk>', MembershipUpdateView.as_view(), name='membership-update'),
+    path('memberships/<int:pk>', MembershipDeleteView.as_view(), name='membership_delete'),
     path('memberships/list', MembershipListForUser.as_view(), name='membership-list'),
 ]
