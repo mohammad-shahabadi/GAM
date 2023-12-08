@@ -12,8 +12,4 @@ RUN pip install -r requirements.txt
 
 EXPOSE 8000
 
-RUN python manage.py migrate
-RUN python manage.py create_default_admin
 RUN python manage.py collectstatic --noinput
-
-CMD ["gunicorn", "gam.wsgi:application", "--bind", "0.0.0.0:8000"]

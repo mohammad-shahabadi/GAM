@@ -101,7 +101,7 @@ DATABASES = {
         'NAME': os.environ.get('POSTGRES_DB', 'gam'),
         'USER': os.environ.get('POSTGRES_USER', 'root'),
         'PASSWORD': os.environ.get('POSTGRES_PASSWORD', 'root'),
-        'HOST': os.environ.get('POSTGRES_HOST', 'localhost'),  # Assuming your PostgreSQL service in Docker Compose is named 'postgres'
+        'HOST': os.environ.get('POSTGRES_HOST', 'postgres'),  # Assuming your PostgreSQL service in Docker Compose is named 'postgres'
         'PORT': '5432',
     }
 }
