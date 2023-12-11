@@ -20,13 +20,13 @@ class CourseCreateView(generics.CreateAPIView):
         course = serializer.save()
         user = self.request.user
         Membership.objects.create(course=course, user=user, role='teacher')
-        try:
-            gitlab = GitLabWrapper()
-            group_path = course.title.replace(' ', '-') if ' ' in course.title else course.title
-            group_gitlab_dto = GroupDTO(name=course.title, path=group_path)
-            gitlab.create_group(group_gitlab_dto)
-        except Exception as e:
-            print(f'Failed to create group in gitlab {e}')
+        # try:
+        #     gitlab = GitLabWrapper()
+        #     group_path = course.title.replace(' ', '-') if ' ' in course.title else course.title
+        #     group_gitlab_dto = GroupDTO(name=course.title, path=group_path)
+        #     gitlab.create_group(group_gitlab_dto)
+        # except Exception as e:
+        #     print(f'Failed to create group in gitlab {e}')
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
@@ -59,15 +59,33 @@ class CourseDeleteView(generics.DestroyAPIView):
 class MembershipCreateView(generics.CreateAPIView):
     serializer_class = MembershipCreationSerializer
     permission_classes = [TeacherOrAdminPermission]
-    # todo how do i make it so that the user can only create a membership if they are part of the course?
+
+    def perform_create(self, serializer):
+        course = serializer.validated_data['course']
+        user = serializer.validated_data['user']
+
+        # Check if the membership already exists
+        existing_membership = Membership.objects.filter(course=course, user=user).first()
+
+        if existing_membership:
+            # If the membership exists, update the role
+            existing_membership.role = serializer.validated_data.get('role', 'student')
+            existing_membership.save()
+            serializer.instance = existing_membership
+        else:
+            # If the membership doesn't exist, create it
+            serializer.save()
 
 
-class MembershipUpdateView(generics.UpdateAPIView):
+class MembershipDeleteView(generics.DestroyAPIView):
     queryset = Membership.objects.all()
     serializer_class = MembershipSerializer
     permission_classes = [TeacherOrAdminPermission]
-    # todo how do i make it so that the user can only create a membership if they are part of the course?
 
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 class MembershipListForUser(generics.ListAPIView):
     serializer_class = MembershipSerializer
