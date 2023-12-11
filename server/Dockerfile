@@ -3,9 +3,9 @@ FROM python:3.10
 ENV PYTHONUNBUFFERED 1
 ENV DJANGO_SETTINGS_MODULE gam.settings
 
-WORKDIR /gam
+WORKDIR /gam_backend
 
-COPY . /gam/
+COPY . /gam_backend/
 
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
