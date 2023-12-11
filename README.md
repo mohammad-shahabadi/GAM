@@ -24,7 +24,7 @@ To start the GAM project, use the following steps:
 
    This command will build the required images and start the services in detached mode.
 
-3. Access the GAM web application at [http://localhost:8000](http://localhost:8000).
+3. Access the GAM web application at [http://localhost:8000](http://localhost:8000)  The default credentials are `admin@admin.com` for username and  `admin` for password.
 
 4. Access the GAM frontend at [http://localhost:3000](http://localhost:3000).
 
