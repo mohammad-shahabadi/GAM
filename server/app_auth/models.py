@@ -6,9 +6,11 @@ from django.db import models
 class User(AbstractUser):
     student_number = models.CharField(max_length=10, blank=True, null=True)
     is_deleted = models.BooleanField(default=False)
+    git_reference_id = models.IntegerField(blank=True, null=True)
 
     def __str__(self):
         return self.username
+
 
 class Role(models.Model):
     ROLE_CHOICES = (
