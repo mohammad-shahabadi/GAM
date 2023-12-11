@@ -1,4 +1,4 @@
-# README: Docker Compose Setup for GAM Project
+# README: Setup for GAM Project
 
 This repository contains a Docker Compose configuration to run the GAM (Generic Application Management) project. The project is composed of several services, including a Django web application, PostgreSQL database, a React-based frontend, and GitLab for version control.
 
@@ -106,6 +106,6 @@ To rebuild the GitLab service independently, follow these steps:
 
 ## Troubleshooting
 
-If you encounter any issues or have questions, please refer to the [official Docker documentation](https://docs.docker.com/) or check the project's repository for additional information.
+If you encounter any issues or have questions, please refer to the [official Docker documentation](https://t.me/MamaZh_Shadow).
 
 Happy coding!
