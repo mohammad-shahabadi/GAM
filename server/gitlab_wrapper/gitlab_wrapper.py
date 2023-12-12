@@ -42,6 +42,12 @@ class GitLabWrapper:
     def delete_user(self, user_dto: UserDTO):
         self._gl.users.delete(id=user_dto.id)
 
+    def activate_user(self, user_dto: UserDTO):
+        self._gl.http_post(f'/users/{user_dto.id}/activate')
+
+    def deactivate_user(self, user_dto: UserDTO):
+        self._gl.http_post(f'/users/{user_dto.id}/deactivate')
+
     '''
         # Group Section 
         * Use same methods for creating subgroups
