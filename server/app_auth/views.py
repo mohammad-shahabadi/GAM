@@ -4,69 +4,78 @@ import jwt
 from django.conf import settings
 # from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.hashers import make_password, check_password
+from django.db import transaction
+from gitlab.exceptions import GitlabCreateError
 # from django.contrib.auth.models import User
-from rest_framework import status, generics, viewsets
+from rest_framework import status, generics
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 
+from gitlab_wrapper.gitlab_dto import UserDTO
+from gitlab_wrapper.gitlab_wrapper import GitLabWrapper
 from .models import UserRoles, Role, User
 from .permissions import AdminPermission, SelfOrAdminPermission, UnauthenticatedPermission
 from .serializers import UserSerializer
 
-from gitlab_wrapper.gitlab_wrapper import GitLabWrapper
-from gitlab_wrapper.gitlab_dto import UserDTO
 
 @api_view(['POST'])
 @permission_classes([AdminPermission])
 def signup(request):
-    email = request.data.get('email')
-    password = request.data.get('password')
-    role_names = request.data.get('roles', [])  # List of role names
-    student_number = request.data.get('student_number')
-
     try:
-        user = User.objects.get(email=email)
-        if user:
-            return Response({'error': 'User already exists'}, status=status.HTTP_400_BAD_REQUEST)
-    except User.DoesNotExist:
-        pass
+        with transaction.atomic():
+            email = request.data.get('email')
+            password = request.data.get('password')
+            role_names = request.data.get('roles', [])  # List of role names
+            student_number = request.data.get('student_number')
+            first_name = request.data.get('first_name')
+            last_name = request.data.get('last_name')
 
-    if email and password:
-        hashed_password = make_password(password)
-        user = User(email=email, password=hashed_password, username=email, student_number=student_number)
-        user.save()
-
-        # Create UserRoles instance and assign roles
-        user_roles = UserRoles(user=user)
-        user_roles.save()
-
-        for role_name in role_names:
             try:
-                role = Role.objects.get(role=role_name)
-                user_roles.roles.add(role)
-            except Role.DoesNotExist:
-                # Handle the case where the specified role does not exist
-                return Response({'error': f'Role "{role_name}" does not exist'}, status=status.HTTP_400_BAD_REQUEST)
-        user_roles.save()  # do we really need this here as well?
+                user = User.objects.get(email=email)
+                if user:
+                    raise Exception('User already exists')
+            except User.DoesNotExist:
+                pass
 
-        payload = {
-            'user_id': user.id,
-            'exp': datetime.utcnow() + timedelta(days=1)  # Token expiration time
-        }
-        token = jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
+            if email and password:
+                hashed_password = make_password(password)
+                user = User(first_name=first_name or '', last_name=last_name or '', email=email,
+                            password=hashed_password, username=email, student_number=student_number)
+                user.save()
 
-        # TODO: add exception handling and transaction
-        # try:
-        #     gitlab = GitLabWrapper()
-        #     user_gitlab_dto = UserDTO(name=email.split('@')[0], username=email.split('@')[0], email=email, password=password)
-        #     gitlab.create_user(user_dto=user_gitlab_dto)
-        # except Exception as e:
-        #     print(f'User failed to create in gitlab {e}')
-        #     return Response(f'User failed to create in gitlab {e}', status=status.HTTP_201_CREATED)
+                # Create UserRoles instance and assign roles
+                user_roles = UserRoles(user=user)
+                user_roles.save()
 
-        return Response({'token': token}, status=status.HTTP_201_CREATED)
-    else:
-        return Response({'error': 'Missing email or password'}, status=status.HTTP_400_BAD_REQUEST)
+                for role_name in role_names:
+                    role = Role.objects.get(role=role_name)
+                    user_roles.roles.add(role)
+
+                user_roles.save()  # do we really need this here as well?
+
+                payload = {
+                    'user_id': user.id,
+                    'exp': datetime.utcnow() + timedelta(days=1)  # Token expiration time
+                }
+                token = jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
+                gitlab = GitLabWrapper()
+                user_gitlab_dto = UserDTO(name=f'{first_name} {last_name}', username=email.split('@')[0], email=email,
+                                          password=password)
+                gitlab_user = gitlab.create_user(user_dto=user_gitlab_dto)
+                user.git_reference_id = gitlab_user.id
+                user.save()
+            else:
+                raise Exception('Missing email or password')
+
+            return Response({'token': token}, status=status.HTTP_201_CREATED)
+
+    except Role.DoesNotExist:
+        return Response({'error': f'Role "{role_name}" does not exist'},
+                        status=status.HTTP_400_BAD_REQUEST)
+    except GitlabCreateError as e:
+        return Response({'error': f'User failed to create in gitlab {e}'}, status=status.HTTP_400_BAD_REQUEST)
+    except Exception as e:
+        return Response({'error': e}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['POST'])
@@ -98,12 +107,13 @@ def login(request):
         return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
-#todo add role modification
+# todo add role modification
 
 class GetUserByIDView(generics.RetrieveAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [SelfOrAdminPermission]
+
 
 class GetAllUsersView(generics.ListAPIView):
     queryset = User.objects.all()
@@ -113,31 +123,43 @@ class GetAllUsersView(generics.ListAPIView):
     def get_queryset(self):
         return User.objects.filter(is_deleted=False)
 
+
 class DeactivateUserView(generics.UpdateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [AdminPermission]
 
     def perform_update(self, serializer):
-        if(serializer.instance.email == "admin@admin.com"):
+        if (serializer.instance.email == "admin@admin.com"):
             return Response({'error': 'Cannot delete admin'}, status=status.HTTP_400_BAD_REQUEST)
         serializer.instance.is_active = not serializer.instance.is_active
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
-    
+
+
 class SoftDeleteUserView(generics.UpdateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [AdminPermission]
 
     def perform_update(self, serializer):
-        if(serializer.instance.email == "admin@admin.com"):
+        if (serializer.instance.email == "admin@admin.com"):
             return Response({'error': 'Cannot delete admin'}, status=status.HTTP_400_BAD_REQUEST)
         serializer.instance.is_deleted = True
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
-    
+
+
 class ModifyUserView(generics.UpdateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [AdminPermission]
+    # def perform_update(self, serializer):
+    #     try :
+    #         with transaction.atomic():
+    #             serializer.save()
+    #             gitlab = GitLabWrapper()
+    #             update_user_gitalb_dto = UserDTO(name =serializer.instance.name,email=serializer.instance.email,username=serializer.instance.username)
+    #             gitlab.update_user()
+    #
+    #     except GitlabCreateError:

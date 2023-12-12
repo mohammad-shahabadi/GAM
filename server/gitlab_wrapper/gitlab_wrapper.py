@@ -24,7 +24,7 @@ class GitLabWrapper:
                 'can_create_group': False,
             }
         )
-        user_dto = user.get_id()
+        user_dto.id = user.get_id()
         return user_dto
 
     # Username, Name and Email is required to update user (IDK WHY ?)
