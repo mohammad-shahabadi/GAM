@@ -5,7 +5,7 @@ from django.conf import settings
 # from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.hashers import make_password, check_password
 from django.db import transaction
-from gitlab.exceptions import GitlabCreateError
+from gitlab.exceptions import GitlabCreateError, GitlabUpdateError, GitlabDeleteError
 # from django.contrib.auth.models import User
 from rest_framework import status, generics
 from rest_framework.decorators import api_view, permission_classes
@@ -129,12 +129,29 @@ class DeactivateUserView(generics.UpdateAPIView):
     serializer_class = UserSerializer
     permission_classes = [AdminPermission]
 
+    def update(self, request, *args, **kwargs):
+        try:
+            return super().update(request, *args, **kwargs)
+        except Exception as e:
+            return Response({'error': f'{e}'}, status=status.HTTP_400_BAD_REQUEST)
+
     def perform_update(self, serializer):
-        if (serializer.instance.email == "admin@admin.com"):
-            return Response({'error': 'Cannot delete admin'}, status=status.HTTP_400_BAD_REQUEST)
-        serializer.instance.is_active = not serializer.instance.is_active
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        if serializer.instance.is_deleted:
+            raise Exception('User not found')
+        with transaction.atomic():
+            if serializer.instance.email == "admin@admin.com":
+                raise Exception('Cannot delete admin')
+
+            serializer.instance.is_active = not serializer.instance.is_active
+            serializer.save()
+
+            gitlab = GitLabWrapper()
+            deactivate_user_gitlab_dto = UserDTO(id=serializer.instance.git_reference_id)
+
+            if serializer.instance.is_active:
+                gitlab.activate_user(deactivate_user_gitlab_dto)
+            else:
+                gitlab.deactivate_user(deactivate_user_gitlab_dto)
 
 
 class SoftDeleteUserView(generics.UpdateAPIView):
@@ -142,24 +159,49 @@ class SoftDeleteUserView(generics.UpdateAPIView):
     serializer_class = UserSerializer
     permission_classes = [AdminPermission]
 
+    def update(self, request, *args, **kwargs):
+        try:
+            return super().update(request, *args, **kwargs)
+        except GitlabDeleteError as e:
+            return Response({'error': f'User failed to delete in gitlab {e}'}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({'error': f'{e}'}, status=status.HTTP_400_BAD_REQUEST)
+
     def perform_update(self, serializer):
-        if (serializer.instance.email == "admin@admin.com"):
-            return Response({'error': 'Cannot delete admin'}, status=status.HTTP_400_BAD_REQUEST)
-        serializer.instance.is_deleted = True
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        if serializer.instance.is_deleted:
+            raise Exception('User not found')
+        with transaction.atomic():
+            if serializer.instance.email == "admin@admin.com":
+                raise Exception('Cannot delete admin')
+            serializer.instance.is_deleted = True
+            serializer.save()
+
+            gitlab = GitLabWrapper()
+            delete_user_gitlab_dto = UserDTO(id=serializer.instance.git_reference_id)
+            gitlab.delete_user(delete_user_gitlab_dto)
 
 
 class ModifyUserView(generics.UpdateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [AdminPermission]
-    # def perform_update(self, serializer):
-    #     try :
-    #         with transaction.atomic():
-    #             serializer.save()
-    #             gitlab = GitLabWrapper()
-    #             update_user_gitalb_dto = UserDTO(name =serializer.instance.name,email=serializer.instance.email,username=serializer.instance.username)
-    #             gitlab.update_user()
-    #
-    #     except GitlabCreateError:
+
+    def update(self, request, *args, **kwargs):
+        try:
+            return super().update(request, *args, **kwargs)
+        except GitlabUpdateError as e:
+            return Response({'error': f'User failed to update in gitlab {e}'}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({'error': f'{e}'}, status=status.HTTP_400_BAD_REQUEST)
+
+    def perform_update(self, serializer):
+        if serializer.instance.is_deleted:
+            raise Exception('User not found')
+        with transaction.atomic():
+            serializer.save()
+            gitlab = GitLabWrapper()
+            full_name = f'{serializer.instance.first_name} {serializer.instance.last_name}'
+            update_user_gitlab_dto = UserDTO(id=serializer.instance.git_reference_id, name=full_name,
+                                             email=serializer.instance.email,
+                                             username=serializer.instance.email.split('@')[0])
+            gitlab.update_user(update_user_gitlab_dto)
