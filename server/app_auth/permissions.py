@@ -5,31 +5,32 @@ from app_api.models import Membership
 
 class AdminPermission(permissions.BasePermission):
     def has_permission(self, request, view):
-        return request.user.is_authenticated and User.objects.filter(user=request.user,
+        return request.user.is_authenticated and User.objects.filter(id=request.user.id,
                                                                      role='admin').exists()
 
 
 class SelfOrAdminPermission(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         return request.user.is_authenticated and (
-                obj == request.user or User.objects.filter(user=request.user, role='admin').exists())
+                obj == request.user or User.objects.filter(id=request.user.id,
+                                                           role='admin').exists())
 
 
 class TeacherOrAdminPermission(permissions.BasePermission):
     def has_permission(self, request, view):
-        return request.user.is_authenticated and (User.objects.filter(user=request.user,
+        return request.user.is_authenticated and (User.objects.filter(id=request.user.id,
                                                                       role='teacher').exists()
                                                   or
-                                                  User.objects.filter(user=request.user,
+                                                  User.objects.filter(id=request.user.id,
                                                                       role='admin').exists())
 
 
 class StudentOrAdminPermission(permissions.BasePermission):
     def has_permission(self, request, view):
-        return request.user.is_authenticated and (User.objects.filter(user=request.user,
+        return request.user.is_authenticated and (User.objects.filter(id=request.user.id,
                                                                       role='student').exists()
                                                   or
-                                                  User.objects.filter(user=request.user,
+                                                  User.objects.filter(id=request.user.id,
                                                                       role='admin').exists())
 
 
