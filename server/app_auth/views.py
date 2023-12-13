@@ -13,7 +13,7 @@ from rest_framework.response import Response
 
 from gitlab_wrapper.gitlab_dto import UserDTO
 from gitlab_wrapper.gitlab_wrapper import GitLabWrapper
-from .models import UserRoles, Role, User
+from .models import User
 from .permissions import AdminPermission, SelfOrAdminPermission, UnauthenticatedPermission
 from .serializers import UserSerializer
 
@@ -25,7 +25,7 @@ def signup(request):
         with transaction.atomic():
             email = request.data.get('email')
             password = request.data.get('password')
-            role_names = request.data.get('roles', [])  # List of role names
+            role_name = request.data.get('role')
             student_number = request.data.get('student_number')
             first_name = request.data.get('first_name')
             last_name = request.data.get('last_name')
@@ -40,22 +40,13 @@ def signup(request):
             if email and password:
                 hashed_password = make_password(password)
                 user = User(first_name=first_name or '', last_name=last_name or '', email=email,
-                            password=hashed_password, username=email, student_number=student_number)
+                            password=hashed_password, username=email, student_number=student_number,
+                            role=role_name)
                 user.save()
-
-                # Create UserRoles instance and assign roles
-                user_roles = UserRoles(user=user)
-                user_roles.save()
-
-                for role_name in role_names:
-                    role = Role.objects.get(role=role_name)
-                    user_roles.roles.add(role)
-
-                user_roles.save()  # do we really need this here as well?
 
                 payload = {
                     'user_id': user.id,
-                    'exp': datetime.utcnow() + timedelta(days=1)  # Token expiration time
+                    'exp': datetime.utcnow() + timedelta(days=7)  # Token expiration time
                 }
                 token = jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
                 gitlab = GitLabWrapper()
@@ -69,9 +60,6 @@ def signup(request):
 
             return Response({'token': token}, status=status.HTTP_201_CREATED)
 
-    except Role.DoesNotExist:
-        return Response({'error': f'Role "{role_name}" does not exist'},
-                        status=status.HTTP_400_BAD_REQUEST)
     except GitlabCreateError as e:
         return Response({'error': f'User failed to create in gitlab {e}'}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
@@ -96,18 +84,9 @@ def login(request):
         }
         token = jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
 
-        try:
-            user_roles = UserRoles.objects.get(user=user)
-            roles = [role.role for role in user_roles.roles.all()]
-        except UserRoles.DoesNotExist:
-            roles = []
-
-        return Response({'token': token, 'roles': roles}, status=status.HTTP_200_OK)
+        return Response({'token': token, 'role': user.role}, status=status.HTTP_200_OK)
     else:
         return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
-
-
-# todo add role modification
 
 class GetUserByIDView(generics.RetrieveAPIView):
     queryset = User.objects.all()
