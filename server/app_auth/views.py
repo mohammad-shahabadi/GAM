@@ -63,7 +63,7 @@ def signup(request):
     except GitlabCreateError as e:
         return Response({'error': f'User failed to create in gitlab {e}'}, status=status.HTTP_400_BAD_REQUEST)
     except Exception as e:
-        return Response({'error': e}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'error': f'{e}'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['POST'])
@@ -87,6 +87,7 @@ def login(request):
         return Response({'token': token, 'role': user.role}, status=status.HTTP_200_OK)
     else:
         return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+
 
 class GetUserByIDView(generics.RetrieveAPIView):
     queryset = User.objects.all()
