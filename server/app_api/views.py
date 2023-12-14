@@ -87,6 +87,7 @@ class MembershipDeleteView(generics.DestroyAPIView):
         self.perform_destroy(instance)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+
 class MembershipListForUser(generics.ListAPIView):
     serializer_class = MembershipSerializer
     permission_classes = [AllAuthenticatedPermission, IsPartOfCourseOrAdmin]

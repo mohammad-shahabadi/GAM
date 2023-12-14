@@ -23,4 +23,5 @@ class Course(models.Model):
     professor = models.CharField(max_length=255, blank=True, null=True)
     identifier_field = models.CharField(max_length=255, blank=True, null=True,
                                         help_text=("Default field to use for identifier field"))
+    git_reference_id = models.IntegerField(blank=True, null=True)
     # identifier_text = models.CharField(max_length=255, blank=True)
