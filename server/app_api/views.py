@@ -37,6 +37,12 @@ class CourseCreateView(generics.CreateAPIView):
                                                path=course.git_path,
                                                description=course.description)
             gitlab_group = gitlab.create_group(create_group_gitlab_dto)
+            # Group for storing homeworks and assignments created in panel
+            homeworks_group_gitlab_dto = GroupDTO(name='Homeworks',
+                                                  path='homeworks',
+                                                  parent_id=gitlab_group.id
+                                                  )
+            gitlab.create_group(homeworks_group_gitlab_dto)
 
             user_gitlab_access = map_user_role_to_group_access(user.role)
 
