@@ -10,10 +10,10 @@ class GroupDTO(BaseDTO):
             path=path,
             description=description
         )
-        self.id = id,
-        self.parent_id = parent_id,
-        self.name = name,
-        self.path = path,
+        self.id = id
+        self.parent_id = parent_id
+        self.name = name
+        self.path = path
         self.description = description
 
 
