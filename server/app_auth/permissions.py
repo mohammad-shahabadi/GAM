@@ -54,4 +54,4 @@ class IsPartOfCourseOrAdmin(permissions.BasePermission):
         user = request.user
         return (Membership.objects.filter(user=user, course=obj).exists()
                 or
-                User.objects.filter(user=user, role='admin').exists())
+                User.objects.filter(id=user.id, role='admin').exists())

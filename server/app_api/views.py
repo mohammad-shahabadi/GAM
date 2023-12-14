@@ -1,5 +1,5 @@
 from django.db import transaction
-from gitlab.exceptions import GitlabCreateError
+from gitlab.exceptions import GitlabCreateError, GitlabUpdateError
 from rest_framework import generics
 from rest_framework import status
 from rest_framework.response import Response
@@ -21,7 +21,7 @@ class CourseCreateView(generics.CreateAPIView):
         try:
             return super().create(request, *args, **kwargs)
         except GitlabCreateError as e:
-            return Response({'error': f'User failed to update in gitlab {e}'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': f'Class failed to create in gitlab {e}'}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({'error': f'{e}'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -45,7 +45,6 @@ class CourseCreateView(generics.CreateAPIView):
                                          access_level=user_gitlab_access)
             course.git_reference_id = gitlab_group.id
             course.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class CourseListView(generics.ListAPIView):
@@ -66,6 +65,23 @@ class CourseUpdateView(generics.UpdateAPIView):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
     permission_classes = [TeacherOrAdminPermission, IsPartOfCourseOrAdmin]
+
+    def update(self, request, *args, **kwargs):
+        try:
+            return super().update(request, *args, **kwargs)
+        except GitlabUpdateError as e:
+            return Response({'error': f'Class failed to update in gitlab {e}'}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({'error': f'{e}'}, status=status.HTTP_400_BAD_REQUEST)
+
+    def perform_update(self, serializer):
+        with transaction.atomic():
+            course = serializer.save()
+            gitlab = GitLabWrapper()
+            create_group_gitlab_dto = GroupDTO(name=course.title,
+                                               path=course.git_path,
+                                               description=course.description)
+            gitlab.update_group(course.git_reference_id, create_group_gitlab_dto)
 
 
 class CourseDeleteView(generics.DestroyAPIView):
