@@ -26,7 +26,7 @@ class MembershipSerializer(serializers.ModelSerializer):
 class MembershipCreationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Membership
-        fields = ['course', 'user', 'role']
+        fields = ['id', 'course', 'user', 'role']
 
 
 class UserMembershipSerializer(serializers.ModelSerializer):

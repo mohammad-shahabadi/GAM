@@ -7,6 +7,7 @@ class Membership(models.Model):
     user = models.ForeignKey('app_auth.User', on_delete=models.CASCADE, related_name='memberships')
     # course permissions
     role = models.CharField(max_length=255, blank=True, default='student')
+    git_reference_id = models.IntegerField(blank=True, null=True)
 
     class Meta:
         constraints = (

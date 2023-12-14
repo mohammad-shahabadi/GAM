@@ -118,11 +118,25 @@ class MembershipCreateView(generics.CreateAPIView):
                 existing_membership.role = serializer.validated_data.get('role', 'student')
                 existing_membership.save()
                 serializer.instance = existing_membership
-                gitlab.update_user_access_group(user.git_reference_id, course.git_reference_id, user_gitlab_access)
+
+                gitlab.update_user_access_group(user.git_reference_id,
+                                                existing_membership.git_reference_id,
+                                                user_gitlab_access)
             else:
                 # If the membership doesn't exist, create it
-                serializer.save()
-                gitlab.add_user_to_group(user.git_reference_id, course.git_reference_id, user_gitlab_access)
+                membership = serializer.save()
+
+                sub_group_name = (user.first_name + user.last_name).strip().replace(' ', '')
+                sub_group_path = (user.first_name + user.last_name).strip().replace(' ', '-')
+                create_group_gitlab_dto = GroupDTO(name=sub_group_name,
+                                                   path=sub_group_path,
+                                                   description=course.description,
+                                                   parent_id=course.git_reference_id
+                                                   )
+                gitlab_group = gitlab.create_group(create_group_gitlab_dto)
+                gitlab.add_user_to_group(user.git_reference_id, gitlab_group.id, user_gitlab_access)
+                membership.git_reference_id = gitlab_group.id
+                membership.save()
 
 
 class MembershipDeleteView(generics.DestroyAPIView):
@@ -139,13 +153,19 @@ class MembershipDeleteView(generics.DestroyAPIView):
             return Response({'error': f'{e}'}, status=status.HTTP_400_BAD_REQUEST)
 
     def perform_destroy(self, instance):
+        print(instance, 'sdasasdads')
         with transaction.atomic():
             user_git_reference = instance.user.git_reference_id
-            course_git_reference = instance.course.git_reference_id
+            membership_get_reference = instance.git_reference_id
             instance.delete()
 
             gitlab = GitLabWrapper()
-            gitlab.delete_user_from_group(user_git_reference, course_git_reference)
+            gitlab.delete_user_from_group(user_git_reference, membership_get_reference)
+            # Update title and path of membership subgroup to mark as deleted
+            membership_group_git = gitlab.get_group(membership_get_reference)
+            membership_group_git.name = f'{membership_group_git.name}-deleted-{membership_group_git.id}'
+            membership_group_git.path = f'{membership_group_git.path}-deleted-{membership_group_git.id}'
+            membership_group_git.save()
 
 
 class MembershipListForUser(generics.ListAPIView):

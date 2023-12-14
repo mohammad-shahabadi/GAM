@@ -52,9 +52,11 @@ class UnauthenticatedPermission(permissions.BasePermission):
 class IsTeacherOfCourseOrAdmin(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         user = request.user
-        return (Membership.objects.filter(id=user.id, course=obj, role='teacher').exists()
+        return (User.objects.filter(id=user.id, role='admin').exists()
                 or
-                User.objects.filter(id=user.id, role='admin').exists())
+                Membership.objects.filter(id=user.id, course=obj, role='teacher').exists())
+
+
 
 
 class IsPartOfCourseOrAdmin(permissions.BasePermission):
