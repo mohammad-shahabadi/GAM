@@ -7,6 +7,7 @@ class Membership(models.Model):
     user = models.ForeignKey('app_auth.User', on_delete=models.CASCADE, related_name='memberships')
     # course permissions
     role = models.CharField(max_length=255, blank=True, default='student')
+    git_reference_id = models.IntegerField(blank=True, null=True)
 
     class Meta:
         constraints = (
@@ -16,12 +17,13 @@ class Membership(models.Model):
 
 
 class Course(models.Model):
-    title = models.CharField(max_length=255)
+    title = models.CharField(max_length=50)
+    description = models.CharField(max_length=255, blank=True, null=True)
     members = models.ManyToManyField('app_auth.User', through=Membership)
     password = models.CharField(max_length=255, blank=True, null=True,
-                                help_text=("Optional password for joining the course"))
+                                help_text="Optional password for joining the course")
     professor = models.CharField(max_length=255, blank=True, null=True)
     identifier_field = models.CharField(max_length=255, blank=True, null=True,
-                                        help_text=("Default field to use for identifier field"))
+                                        help_text="Default field to use for identifier field")
+    git_path = models.CharField(max_length=30)
     git_reference_id = models.IntegerField(blank=True, null=True)
-    # identifier_text = models.CharField(max_length=255, blank=True)

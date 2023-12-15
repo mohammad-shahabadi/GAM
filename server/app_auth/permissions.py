@@ -1,35 +1,36 @@
 from app_auth.models import User
 from rest_framework import permissions
-from app_api.models import Membership
+from app_api.models import Membership, Course
 
 
 class AdminPermission(permissions.BasePermission):
     def has_permission(self, request, view):
-        return request.user.is_authenticated and User.objects.filter(user=request.user,
+        return request.user.is_authenticated and User.objects.filter(id=request.user.id,
                                                                      role='admin').exists()
 
 
 class SelfOrAdminPermission(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         return request.user.is_authenticated and (
-                obj == request.user or User.objects.filter(user=request.user, role='admin').exists())
+                obj == request.user or User.objects.filter(id=request.user.id,
+                                                           role='admin').exists())
 
 
 class TeacherOrAdminPermission(permissions.BasePermission):
     def has_permission(self, request, view):
-        return request.user.is_authenticated and (User.objects.filter(user=request.user,
+        return request.user.is_authenticated and (User.objects.filter(id=request.user.id,
                                                                       role='teacher').exists()
                                                   or
-                                                  User.objects.filter(user=request.user,
+                                                  User.objects.filter(id=request.user.id,
                                                                       role='admin').exists())
 
 
 class StudentOrAdminPermission(permissions.BasePermission):
     def has_permission(self, request, view):
-        return request.user.is_authenticated and (User.objects.filter(user=request.user,
+        return request.user.is_authenticated and (User.objects.filter(id=request.user.id,
                                                                       role='student').exists()
                                                   or
-                                                  User.objects.filter(user=request.user,
+                                                  User.objects.filter(id=request.user.id,
                                                                       role='admin').exists())
 
 
@@ -48,9 +49,25 @@ class UnauthenticatedPermission(permissions.BasePermission):
 #         user = request.user
 #         return Membership.objects.filter(user=user, course=obj).exists()
 
+class IsTeacherOfCourseOrAdmin(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        user = request.user
+        return (User.objects.filter(id=user.id, role='admin').exists()
+                or
+                Membership.objects.filter(user=user, course=obj, role='teacher').exists())
+
+
 class IsPartOfCourseOrAdmin(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         user = request.user
-        return (Membership.objects.filter(user=user, course=obj).exists()
+        return (obj.members.filter(id=user.id).exists()
                 or
-                User.objects.filter(user=user, role='admin').exists())
+                User.objects.filter(id=user.id, role='admin').exists())
+
+
+class IsTeacherOfCourseOrAdminForMemberShip(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        user = request.user
+        return (User.objects.filter(id=user.id, role='admin').exists()
+                or
+                Membership.objects.filter(user=user, course=obj.course, role='teacher').exists())

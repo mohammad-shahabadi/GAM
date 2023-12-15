@@ -17,7 +17,7 @@ class Command(BaseCommand):
         if not User.objects.filter(email=email).exists():
 
             hashed_password = make_password(password)
-            user = User(email=email, password=hashed_password, username=email, role='admin')
+            user = User(email=email, password=hashed_password, username=email, role='admin', is_superuser=True)
             user.save()
 
             self.stdout.write(self.style.SUCCESS('Default user created successfully'))

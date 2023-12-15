@@ -7,10 +7,12 @@ from rest_framework.exceptions import AuthenticationFailed
 
 class JWTAuthentication(BaseAuthentication):
     def authenticate(self, request):
-        token = request.headers.get('Authorization')
+        bearer_token = request.headers.get('Authorization')
 
-        if not token:
+        if not bearer_token:
             return None
+
+        token = bearer_token.split(' ')[1]
 
         try:
             payload = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'])

@@ -7,7 +7,7 @@ class User(AbstractUser):
     student_number = models.CharField(max_length=10, blank=True, null=True)
     is_deleted = models.BooleanField(default=False)
     git_reference_id = models.IntegerField(blank=True, null=True)
-    role = models.CharField(max_length=10, blank=True, null=True)
+    role = models.CharField(max_length=10)
 
     def __str__(self):
         return self.username
