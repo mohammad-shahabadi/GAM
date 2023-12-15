@@ -1,6 +1,6 @@
 import axios from "axios";
-import { useState } from "react";
-import { toast } from "react-toastify";
+import {useState} from "react";
+import {toast} from "react-toastify";
 import Cookies from "js-cookie";
 
 export function useRequest(url, method, token, loaderInitState) {
@@ -11,7 +11,7 @@ export function useRequest(url, method, token, loaderInitState) {
         setLoading(true);
         let finalUrl = url;
         if (params) {
-            for (let param of params)  {
+            for (let param of params) {
                 finalUrl = finalUrl.replace(":" + param.name, param.value);
             }
         }
@@ -24,10 +24,10 @@ export function useRequest(url, method, token, loaderInitState) {
             cancelToken: new CancelToken(function executor(c) {
                 setCancel(() => c);
             }),
-            headers: {
+            headers: Cookies.get("gam-token") ? {
                 Authorization:
-                    Cookies.get("gam-token") || token || undefined,
-            },
+                    "Bearer " + Cookies.get("gam-token") || token || undefined,
+            } : {},
         })
             .then((r) => {
 
