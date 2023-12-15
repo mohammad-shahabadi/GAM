@@ -35,8 +35,8 @@ export default function ClassesTable({ t }) {
 
     },
     {
-        field: "edit",
-        headerName: t('edit'),
+        field: "[slug]",
+        headerName: t('[slug]'),
         sortable: false,
         renderCell: (params) => {
             return <div ><EditIcon/></div>;

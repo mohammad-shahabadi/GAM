@@ -17,6 +17,10 @@
     "login": "Login"
   },
   "Users": {
+    "header": "Users List",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "stdNumber": "Student Number",
     "email": "Email",
     "role": "Role",
     "edit": "Edit",
@@ -28,7 +32,8 @@
     "admin": "Admin",
     "teacher": "Teacher",
     "student": "Student",
-    "addUser": "Add A New User"
+    "addUser": "Add A New User",
+    "password": "Password"
   },
   "Classes": {
     "name": "Name",
@@ -40,5 +45,13 @@
     "deleteCancel": "Cancel",
     "submit": "Submit",
     "addClass": "Add A New Class"
+  },
+  "Dashboard": {
+    "welcome": "Welcome",
+    "role": "Role",
+    "admin": "Admin",
+    "teacher": "Teacher",
+    "student": "Student",
+    "logout": "Logout"
   }
 }

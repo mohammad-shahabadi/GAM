@@ -17,6 +17,10 @@
     "login": "Login"
   },
   "Users": {
+    "header": "لیست کاربران",
+    "firstName": "نام",
+    "lastName": "نام خانوادگی",
+    "stdNumber": "شماره دانشجویی",
     "email": "ایمیل",
     "role": "سمت",
     "edit": "ویرایش",
@@ -28,7 +32,8 @@
     "admin": "ادمین",
     "teacher": "استاد",
     "student": "دانشجو",
-    "addUser": "اضافه کردن کاربر جدید"
+    "addUser": "اضافه کردن کاربر جدید",
+    "password": "کلمه عبور"
   },
   "Classes": {
     "name": "اسم",
@@ -40,5 +45,13 @@
     "deleteText":"آیا از حذف این کلاس مطمئن هستید؟",
     "submit": "تایید",
     "addClass": "اضافه کردن کلاس جدید"
+  },
+  "Dashboard": {
+    "welcome": "خوش آمدید",
+    "role": "سمت",
+    "admin": "ادمین",
+    "teacher": "استاد",
+    "student": "دانشجو",
+    "logout": "خروج"
   }
 }

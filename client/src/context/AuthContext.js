@@ -5,9 +5,14 @@ import Cookies from 'js-cookie';
 import {useRouter} from "@/navigation";
 import {useRequest} from "@/hooks/useRequest";
 import {LOGIN} from "@/apiList";
+import {createTheme, ThemeProvider} from "@mui/material";
 
 
-
+const theme = createTheme({
+    typography: {
+        fontFamily: 'inherit',
+    }
+})
 export const AuthContext = React.createContext({});
 
 const isValidToken = () => {
@@ -16,15 +21,15 @@ const isValidToken = () => {
 };
 const isValidAdmin = () => {
     const token = Cookies.get('gam-authorities');
-    return !!(token && token.indexOf('admin') >-1);
+    return !!(token && token.indexOf('admin') > -1);
 };
 const isValidTeacher = () => {
     const token = Cookies.get('gam-authorities');
-    return !!(token && token.indexOf('teacher') >-1);
+    return !!(token && token.indexOf('teacher') > -1);
 };
 const isValidUser = () => {
     const token = Cookies.get('gam-authorities');
-    return !!(token && token.indexOf('student') >-1);
+    return !!(token && token.indexOf('student') > -1);
 };
 
 const AuthProvider = ({children}) => {
@@ -37,28 +42,27 @@ const AuthProvider = ({children}) => {
     const [loading, setLoading] = React.useState(false);
     const router = useRouter();
 
-    useEffect(()=>{
+    useEffect(() => {
         makeAdmin(isValidAdmin())
         makeTeacher(isValidTeacher())
         makeUser(isValidUser())
-    },[token])
+    }, [token])
     const [loginReq, loginLoader] = useRequest(LOGIN, "POST");
 
     async function authenticate({stdNum, password}) {
-        // setLoading(true)
-        // loginReq({email:stdNum,password},null).then((res)=>{
-        //     setToken(res.token)
-        //     Cookies.set('gam-token', res.token, {expires: 1})
-        //     Cookies.set('gam-authorities', res.roles, {expires: 1})
-        //     console.log(res)
-        // }).finally(()=>{
-        //     setLoading(false)
-        // })
-        setToken(1)
-        Cookies.set('gam-token', 1, {expires: 1})
-        Cookies.set('gam-authorities', 'admin', {expires: 1})
+        setLoading(true)
+        loginReq({email: stdNum, password}, null).then((res) => {
+            setToken(res.token)
+            Cookies.set('gam-token', res.token, {expires: 1})
+            Cookies.set('gam-authorities', res.role, {expires: 1})
+            console.log(res)
+        }).finally(() => {
+            setLoading(false)
+        })
+        // setToken(1)
+        // Cookies.set('gam-token', 1, {expires: 1})
+        // Cookies.set('gam-authorities', 'admin', {expires: 1})
     }
-
 
 
     function signOut() {
@@ -67,6 +71,7 @@ const AuthProvider = ({children}) => {
         makeAuthenticated(false);
         setToken(null);
         setProfile(null);
+        router.push('/')
     }
 
     const value = {
@@ -81,9 +86,13 @@ const AuthProvider = ({children}) => {
         loading
     };
     return (
-            <AuthContext.Provider value={value}>
+        <AuthContext.Provider value={value}>
+            <ThemeProvider theme={theme}>
+
                 {children}
-            </AuthContext.Provider>
+            </ThemeProvider>
+
+        </AuthContext.Provider>
     );
 };
 

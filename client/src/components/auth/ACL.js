@@ -4,6 +4,7 @@ import React, {useContext, useEffect, useState} from 'react';
 import {AuthContext} from '@/context/AuthContext';
 import {usePathname, useRouter} from "@/navigation";
 import {BeatLoader} from "react-spinners";
+import Cookies from "js-cookie";
 
 
 const ACL = ({
@@ -16,7 +17,8 @@ const ACL = ({
 
     useEffect(() => {
         let tempAuthorized = true
-        console.log(pathname, "isAdmin: ", isAdmin, "isUser: ", isUser)
+        console.log(pathname, "isAdmin: ", isAdmin, "isUser: ", isUser,"isTeacher: ", isTeacher)
+        console.log(Cookies.get('gam-authorities'))
         if (pathname.startsWith('/admin') && !isAdmin) {
             tempAuthorized = false
             router.push('/')

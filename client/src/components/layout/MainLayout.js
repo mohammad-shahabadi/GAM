@@ -14,17 +14,19 @@ import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import {useState} from "react";
 import {useTranslations} from "next-intl";
-import LanguageIcon from '@mui/icons-material/Language';
+import TranslateIcon from '@mui/icons-material/Translate';
 import {Menu, MenuItem} from "@mui/material";
 import {usePathname} from "@/navigation";
 import {Link} from "@/navigation";
-
+import useWindowSize from "@/hooks/useWindowSize";
+import img1 from "../../assets/images/no-organization_prev_ui.png"
+import Image from "next/image";
 const drawerWidth = 200;
 
 export default function MainLayout({children, locale}) {
     const [mobileOpen, setMobileOpen] = useState(false);
     const [anchorElLanguage, setAnchorElLanguage] = useState(null)
-
+    const mode = useWindowSize()
     const t = useTranslations('Layout');
     const handleDrawerToggle = () => {
         setMobileOpen(!mobileOpen);
@@ -38,70 +40,106 @@ export default function MainLayout({children, locale}) {
     const isLanguageMenuOpen = Boolean(anchorElLanguage)
     const pathname = usePathname()
     const drawer = (
-        <div>
-            <Toolbar>
-                <IconButton
-                    color="inherit"
-                    aria-label="open drawer"
-                    edge="start"
-                    onClick={handleDrawerToggle}
-                    sx={{mr: 2, display: {sm: 'none'}}}
-                >
-                    <MenuIcon/>
-                </IconButton>
-                <Typography variant="h6" noWrap component="div">
-                    {t('title')}
-                </Typography>
-                <IconButton
-                    size="large"
-                    aria-label="Select a language"
-                    aria-haspopup="true"
-                    onClick={handleLanguageMenuOpen}
-                    color="#ffffff">
-                    <LanguageIcon/>
-                </IconButton>
-            </Toolbar>
-            <Divider/>
-            <List>
-                <ListItem disablePadding>
-                    <Link style={pathname === "/admin"? {backgroundColor:"lightskyblue"}:{}} className={"w-full"} href={"/admin"}>
-                        <ListItemButton>
-                            <ListItemText sx={{textAlign: "start"}} primary={t('dashboard')}/>
-                        </ListItemButton>
-                    </Link>
-
-                </ListItem>
-                {['users', 'classes'].map((text, index) => (
-                    <ListItem key={index} disablePadding>
-                        <Link style={pathname === "/admin/"+text? {backgroundColor:"lightskyblue"}:{}} className={"w-full"} href={"/admin/"+text}>
+        <div className={"bg-[var(--background)] min-h-screen !font-bold flex flex-col justify-between"}>
+            <div>
+                <Toolbar>
+                    <IconButton
+                        color="inherit"
+                        aria-label="open drawer"
+                        edge="start"
+                        onClick={handleDrawerToggle}
+                        sx={{me: 2, display: {sm: 'none'}}}
+                    >
+                        <MenuIcon/>
+                    </IconButton>
+                    <Typography variant="h5" noWrap component="div">
+                        {t('title')}
+                    </Typography>
+                    <IconButton
+                        size="large"
+                        aria-label="Select a language"
+                        aria-haspopup="true"
+                        onClick={handleLanguageMenuOpen}
+                        color="#ffffff">
+                        <TranslateIcon/>
+                    </IconButton>
+                </Toolbar>
+                <Divider/>
+                <List>
+                    <ListItem disablePadding>
+                        <Link style={pathname === "/admin"? {backgroundColor:"#ff5733",color:"white"}:{}} className={"w-full"} href={"/admin"}>
                             <ListItemButton>
-                                <ListItemText sx={{textAlign: "start"}} primary={t(text)}/>
+                                <ListItemText sx={{textAlign: "start"}} primary={t('dashboard')}/>
                             </ListItemButton>
                         </Link>
 
                     </ListItem>
-                ))}
-            </List>
-            <Divider/>
-            <List>
-                {['settings'].map((text, index) => (
-                    <ListItem key={index} disablePadding>
-                        <Link style={pathname === "/admin/"+text? {backgroundColor:"lightskyblue"}:{}} className={"w-full"} href={"/admin/"+text}>
-                            <ListItemButton>
-                                <ListItemText sx={{textAlign: "start"}} primary={t(text)}/>
-                            </ListItemButton>
-                        </Link>
-                    </ListItem>
-                ))}
-            </List>
+                    {['users', 'classes'].map((text, index) => (
+                        <ListItem key={index} disablePadding>
+                            <Link style={pathname.startsWith("/admin/"+text)? {backgroundColor:"#ff5733",color:"white"}:{}} className={"w-full"} href={"/admin/"+text}>
+                                <ListItemButton>
+                                    <ListItemText sx={{textAlign: "start"}} primary={t(text)}/>
+                                </ListItemButton>
+                            </Link>
+
+                        </ListItem>
+                    ))}
+                </List>
+                <Divider/>
+                <List>
+                    {['settings'].map((text, index) => (
+                        <ListItem key={index} disablePadding>
+                            <Link style={pathname === "/admin/"+text? {backgroundColor:"#ff5733",color:"white"}:{}} className={"w-full"} href={"/admin/"+text}>
+                                <ListItemButton>
+                                    <ListItemText sx={{textAlign: "start"}} primary={t(text)}/>
+                                </ListItemButton>
+                            </Link>
+                        </ListItem>
+                    ))}
+                </List>
+            </div>
+            <div className={"w-full flex items-center justify-center mb-4"}>
+                <Image width={150} height={150} src={img1.src} alt={"img1"}/>
+            </div>
+
         </div>
     );
 
 
     return (
-        <Box sx={{display: 'flex'}}>
+        <Box  sx={mode ===1?{backgroundColor:"inherit"}:{backgroundColor:"inherit",display: 'flex'}}>
             <CssBaseline/>
-
+            { mode ===1 && <AppBar
+                className={"!bg-[var(--background)] !text-black"}
+                position="fixed"
+                sx={locale.startsWith('fa') ? {mr: {sm: `${drawerWidth}px`}} : {
+                    ml: {sm: `${drawerWidth}px`},
+                    right: "auto"
+                }}
+            >
+                <Toolbar>
+                    <IconButton
+                        color="inherit"
+                        aria-label="open drawer"
+                        edge="start"
+                        onClick={handleDrawerToggle}
+                        sx={{mx: 2, display: {sm: 'none'}}}
+                    >
+                        <MenuIcon/>
+                    </IconButton>
+                    <Typography className={"mx-2"} variant="h5" noWrap component="div">
+                        {t('title')}
+                    </Typography>
+                    <IconButton
+                        size="large"
+                        aria-label="Select a language"
+                        aria-haspopup="true"
+                        onClick={handleLanguageMenuOpen}
+                        color="#ffffff">
+                        <TranslateIcon/>
+                    </IconButton>
+                </Toolbar>
+            </AppBar>}
             <Box
                 component="nav"
                 sx={{width: {sm: drawerWidth}, flexShrink: {sm: 0}}}
@@ -135,7 +173,7 @@ export default function MainLayout({children, locale}) {
             </Box>
             <Box
                 component="main"
-                sx={{flexGrow: 1, p: 3, width: {sm: `calc(100% - ${drawerWidth}px)`}}}
+                sx={{flexGrow: 1, p: 3, width: {sm: `calc(100% - ${drawerWidth}px)`,marginTop:mode === 1 ?"54px":"0"}}}
             >
                 {children}
             </Box>
