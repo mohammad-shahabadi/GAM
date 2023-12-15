@@ -3,7 +3,7 @@ import {locales} from './navigation';
 
 export default createMiddleware({
     locales,
-    defaultLocale: 'fa'
+    defaultLocale: 'en'
 });
 
 export const config = {

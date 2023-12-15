@@ -10,6 +10,6 @@ export default function Page() {
     const t = useTranslations('Users')
 
     return (
-        <AddForm t={t}/>
+        <AddForm slug={null} t={t}/>
     );
 }

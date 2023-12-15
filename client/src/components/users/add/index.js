@@ -10,6 +10,7 @@ import {LOGIN, SIGNUP} from "@/apiList";
 import Typography from "@mui/material/Typography";
 import {router} from "next/client";
 import {useRouter} from "@/navigation";
+import {Paper} from "@mui/material";
 
 const AddForm = ({t}) => {
     const router = useRouter()
@@ -41,16 +42,23 @@ const AddForm = ({t}) => {
                 marginTop: 2,
             }}
         >
-            <Typography className={"font-bold  text-center text-xl md:text-3xl"}>{t('addUser')}</Typography>
-            <TextField
-                label="Email"
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                margin="normal"
-                sx={{ margin: 1 }}
-            />
+            <div className={"font-bold  text-center text-xl md:text-3xl"}>{t('addUser')}</div>
+            <Paper
+                elevation={0}
+                className="shadow"
+                sx={{ display: "flex", flexDirection: "column", gap: "1rem", p: 2 }}
+            >
+                <TextField
+                    label="Email"
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    margin="normal"
+                    sx={{ margin: 1 }}
+                />
+            </Paper>
+
             <TextField
                 label="Password"
                 type="password"

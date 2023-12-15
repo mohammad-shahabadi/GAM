@@ -17,6 +17,10 @@
     "login": "Login"
   },
   "Users": {
+    "header": "Users List",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "stdNumber": "Student Number",
     "email": "Email",
     "role": "Role",
     "edit": "Edit",

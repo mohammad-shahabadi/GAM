@@ -8,9 +8,11 @@ export default function useWindowSize() {
     useEffect(() => {
         function handleResize() {
             let mode = 2
+
             if(window.innerWidth < 600){
                 mode = 1
             }
+
             setMode(mode)
         }
 

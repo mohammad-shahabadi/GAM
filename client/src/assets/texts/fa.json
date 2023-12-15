@@ -17,6 +17,10 @@
     "login": "Login"
   },
   "Users": {
+    "header": "لیست کاربران",
+    "firstName": "نام",
+    "lastName": "نام خانوادگی",
+    "stdNumber": "شماره دانشجویی",
     "email": "ایمیل",
     "role": "سمت",
     "edit": "ویرایش",

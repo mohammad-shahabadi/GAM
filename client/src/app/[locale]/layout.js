@@ -31,8 +31,8 @@ export default function LocaleLayout({children, params: {locale}}) {
 
 
     return (<html suppressHydrationWarning dir={locale?.startsWith('fa') ? 'rtl' : 'ltr'} lang={locale}
-                  className={locale?.startsWith('fa') ? faFont.className : enFont.className}>
-    <body>
+                  className={(locale?.startsWith('fa') ? faFont.className : enFont.className) + " bg-[#fafafa]"}>
+    <body className={"bg-inherit"}>
 
         <NextIntlClientProvider locale={locale} messages={messages}>
             <AuthProvider>

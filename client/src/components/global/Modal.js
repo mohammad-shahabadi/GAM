@@ -27,7 +27,7 @@ export default function CustomModal({open, onConfirm, onCancel, headerText, body
                 aria-describedby="modal-modal-description"
             >
                 <Box sx={style}>
-                    {headerText && <Typography className={"text-center"} id="modal-modal-title" variant="h6" component="h2">
+                    {headerText && <Typography className={"text-start font-bold"} id="modal-modal-title" variant="h6" component="h2">
                         {headerText}
                     </Typography>}
                     {bodyText && <Typography className={"text-center"} id="modal-modal-description" sx={{mt: 2}}>
