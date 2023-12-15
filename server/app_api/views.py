@@ -1,16 +1,19 @@
 from django.db import transaction
 from gitlab.exceptions import GitlabCreateError, GitlabUpdateError, GitlabDeleteError
-from rest_framework import generics
+from rest_framework import generics, viewsets
 from rest_framework import status
 from rest_framework.response import Response
 
 from app_auth.permissions import TeacherOrAdminPermission, AllAuthenticatedPermission, IsPartOfCourseOrAdmin, \
-    AdminPermission, IsTeacherOfCourseOrAdmin, IsTeacherOfCourseOrAdminForMemberShip
+    AdminPermission, IsTeacherOfCourseOrAdmin, IsTeacherOfCourseOrAdminForMemberShip, IsPartOfCourseOrAdminForProblem, \
+    IsPartOfCourseOrAdminForProblemSet, IsTeacherOrTaOfCourseOrAdminForProblemSet, \
+    IsTeacherOrTaOfCourseOrAdminForProblem
 from app_auth.utils.mappers import map_user_role_to_group_access
 from gitlab_wrapper.gitlab_dto import GroupDTO
 from gitlab_wrapper.gitlab_wrapper import GitLabWrapper
-from .models import Course, Membership
-from .serializers import CourseSerializer, MembershipSerializer, MembershipCreationSerializer, CourseDetailSerializer
+from .models import Course, Membership, ProblemSet, Problem
+from .serializers import CourseSerializer, MembershipSerializer, MembershipCreationSerializer, CourseDetailSerializer, \
+    ProblemSetSerializer, ProblemSerializer
 
 
 class CourseCreateView(generics.CreateAPIView):
@@ -181,3 +184,78 @@ class MembershipListForUser(generics.ListAPIView):
     def get_queryset(self):
         user = self.request.user
         return Membership.objects.filter(user=user).select_related('course')
+
+
+class ProblemSetCreateView(generics.CreateAPIView):
+    queryset = ProblemSet.objects.all()
+    serializer_class = ProblemSetSerializer
+    permission_classes = [IsTeacherOrTaOfCourseOrAdminForProblemSet]
+
+    def perform_create(self, serializer):
+        with transaction.atomic():
+            serializer.save()
+
+
+class ProblemSetListView(generics.ListAPIView):
+    queryset = ProblemSet.objects.all()
+    serializer_class = ProblemSetSerializer
+    permission_classes = [IsPartOfCourseOrAdminForProblemSet]
+
+    def get_queryset(self):
+        course_id = self.kwargs['course_id']
+        return ProblemSet.objects.filter(course=course_id)
+
+
+class ProblemSetDeleteView(generics.DestroyAPIView):
+    queryset = ProblemSet.objects.all()
+    serializer_class = ProblemSetSerializer
+    permission_classes = [IsTeacherOrTaOfCourseOrAdminForProblemSet]
+
+
+class ProblemSetRetrieveView(generics.RetrieveAPIView):
+    queryset = ProblemSet.objects.all()
+    serializer_class = ProblemSetSerializer
+    permission_classes = [IsPartOfCourseOrAdminForProblemSet]
+
+
+class ProblemSetUpdateView(generics.UpdateAPIView):
+    queryset = ProblemSet.objects.all()
+    serializer_class = ProblemSetSerializer
+    permission_classes = [IsTeacherOrTaOfCourseOrAdminForProblemSet]
+
+
+class ProblemCreateView(generics.CreateAPIView):
+    queryset = Problem.objects.all()
+    serializer_class = ProblemSerializer
+    permission_classes = [IsTeacherOrTaOfCourseOrAdminForProblem]
+
+    def perform_create(self, serializer):
+        with transaction.atomic():
+            serializer.save()
+
+
+class ProblemListView(generics.ListAPIView):
+    serializer_class = ProblemSerializer
+    permission_classes = [IsPartOfCourseOrAdminForProblem]
+
+    def get_queryset(self):
+        problem_set_id = self.kwargs['problem_set_id']
+        return Problem.objects.filter(problem_set=problem_set_id)
+
+
+class ProblemDeleteView(generics.DestroyAPIView):
+    queryset = Problem.objects.all()
+    serializer_class = ProblemSerializer
+    permission_classes = [IsTeacherOrTaOfCourseOrAdminForProblem]
+
+
+class ProblemRetrieveView(generics.RetrieveAPIView):
+    queryset = Problem.objects.all()
+    serializer_class = ProblemSerializer
+    permission_classes = [IsPartOfCourseOrAdminForProblem]
+
+
+class ProblemUpdateView(generics.UpdateAPIView):
+    queryset = Problem.objects.all()
+    serializer_class = ProblemSerializer
+    permission_classes = [IsTeacherOrTaOfCourseOrAdminForProblem]
