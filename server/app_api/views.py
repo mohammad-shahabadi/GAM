@@ -5,7 +5,7 @@ from rest_framework import status
 from rest_framework.response import Response
 
 from app_auth.permissions import TeacherOrAdminPermission, AllAuthenticatedPermission, IsPartOfCourseOrAdmin, \
-    AdminPermission, IsTeacherOfCourseOrAdmin
+    AdminPermission, IsTeacherOfCourseOrAdmin, IsTeacherOfCourseOrAdminForMemberShip
 from app_auth.utils.mappers import map_user_role_to_group_access
 from gitlab_wrapper.gitlab_dto import GroupDTO
 from gitlab_wrapper.gitlab_wrapper import GitLabWrapper
@@ -98,7 +98,7 @@ class CourseDeleteView(generics.DestroyAPIView):
 
 class MembershipCreateView(generics.CreateAPIView):
     serializer_class = MembershipCreationSerializer
-    permission_classes = [IsTeacherOfCourseOrAdmin]
+    permission_classes = [IsTeacherOfCourseOrAdminForMemberShip]
 
     def create(self, request, *args, **kwargs):
         try:
@@ -148,7 +148,7 @@ class MembershipCreateView(generics.CreateAPIView):
 class MembershipDeleteView(generics.DestroyAPIView):
     queryset = Membership.objects.all()
     serializer_class = MembershipSerializer
-    permission_classes = [IsTeacherOfCourseOrAdmin]
+    permission_classes = [IsTeacherOfCourseOrAdminForMemberShip]
 
     def destroy(self, request, *args, **kwargs):
         try:
@@ -176,7 +176,7 @@ class MembershipDeleteView(generics.DestroyAPIView):
 
 class MembershipListForUser(generics.ListAPIView):
     serializer_class = MembershipSerializer
-    permission_classes = [AllAuthenticatedPermission, IsPartOfCourseOrAdmin]
+    permission_classes = [AllAuthenticatedPermission]
 
     def get_queryset(self):
         user = self.request.user
