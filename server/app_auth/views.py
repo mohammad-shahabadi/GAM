@@ -73,7 +73,7 @@ def login(request):
     password = request.data.get('password')
 
     try:
-        user = User.objects.get(email=email)
+        user = User.objects.get(email=email, is_deleted=False)
     except User.DoesNotExist:
         return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
