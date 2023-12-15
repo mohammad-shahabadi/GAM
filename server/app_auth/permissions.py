@@ -1,6 +1,6 @@
 from app_auth.models import User
 from rest_framework import permissions
-from app_api.models import Membership
+from app_api.models import Membership, Course
 
 
 class AdminPermission(permissions.BasePermission):
@@ -54,14 +54,20 @@ class IsTeacherOfCourseOrAdmin(permissions.BasePermission):
         user = request.user
         return (User.objects.filter(id=user.id, role='admin').exists()
                 or
-                Membership.objects.filter(id=user.id, course=obj, role='teacher').exists())
-
-
+                Membership.objects.filter(user=user, course=obj, role='teacher').exists())
 
 
 class IsPartOfCourseOrAdmin(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         user = request.user
-        return (Membership.objects.filter(id=user.id, course=obj).exists()
+        return (obj.members.filter(id=user.id).exists()
                 or
                 User.objects.filter(id=user.id, role='admin').exists())
+
+
+class IsTeacherOfCourseOrAdminForMemberShip(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        user = request.user
+        return (User.objects.filter(id=user.id, role='admin').exists()
+                or
+                Membership.objects.filter(user=user, course=obj.course, role='teacher').exists())
