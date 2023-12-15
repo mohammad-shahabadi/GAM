@@ -41,7 +41,7 @@ export default function Login({texts,authenticate,loading}) {
         authenticate(loginForm)
     };
     return(
-        <div className={"h-screen flex justify-center items-center bg-[var(--background)] text-white"}>
+        <div className={"h-screen flex justify-center items-center bg-[var(--background)] "}>
             <div className={"p-4 w-full  md:w-1/2  "}>
                 <div className={"font-bold text-center text-lg md:text-2xl text-[var(--textMain)]"}>
                     {texts('title')}

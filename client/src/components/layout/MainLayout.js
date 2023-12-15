@@ -39,7 +39,28 @@ export default function MainLayout({children, locale}) {
     const pathname = usePathname()
     const drawer = (
         <div>
-            <Toolbar/>
+            <Toolbar>
+                <IconButton
+                    color="inherit"
+                    aria-label="open drawer"
+                    edge="start"
+                    onClick={handleDrawerToggle}
+                    sx={{mr: 2, display: {sm: 'none'}}}
+                >
+                    <MenuIcon/>
+                </IconButton>
+                <Typography variant="h6" noWrap component="div">
+                    {t('title')}
+                </Typography>
+                <IconButton
+                    size="large"
+                    aria-label="Select a language"
+                    aria-haspopup="true"
+                    onClick={handleLanguageMenuOpen}
+                    color="#ffffff">
+                    <LanguageIcon/>
+                </IconButton>
+            </Toolbar>
             <Divider/>
             <List>
                 <ListItem disablePadding>
@@ -80,36 +101,7 @@ export default function MainLayout({children, locale}) {
     return (
         <Box sx={{display: 'flex'}}>
             <CssBaseline/>
-            <AppBar
-                position="fixed"
-                sx={locale.startsWith('fa') ? {mr: {sm: `${drawerWidth}px`}} : {
-                    ml: {sm: `${drawerWidth}px`},
-                    right: "auto"
-                }}
-            >
-                <Toolbar>
-                    <IconButton
-                        color="inherit"
-                        aria-label="open drawer"
-                        edge="start"
-                        onClick={handleDrawerToggle}
-                        sx={{mr: 2, display: {sm: 'none'}}}
-                    >
-                        <MenuIcon/>
-                    </IconButton>
-                    <Typography variant="h6" noWrap component="div">
-                        {t('title')}
-                    </Typography>
-                    <IconButton
-                        size="large"
-                        aria-label="Select a language"
-                        aria-haspopup="true"
-                        onClick={handleLanguageMenuOpen}
-                        color="#ffffff">
-                        <LanguageIcon/>
-                    </IconButton>
-                </Toolbar>
-            </AppBar>
+
             <Box
                 component="nav"
                 sx={{width: {sm: drawerWidth}, flexShrink: {sm: 0}}}
@@ -145,7 +137,6 @@ export default function MainLayout({children, locale}) {
                 component="main"
                 sx={{flexGrow: 1, p: 3, width: {sm: `calc(100% - ${drawerWidth}px)`}}}
             >
-                <Toolbar/>
                 {children}
             </Box>
             <Menu
