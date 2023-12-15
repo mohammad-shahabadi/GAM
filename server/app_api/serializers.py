@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Course, Membership
+from .models import Course, Membership, ProblemSet, Problem
 
 
 class CourseSerializer(serializers.ModelSerializer):
@@ -43,3 +43,15 @@ class CourseDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Course
         fields = ['id', 'title', 'description', 'memberships', 'password', 'professor']
+
+
+class ProblemSetSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProblemSet
+        fields = '__all__'
+
+
+class ProblemSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Problem
+        fields = '__all__'
