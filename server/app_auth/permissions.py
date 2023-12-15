@@ -9,11 +9,9 @@ class AdminPermission(permissions.BasePermission):
                                                                      role='admin').exists()
 
 
-class SelfOrAdminPermission(permissions.BasePermission):
+class SelfPermission(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
-        return request.user.is_authenticated and (
-                obj == request.user or User.objects.filter(id=request.user.id,
-                                                           role='admin').exists())
+        return request.user.is_authenticated
 
 
 class TeacherOrAdminPermission(permissions.BasePermission):

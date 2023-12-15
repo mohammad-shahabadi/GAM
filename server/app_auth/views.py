@@ -14,7 +14,7 @@ from rest_framework.response import Response
 from gitlab_wrapper.gitlab_dto import UserDTO
 from gitlab_wrapper.gitlab_wrapper import GitLabWrapper
 from .models import User
-from .permissions import AdminPermission, SelfOrAdminPermission, UnauthenticatedPermission
+from .permissions import AdminPermission, UnauthenticatedPermission, SelfPermission
 from .serializers import UserSerializer, UserSoftDeleteSerializer
 
 
@@ -92,7 +92,15 @@ def login(request):
 class GetUserByIDView(generics.RetrieveAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [SelfOrAdminPermission]
+    permission_classes = [AdminPermission]
+
+
+class GetUserSelfInfoView(generics.RetrieveAPIView):
+    serializer_class = UserSerializer
+    permission_classes = [SelfPermission]
+
+    def get_object(self):
+        return self.request.user
 
 
 class GetAllUsersView(generics.ListAPIView):
