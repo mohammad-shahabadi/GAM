@@ -61,7 +61,7 @@ REST_FRAMEWORK = {
         'app_auth.authentication.JWTAuthentication'
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 50
+    'PAGE_SIZE': 1000
 }
 
 ROOT_URLCONF = 'gam.urls'
