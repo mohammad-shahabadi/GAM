@@ -9,7 +9,16 @@ from .views import (
     MembershipCreateView,
     MembershipDeleteView,
     MembershipListForUser,
-
+    ProblemSetCreateView,
+    ProblemSetRetrieveView,
+    ProblemSetUpdateView,
+    ProblemSetDeleteView,
+    ProblemSetListView,
+    ProblemCreateView,
+    ProblemRetrieveView,
+    ProblemUpdateView,
+    ProblemDeleteView,
+    ProblemListView,
 )
 
 urlpatterns = [
@@ -21,4 +30,15 @@ urlpatterns = [
     path('memberships/create', MembershipCreateView.as_view(), name='membership-create'),
     path('memberships/<int:pk>', MembershipDeleteView.as_view(), name='membership_delete'),
     path('memberships/list', MembershipListForUser.as_view(), name='membership-list'),
+    path('problemsets/create', ProblemSetCreateView.as_view(), name='problemset-create'),
+    path('problem_sets', ProblemSetCreateView.as_view(), name='problem-set-create'),
+    path('problem_sets/<int:pk>', ProblemSetRetrieveView.as_view(), name='problem-set-retrieve'),
+    path('problem_sets/<int:pk>/update', ProblemSetUpdateView.as_view(), name='problem-set-update'),
+    path('problem_sets/<int:pk>/delete', ProblemSetDeleteView.as_view(), name='problem-set-delete'),
+    path('courses/<int:course_id>/problem_sets', ProblemSetListView.as_view(), name='course-problem-sets'),
+    path('problems/create', ProblemCreateView.as_view(), name='problem-create'),
+    path('problems/<int:pk>', ProblemRetrieveView.as_view(), name='problem-retrieve'),
+    path('problems/<int:pk>/update', ProblemUpdateView.as_view(), name='problem-update'),
+    path('problems/<int:pk>/delete', ProblemDeleteView.as_view(), name='problem-delete'),
+    path('problem_sets/<int:problem_set_id>/problems', ProblemListView.as_view(), name='problem-set-problems'),
 ]
