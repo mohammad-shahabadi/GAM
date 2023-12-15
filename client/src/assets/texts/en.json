@@ -45,5 +45,13 @@
     "deleteCancel": "Cancel",
     "submit": "Submit",
     "addClass": "Add A New Class"
+  },
+  "Dashboard": {
+    "welcome": "Welcome",
+    "role": "Role",
+    "admin": "Admin",
+    "teacher": "Teacher",
+    "student": "Student",
+    "logout": "Logout"
   }
 }

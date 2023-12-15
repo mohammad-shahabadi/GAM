@@ -2,29 +2,43 @@
 import * as React from "react";
 import {Suspense, useEffect, useState} from "react";
 import {Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow} from "@mui/material";
-import {Link} from "@/navigation";
+import {Link, usePathname, useRouter} from "@/navigation";
 import CustomModal from "@/components/global/Modal";
 import {useRequest} from "@/hooks/useRequest";
-import {GET_ALL_USERS} from "@/apiList";
+import {DELETE_USER, GET_ALL_USERS, UPDATE_USER} from "@/apiList";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import useWindowSize from "@/hooks/useWindowSize";
+import {toast} from "react-toastify";
 export default function UsersTable({t}) {
     const [showDeleteModal, setShowDeleteModal] = useState(false)
     const [selectedUser, setSelectedUser] = useState(null)
     const [users, setUsers] = useState([])
     const [getUsersReq, getUsersLoader] = useRequest(GET_ALL_USERS, "GET");
-    useEffect(() => {
+    const getUsers = ()=>{
         getUsersReq().then((res) => {
-            //console.log(res)
             setUsers(res.results)
         })
+    }
+    useEffect(() => {
+        getUsers()
     }, [])
-    const handleDelete = () => {
+    const [deleteUserReq, deleteUserLoader] = useRequest(DELETE_USER, "PUT");
 
+    const handleDelete = () => {
+        deleteUserReq(undefined, [
+            {name: "id", value: selectedUser.id},
+        ]).then((res) => {
+            getUsers()
+            toast.success("User removed successfully")
+
+        }).catch(() => {
+            toast.error("something wrong happened")
+        })
     }
     const mode = useWindowSize()
-
+    const router = useRouter()
+    const pathname = usePathname()
     const cols = mode ===1 ? [ t('lastName'), t('email'), t('role'), t('edit'), t('delete')] : [t('firstName'), t('lastName'), t('email'), t('role'), t('stdNumber'), t('edit'), t('delete')]
 
     return (
@@ -83,7 +97,7 @@ export default function UsersTable({t}) {
                                             </div>
                                         </TableCell>}
                                         <TableCell align={"center"} component="th" scope="row">
-                                            <div className={"text-[#808080] cursor-pointer"}>
+                                            <div onClick={()=>router.push(pathname + "/"+user.id)} className={"text-[#808080] cursor-pointer"}>
                                                 <EditIcon/>
                                             </div>
                                         </TableCell>

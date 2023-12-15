@@ -123,7 +123,7 @@ export default function MainLayout({children, locale}) {
                         aria-label="open drawer"
                         edge="start"
                         onClick={handleDrawerToggle}
-                        sx={{me: 2, display: {sm: 'none'}}}
+                        sx={{mx: 2, display: {sm: 'none'}}}
                     >
                         <MenuIcon/>
                     </IconButton>
