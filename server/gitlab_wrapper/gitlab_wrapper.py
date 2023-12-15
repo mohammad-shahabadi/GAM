@@ -24,7 +24,7 @@ class GitLabWrapper:
                 'can_create_group': False,
             }
         )
-        user_dto = user.get_id()
+        user_dto.id = user.get_id()
         return user_dto
 
     # Username, Name and Email is required to update user (IDK WHY ?)
@@ -41,6 +41,12 @@ class GitLabWrapper:
 
     def delete_user(self, user_dto: UserDTO):
         self._gl.users.delete(id=user_dto.id)
+
+    def activate_user(self, user_dto: UserDTO):
+        self._gl.http_post(f'/users/{user_dto.id}/activate')
+
+    def deactivate_user(self, user_dto: UserDTO):
+        self._gl.http_post(f'/users/{user_dto.id}/deactivate')
 
     '''
         # Group Section 
