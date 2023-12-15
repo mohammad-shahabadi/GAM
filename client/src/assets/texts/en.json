@@ -32,7 +32,8 @@
     "admin": "Admin",
     "teacher": "Teacher",
     "student": "Student",
-    "addUser": "Add A New User"
+    "addUser": "Add A New User",
+    "password": "Password"
   },
   "Classes": {
     "name": "Name",

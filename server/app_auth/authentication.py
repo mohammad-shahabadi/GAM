@@ -11,12 +11,13 @@ class JWTAuthentication(BaseAuthentication):
 
         if not bearer_token:
             return None
-
+        print(bearer_token)
         token = bearer_token.split(' ')[1]
 
         try:
             payload = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'])
             user = User.objects.get(id=payload['user_id'])
+            print(user)
             return user, None
         except jwt.ExpiredSignatureError:
             raise AuthenticationFailed('Token has expired')
