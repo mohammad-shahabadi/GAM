@@ -46,7 +46,8 @@
     "deleteConfirm": "Confirm",
     "deleteCancel": "Cancel",
     "submit": "Submit",
-    "addClass": "Add A New Class"
+    "addClass": "Add A New Class",
+    "goBack": "Go Back"
   },
   "Dashboard": {
     "welcome": "Welcome",

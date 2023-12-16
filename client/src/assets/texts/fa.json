@@ -46,7 +46,8 @@
     "deleteConfirm" :"تایید",
     "deleteText":"آیا از حذف این کلاس مطمئن هستید؟",
     "submit": "تایید",
-    "addClass": "اضافه کردن کلاس جدید"
+    "addClass": "اضافه کردن کلاس جدید",
+    "goBack": "بازگشت"
   },
   "Dashboard": {
     "welcome": "خوش آمدید",
