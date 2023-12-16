@@ -1,73 +1,124 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import TextField from '@mui/material/TextField';
-import MenuItem from '@mui/material/MenuItem';
-import Select from '@mui/material/Select';
-import InputLabel from '@mui/material/InputLabel';
-import FormControl from '@mui/material/FormControl';
 import Button from "@/components/global/Button";
 import {useRequest} from "@/hooks/useRequest";
-import {CREATE_CLASS, SIGNUP} from "@/apiList";
-import {useRouter} from "@/navigation";
+import {CREATE_COURSE, GET_COURSE, UPDATE_COURSE} from "@/apiList";
+import {usePathname, useRouter} from "@/navigation";
+import {Box, Paper} from "@mui/material";
+import {BeatLoader} from "react-spinners";
+import {toast} from "react-toastify";
 
-const AddForm = ({t}) => {
+const AddForm = ({t, slug}) => {
     const router = useRouter()
-
+    const pathname = usePathname()
     const [formData, setFormData] = useState({
-        name: '',
-        numberOfStudents: "0",
+        "title": "", "description": "", "git_path": ""
     });
-    const [addReq, addReqLoader] = useRequest(CREATE_CLASS, "POST");
-
+    const [addClassReq, addClassLoader] = useRequest(CREATE_COURSE, "POST");
+    const [classReq, classLoader] = useRequest(GET_COURSE, "GET");
+    const [updateClassReq, updateClassLoader] = useRequest(UPDATE_COURSE, "PATCH");
     const handleChange = (event) => {
-        setFormData({ ...formData, [event.target.name]: event.target.value });
+        setFormData({
+            ...formData,
+            [event.target.name]: event.target.name === "git_path" ? event.target.value.replace(/[^A-Za-z0-9\s]/g, '') : event.target.value
+        });
     };
-
+    useEffect(() => {
+        if (!!slug) {
+            classReq(undefined, [{name: "id", value: slug},]).then((res) => {
+                setFormData(res)
+            }).catch(() => {
+                toast.error("Something wrong happened")
+                router.push(pathname.startsWith('/admin') ? "/admin/classes" : "/teacher/classes")
+            })
+        }
+    }, [slug]);
     const handleSubmit = (event) => {
         event.preventDefault();
-        addReq({title:formData.name}).then((res)=>{
-            console.log(res)
-            router.push('/admin/classes')
-        })
+        if (!!slug) {
+            let tempFormData = {...formData}
+            delete tempFormData.password
+            updateClassReq(tempFormData, [{name: "id", value: slug},]).then((res) => {
+                router.push(pathname.startsWith('/admin') ? "/admin/classes" : "/teacher/classes")
+            }).catch(() => {
+                toast.error("Something wrong happened")
+            })
+        } else {
+            addClassReq(formData).then((res) => {
+                router.push(pathname.startsWith('/admin') ? "/admin/classes" : "/teacher/classes")
+            })
+        }
+
     };
-
-    return (
-        <form
-
-            style={{
-                display: 'flex',
-                flexDirection: 'column',
-                maxWidth: '300px',
-                margin: 'auto',
-                marginTop: 2,
-            }}
+    if (!!slug && classLoader) {
+        return (<div className={"w-full h-screen flex items-center justify-center"}>
+            <BeatLoader color="#1976d2"/>
+        </div>)
+    }
+    return (<form
+        style={{
+            display: 'flex', flexDirection: 'column', margin: 'auto', marginTop: 2,
+        }}
+    >
+        <div className={"font-bold  text-center text-xl md:text-3xl"}>{t('addClass')}</div>
+        <div
+            className={"pt-4 sm:pt-8  flex flex-col sm:flex-row gap-2"}
         >
-            <TextField
-                label="Name"
-                type="text"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                margin="normal"
-                sx={{ margin: 1 }}
-            />
-            <TextField
-                label="NumberOfStudents"
-                type="number"
-                name="numberOfStudents"
-                value={formData.numberOfStudents}
-                onChange={handleChange}
-                margin="normal"
-                sx={{ margin: 1 }}
-            />
-            <Button
-                type="primary"
-                caption={t('submit')}
-                className="mt-4 md:mt-8"
-                onClick={handleSubmit}
-                disabled={!formData.name || !formData.numberOfStudents}
-            />
-        </form>
-    );
+            <div className={"w-full"}>
+                <Box
+                    sx={{display: "flex", flexDirection: "column", gap: "1rem"}}
+                >
+                    <Paper
+                        elevation={0}
+                        className="shadow"
+                        sx={{
+                            display: "flex", flexDirection: "column", gap: "1rem", p: 2, borderRadius: "16px"
+                        }}
+                    >
+                        <TextField
+                            label={t('title')}
+                            type="text"
+                            name="title"
+                            value={formData.title}
+                            onChange={handleChange}
+                            margin="normal"
+                            sx={{margin: 1}}
+                        />
+                        {!slug && <TextField
+                            label={t('git_path')}
+                            type="text"
+                            name="git_path"
+                            value={formData.git_path}
+                            onChange={handleChange}
+                            margin="normal"
+                            sx={{margin: 1}}
+                        />}
+                        <TextField
+                            label={t('description')}
+                            type="text"
+                            name="description"
+                            value={formData.description}
+                            onChange={handleChange}
+                            margin="normal"
+                            sx={{margin: 1}}
+                        />
+                    </Paper>
+                </Box>
+            </div>
+
+
+        </div>
+
+
+        <Button
+            type="primary"
+            caption={t('submit')}
+            className="mt-4 md:mt-8"
+            onClick={handleSubmit}
+            disabled={!formData.description || !formData.title || (!slug && !formData.git_path)}
+            loading={addClassLoader || updateClassLoader}
+        />
+    </form>);
 };
 
 export default AddForm;

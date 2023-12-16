@@ -36,8 +36,10 @@
     "password": "کلمه عبور"
   },
   "Classes": {
-    "name": "اسم",
-    "edit": "ویرایش",
+    "git_path": "آدرس گیت",
+    "header": "لیست کلاس ها",
+    "title": "نام",
+    "description": "توضیحات",
     "numberOfStudents": "تعداد دانشجویان",
     "delete": "حذف",
     "deleteCancel": "انصراف",

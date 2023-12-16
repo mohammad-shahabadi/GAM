@@ -99,7 +99,7 @@ export default function UsersTable({t}) {
                                             </div>
                                         </TableCell>}
                                         <TableCell align={"center"} component="th" scope="row">
-                                            <div onClick={()=>router.push(pathname + "/"+user.id)} className={"text-[#808080] cursor-pointer"}>
+                                            <div onClick={()=>router.push(pathname + "/edit/"+user.id)} className={"text-[#808080] cursor-pointer"}>
                                                 <EditIcon/>
                                             </div>
                                         </TableCell>

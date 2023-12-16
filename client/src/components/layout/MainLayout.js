@@ -86,18 +86,18 @@ export default function MainLayout({children, locale}) {
                         </ListItem>
                     ))}
                 </List>
-                <Divider/>
-                <List>
-                    {['settings'].map((text, index) => (
-                        <ListItem key={index} disablePadding>
-                            <Link style={pathname === "/admin/"+text? {backgroundColor:"#ff5733",color:"white"}:{}} className={"w-full"} href={"/admin/"+text}>
-                                <ListItemButton>
-                                    <ListItemText sx={{textAlign: "start"}} primary={t(text)}/>
-                                </ListItemButton>
-                            </Link>
-                        </ListItem>
-                    ))}
-                </List>
+                {/*<Divider/>*/}
+                {/*<List>*/}
+                {/*    {['settings'].map((text, index) => (*/}
+                {/*        <ListItem key={index} disablePadding>*/}
+                {/*            <Link style={pathname === "/admin/"+text? {backgroundColor:"#ff5733",color:"white"}:{}} className={"w-full"} href={"/admin/"+text}>*/}
+                {/*                <ListItemButton>*/}
+                {/*                    <ListItemText sx={{textAlign: "start"}} primary={t(text)}/>*/}
+                {/*                </ListItemButton>*/}
+                {/*            </Link>*/}
+                {/*        </ListItem>*/}
+                {/*    ))}*/}
+                {/*</List>*/}
             </div>
             <div className={"w-full flex items-center justify-center mb-4"}>
                 <Image width={150} height={150} src={img1.src} alt={"img1"}/>

@@ -20,7 +20,10 @@ export const GET_USER_COURSES = `${HOST}/api/memberships/list`; //GET
 
 // Classes
 
-export const CREATE_CLASS = `${HOST}/api/courses/create`; //POST
+export const CREATE_COURSE = `${HOST}/api/courses/create`; //POST
 export const GET_COURSES = `${HOST}/api/courses/list`; //GET
+export const UPDATE_COURSE = `${HOST}/api/courses/update/:id`; //PATCH
+
 export const GET_COURSE = `${HOST}/api/courses/:id`; //GET
 export const CREATE_MEMBERSHIP = `${HOST}/api/memberships/create`; //DELETE
+export const DELETE_COURSE = `${HOST}/api/courses/delete/:id`; //DELETE
