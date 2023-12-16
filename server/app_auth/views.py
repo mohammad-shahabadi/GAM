@@ -14,8 +14,8 @@ from rest_framework.response import Response
 from gitlab_wrapper.gitlab_dto import UserDTO
 from gitlab_wrapper.gitlab_wrapper import GitLabWrapper
 from .models import User
-from .permissions import AdminPermission, UnauthenticatedPermission, SelfPermission
-from .serializers import UserSerializer, UserSoftDeleteSerializer
+from .permissions import AdminPermission, UnauthenticatedPermission, SelfPermission, 
+TeacherOrAdminPermission from .serializers import UserSerializer, UserSoftDeleteSerializer
 
 
 @api_view(['POST'])
