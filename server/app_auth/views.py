@@ -14,8 +14,8 @@ from rest_framework.response import Response
 from gitlab_wrapper.gitlab_dto import UserDTO
 from gitlab_wrapper.gitlab_wrapper import GitLabWrapper
 from .models import User
-from .permissions import AdminPermission, UnauthenticatedPermission, SelfPermission, 
-TeacherOrAdminPermission from .serializers import UserSerializer, UserSoftDeleteSerializer
+from .permissions import AdminPermission, UnauthenticatedPermission, SelfPermission, TeacherOrAdminPermission
+from .serializers import UserSerializer, UserSoftDeleteSerializer
 
 
 @api_view(['POST'])
@@ -74,7 +74,7 @@ def login(request):
 
     try:
         user = User.objects.get(email=email, is_deleted=False)
-    except User.DoesNotExist:
+    except User.DoesNotExist: 
         return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
     if check_password(password, user.password):
