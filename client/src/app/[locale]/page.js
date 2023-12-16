@@ -5,8 +5,11 @@ import Login from "@/components/login";
 import {useContext, useEffect} from "react";
 import {AuthContext} from "@/context/AuthContext";
 import {useRouter} from "@/navigation";
+import {unstable_setRequestLocale} from "next-intl/server";
 
-export default function Index() {
+export default function Index({locale}) {
+    unstable_setRequestLocale(locale);
+
     const t = useTranslations('Login');
     const {
         authenticate, token, isAdmin, isUser, isTeacher,loading

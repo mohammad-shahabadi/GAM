@@ -7,7 +7,6 @@ const AdminDashboard = ({ user, onLogout,texts }) => {
             <h1 className="text-3xl font-bold mb-4">
                 {texts('welcome')}, {user.firstName} {user.lastName}
             </h1>
-            <p className="text-lg mb-2">{texts('role')}: {texts(user.role)}</p>
             <Image width={600} height={400} src={img1.src} alt={"img"}/>
             <button
                 onClick={onLogout}

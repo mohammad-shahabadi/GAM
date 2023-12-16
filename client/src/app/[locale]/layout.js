@@ -6,6 +6,7 @@ import AuthProvider from "@/context/AuthContext";
 import ACL from "@/components/auth/ACL";
 import "react-toastify/dist/ReactToastify.css"; //add this line
 import {Inter,Rubik} from 'next/font/google'
+import {unstable_setRequestLocale} from "next-intl/server";
 
 const enFont = Inter({
     weight: '500',
@@ -27,6 +28,8 @@ const locales = ['en', 'fa'];
 
 export default function LocaleLayout({children, params: {locale}}) {
     if (!locales.includes(locale)) notFound();
+    unstable_setRequestLocale(locale);
+
     const messages = useMessages();
 
 

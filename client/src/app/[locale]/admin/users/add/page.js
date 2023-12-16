@@ -4,9 +4,12 @@ import { DataGrid } from '@mui/x-data-grid';
 import {useTranslations} from "next-intl";
 import UsersTable from "@/components/users";
 import AddForm from "@/components/users/add";
+import {unstable_setRequestLocale} from "next-intl/server";
 
 
-export default function Page() {
+export default function Page({params}) {
+    unstable_setRequestLocale(params.locale);
+
     const t = useTranslations('Users')
 
     return (
