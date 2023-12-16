@@ -9,7 +9,7 @@ from app_auth.permissions import TeacherOrAdminPermission, AllAuthenticatedPermi
     IsPartOfCourseOrAdminForProblemSet, IsTeacherOrTaOfCourseOrAdminForProblemSet, \
     IsTeacherOrTaOfCourseOrAdminForProblem
 from app_auth.utils.mappers import map_user_role_to_group_access
-from gitlab_wrapper.gitlab_dto import GroupDTO
+from gitlab_wrapper.gitlab_dto import GroupDTO, ProjectDTO
 from gitlab_wrapper.gitlab_wrapper import GitLabWrapper
 from .models import Course, Membership, ProblemSet, Problem
 from .serializers import CourseSerializer, MembershipSerializer, MembershipCreationSerializer, CourseDetailSerializer, \
@@ -243,6 +243,28 @@ class ProblemSetUpdateView(generics.UpdateAPIView):
     queryset = ProblemSet.objects.all()
     serializer_class = ProblemSetSerializer
     permission_classes = [IsTeacherOrTaOfCourseOrAdminForProblemSet]
+
+    def update(self, request, *args, **kwargs):
+        try:
+            return super().update(request, *args, **kwargs)
+        except GitlabUpdateError as e:
+            return Response({'error': f'Problem set failed to update in gitlab {e}'},
+                            status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({'error': f'{e}'}, status=status.HTTP_400_BAD_REQUEST)
+
+    def perform_update(self, serializer):
+        with transaction.atomic():
+            problem_set = serializer.save()
+            gitlab = GitLabWrapper()
+            git_parent_group_id = problem_set.course.git_homeworks_reference_id
+            assert git_parent_group_id is not None, 'Course homeworks git reference id is not set'
+
+            problem_set_group_gitlab_dto = GroupDTO(name=problem_set.title,
+                                                    path=problem_set.git_path,
+                                                    parent_id=git_parent_group_id
+                                                    )
+            gitlab.update_group(problem_set.git_reference_id, problem_set_group_gitlab_dto)
 
 
 class ProblemCreateView(generics.CreateAPIView):
