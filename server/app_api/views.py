@@ -1,6 +1,6 @@
 from django.db import transaction
 from gitlab.exceptions import GitlabCreateError, GitlabUpdateError, GitlabDeleteError
-from rest_framework import generics, viewsets
+from rest_framework import generics
 from rest_framework import status
 from rest_framework.response import Response
 
@@ -45,7 +45,7 @@ class CourseCreateView(generics.CreateAPIView):
                                                   path='homeworks',
                                                   parent_id=gitlab_group.id
                                                   )
-            gitlab.create_group(homeworks_group_gitlab_dto)
+            gitlab_homework_group = gitlab.create_group(homeworks_group_gitlab_dto)
 
             user_gitlab_access = map_user_role_to_group_access(user.role)
 
@@ -53,6 +53,7 @@ class CourseCreateView(generics.CreateAPIView):
                 gitlab.add_user_to_group(user_id=user.git_reference_id, group_id=gitlab_group.id,
                                          access_level=user_gitlab_access)
             course.git_reference_id = gitlab_group.id
+            course.git_homeworks_reference_id = gitlab_homework_group.id
             course.save()
 
 
@@ -191,8 +192,28 @@ class ProblemSetCreateView(generics.CreateAPIView):
     serializer_class = ProblemSetSerializer
     permission_classes = [IsTeacherOrTaOfCourseOrAdminForProblemSet]
 
+    def create(self, request, *args, **kwargs):
+        try:
+            return super().create(request, *args, **kwargs)
+        except GitlabCreateError as e:
+            return Response({'error': f'Problem set failed to create in gitlab {e}'},
+                            status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({'error': f'{e}'}, status=status.HTTP_400_BAD_REQUEST)
+
     def perform_create(self, serializer):
         with transaction.atomic():
+            problem_set = serializer.save()
+            gitlab = GitLabWrapper()
+            git_parent_group_id = problem_set.course.git_homeworks_reference_id
+            assert git_parent_group_id is not None, 'Course homeworks git reference id is not set'
+
+            problem_set_group_gitlab_dto = GroupDTO(name=problem_set.title,
+                                                    path=problem_set.git_path,
+                                                    parent_id=git_parent_group_id
+                                                    )
+            gitlab_group = gitlab.create_group(problem_set_group_gitlab_dto)
+            problem_set.git_reference_id = gitlab_group.id
             serializer.save()
 
 
