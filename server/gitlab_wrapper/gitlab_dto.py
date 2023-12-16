@@ -31,3 +31,19 @@ class UserDTO(BaseDTO):
         self.username = username
         self.email = email
         self.password = password
+
+
+class ProjectDTO(BaseDTO):
+    def __init__(self, id=None, name=None, path=None, namespace_id=None):
+        super().__init__(
+            id=id,
+            name=name,
+            path=path,
+            namespace_id=namespace_id,
+            http_url=None
+        )
+        self.id = id
+        self.name = name
+        self.path = path
+        self.namespace_id = namespace_id
+        self.http_url = None

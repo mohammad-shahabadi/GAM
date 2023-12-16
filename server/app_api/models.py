@@ -48,6 +48,7 @@ class Problem(models.Model):
     content = models.TextField(blank=True, null=True)
     git_path = models.CharField(max_length=30)
     git_reference_id = models.IntegerField(blank=True, null=True)
+    git_http_url = models.CharField(max_length=255, blank=True, null=True)
     # token = models.UUIDField(default=uuid.uuid4, editable=False, unique=True,
     #                          help_text="Secret token for problem operations")
     # template = models.FilePathField(path=settings.TESTERS_TEMPLATE_DIR, recursive=False,

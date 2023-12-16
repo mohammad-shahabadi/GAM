@@ -272,8 +272,29 @@ class ProblemCreateView(generics.CreateAPIView):
     serializer_class = ProblemSerializer
     permission_classes = [IsTeacherOrTaOfCourseOrAdminForProblem]
 
+    def create(self, request, *args, **kwargs):
+        try:
+            return super().create(request, *args, **kwargs)
+        except GitlabCreateError as e:
+            return Response({'error': f'Problem failed to create in gitlab {e}'},
+                            status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({'error': f'{e}'}, status=status.HTTP_400_BAD_REQUEST)
+
     def perform_create(self, serializer):
         with transaction.atomic():
+            problem = serializer.save()
+            gitlab = GitLabWrapper()
+            create_project_dto = ProjectDTO(
+                name=problem.title,
+                namespace_id=problem.problem_set.git_reference_id,
+                path=problem.git_path
+            )
+            project_gitlab = gitlab.create_project(problem.content, create_project_dto)
+
+            problem.git_reference_id = project_gitlab.id
+            problem.git_http_url = project_gitlab.http_url
+
             serializer.save()
 
 

@@ -1,7 +1,7 @@
 from decouple import config
 from gitlab import Gitlab
 
-from .gitlab_dto import GroupDTO, UserDTO
+from .gitlab_dto import GroupDTO, UserDTO, ProjectDTO
 from .gitlab_enum import GroupAccessLevel
 
 
@@ -114,3 +114,40 @@ class GitLabWrapper:
             )
         else:
             raise Exception('Invalid user or group.')
+
+    def create_project(self, readme_content, create_project_dto: ProjectDTO) -> ProjectDTO:
+        project = self._gl.projects.create(
+            {
+                **create_project_dto.serialize_without_none(),
+                'default_branch': 'master',
+                'initialize_with_readme': True
+            }
+        )
+
+        project.commits.create(
+            {
+                'branch': 'master',
+                'commit_message': "Update README.md",
+                'actions': [
+                    {
+                        'action': 'update',
+                        'file_path': 'README.md',
+                        'content': readme_content
+                    }
+                ]
+            }
+        )
+        create_project_dto.id = project.get_id()
+        create_project_dto.http_url = project.http_url_to_repo
+        return create_project_dto
+
+    def update_project(self, project_id, update_project_dto: ProjectDTO) -> ProjectDTO:
+        project = self._gl.projects.update(
+            id=project_id,
+            new_data=update_project_dto.serialize_without_none()
+        )
+        update_project_dto.id = project.get_id()
+        return update_project_dto
+
+    def delete_project(self, project_id):
+        self._gl.projects.delete(id=project_id)
