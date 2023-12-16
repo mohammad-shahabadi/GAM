@@ -12,6 +12,7 @@ export const LOGIN = `${HOST}/auth/login`; //POST
 
 // Users
 export const GET_ALL_USERS = `${HOST}/auth/users`; //GET
+export const GET_ME = `${HOST}/auth/users/me`; //GET
 export const GET_USER = `${HOST}/auth/users/:id`; //GET
 export const UPDATE_USER = `${HOST}/auth/users/:id/update`; //PATCH
 export const DELETE_USER = `${HOST}/auth/users/:id/delete`; //PATCH

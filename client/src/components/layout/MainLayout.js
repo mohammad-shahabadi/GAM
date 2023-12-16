@@ -42,7 +42,7 @@ export default function MainLayout({children, locale}) {
     const drawer = (
         <div className={"bg-[var(--background)] min-h-screen !font-bold flex flex-col justify-between"}>
             <div>
-                <Toolbar>
+                <Toolbar className={"relative"}>
                     <IconButton
                         color="inherit"
                         aria-label="open drawer"
@@ -52,10 +52,11 @@ export default function MainLayout({children, locale}) {
                     >
                         <MenuIcon/>
                     </IconButton>
-                    <Typography variant="h5" noWrap component="div">
+                    <Typography className={"!mx-2"} variant="h5" noWrap component="div">
                         {t('title')}
                     </Typography>
                     <IconButton
+                        className={"!fixed start-[150px] " + (mode === 1 ? "!hidden":"")}
                         size="large"
                         aria-label="Select a language"
                         aria-haspopup="true"
@@ -117,7 +118,7 @@ export default function MainLayout({children, locale}) {
                     right: "auto"
                 }}
             >
-                <Toolbar>
+                <Toolbar className={"relative"}>
                     <IconButton
                         color="inherit"
                         aria-label="open drawer"
@@ -131,6 +132,7 @@ export default function MainLayout({children, locale}) {
                         {t('title')}
                     </Typography>
                     <IconButton
+                        className={"!fixed end-0"}
                         size="large"
                         aria-label="Select a language"
                         aria-haspopup="true"

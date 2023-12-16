@@ -34,6 +34,8 @@ export default function UsersTable({t}) {
 
         }).catch(() => {
             toast.error("something wrong happened")
+        }).finally(()=>{
+            setShowDeleteModal(false)
         })
     }
     const mode = useWindowSize()
