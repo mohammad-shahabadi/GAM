@@ -25,5 +25,16 @@ export const GET_COURSES = `${HOST}/api/courses/list`; //GET
 export const UPDATE_COURSE = `${HOST}/api/courses/update/:id`; //PATCH
 
 export const GET_COURSE = `${HOST}/api/courses/:id`; //GET
-export const CREATE_MEMBERSHIP = `${HOST}/api/memberships/create`; //DELETE
+export const GET_COURSE_HWS = `${HOST}/api/courses/:id/problem_sets`; //GET
+export const CREATE_MEMBERSHIP = `${HOST}/api/memberships/create`; //POST
+export const DELETE_MEMBERSHIP = `${HOST}/api/memberships/:id`; //DELETE
+
 export const DELETE_COURSE = `${HOST}/api/courses/delete/:id`; //DELETE
+
+// HomeWorks
+
+export const GET_HW = `${HOST}/api/problem_sets/:id`; //GET
+
+export const DELETE_HW = `${HOST}/api/problem_sets/:id/delete`; //DELETE
+export const CREATE_HW = `${HOST}/api/problemsets/create`; //POST
+export const UPDATE_HW = `${HOST}/api/problem_sets/:id/update`; //PATCH

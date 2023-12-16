@@ -74,7 +74,7 @@ export default function ClassesTable({t}) {
                                         sx={{'&:last-child td, &:last-child th': {border: 0}}}
                                     >
 
-                                        <TableCell onClick={()=>router.push(pathname+"/"+course.id)} className={"cursor-pointer"} align={"center"}  component="th" scope="row">
+                                        <TableCell onClick={()=>router.push(pathname+"/"+course.id)} className={"cursor-pointer "} align={"center"}  component="th" scope="row">
                                             <div>
                                                 {course.title || "-"}
                                             </div>
