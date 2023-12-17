@@ -153,14 +153,14 @@ class UserDeleteView(generics.DestroyAPIView):
         except Exception as e:
             return Response({'error': f'{e}'}, status=status.HTTP_400_BAD_REQUEST)
 
-    def perform_destroy(self, serializer):
+    def perform_destroy(self, instance):
         with transaction.atomic():
-            if serializer.instance.is_superuser:
+            if instance.is_superuser:
                 raise Exception('Cannot delete admin')
-            serializer.instance.delete()
+            instance.delete()
 
             gitlab = GitLabWrapper()
-            delete_user_gitlab_dto = UserDTO(id=serializer.instance.git_reference_id)
+            delete_user_gitlab_dto = UserDTO(id=instance.git_reference_id)
             gitlab.delete_user(delete_user_gitlab_dto)
 
 
