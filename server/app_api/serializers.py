@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from .models import Course, Membership, ProblemSet, Problem
+from app_auth.models import User
 
 
 class CourseSerializer(serializers.ModelSerializer):
@@ -24,9 +25,17 @@ class MembershipSerializer(serializers.ModelSerializer):
 
 
 class MembershipCreationSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(write_only=True)  # Add an email field
+
     class Meta:
         model = Membership
-        fields = ['id', 'course', 'user', 'role']
+        fields = ['id', 'course', 'email', 'role']  # Replace 'user' with 'email'
+
+    def create(self, validated_data):
+        email = validated_data.pop('email')
+        user = User.objects.get(email=email)
+        membership = Membership.objects.create(user=user, **validated_data)
+        return membership
 
 
 class UserMembershipSerializer(serializers.ModelSerializer):

@@ -44,8 +44,8 @@ export function useRequest(url, method, token, loaderInitState) {
                     setLoading(false);
 
                     if (
-                        (e.response.status === 401 ||
-                            e.response.status === 403) && /// must be unified.
+                        (e?.response?.status === 401 ||
+                            e?.response?.status === 403) && /// must be unified.
                         Cookies.get("gam-token")
                     ) {
                         Cookies.remove("gam-token")
