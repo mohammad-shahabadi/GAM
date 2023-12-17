@@ -73,7 +73,7 @@ def login(request):
     password = request.data.get('password')
 
     try:
-        user = User.objects.get(email=email, is_deleted=False)
+        user = User.objects.get(email=email)
     except User.DoesNotExist: 
         return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
@@ -109,7 +109,7 @@ class GetAllUsersView(generics.ListAPIView):
     permission_classes = [AdminPermission]
 
     def get_queryset(self):
-        return User.objects.filter(is_deleted=False)
+        return User.objects.filter()
 
 
 class DeactivateUserView(generics.UpdateAPIView):
