@@ -34,7 +34,8 @@ class CourseCreateView(generics.CreateAPIView):
         with transaction.atomic():
             course = serializer.save()
             user = self.request.user
-            Membership.objects.create(course=course, user=user, role='teacher')
+            if user.is_superuser is False:
+                Membership.objects.create(course=course, user=user, role='teacher')
 
             gitlab = GitLabWrapper()
             create_group_gitlab_dto = GroupDTO(name=course.title,
@@ -140,6 +141,9 @@ class MembershipCreateView(generics.CreateAPIView):
 
             gitlab = GitLabWrapper()
             user_gitlab_access = map_user_role_to_group_access(user.role)
+
+            if user.is_superuser:
+                return
 
             if existing_membership:
                 # If the membership exists, update the role
