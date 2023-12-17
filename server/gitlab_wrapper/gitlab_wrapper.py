@@ -154,3 +154,9 @@ class GitLabWrapper:
 
     def delete_project(self, project_id):
         self._gl.projects.delete(id=project_id)
+
+    def fork_projects_to_groups(self, projects: [ProjectDTO], groups: [GroupDTO]):
+        for group in groups:
+            for project in projects:
+                project_git = self._gl.projects.get(project.id)
+                project_git.forks.create({'namespace_id': group.id, 'mr_default_target_self': False})
