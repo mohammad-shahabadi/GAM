@@ -250,6 +250,21 @@ class ProblemSetDeleteView(generics.DestroyAPIView):
     serializer_class = ProblemSetSerializer
     permission_classes = [IsTeacherOrTaOfCourseOrAdminForProblemSet]
 
+    def destroy(self, request, *args, **kwargs):
+        try:
+            return super().destroy(request, *args, **kwargs)
+        except GitlabDeleteError as e:
+            return Response({'error': f'Problem set failed to delete in gitlab {e}'}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({'error': f'{e}'}, status=status.HTTP_400_BAD_REQUEST)
+
+    def perform_destroy(self, instance):
+        with transaction.atomic():
+            problem_set_git_group_id = instance.git_reference_id
+            instance.delete()
+            gitlab = GitLabWrapper()
+            gitlab.delete_group(problem_set_git_group_id)
+
 
 class ProblemSetRetrieveView(generics.RetrieveAPIView):
     queryset = ProblemSet.objects.all()
