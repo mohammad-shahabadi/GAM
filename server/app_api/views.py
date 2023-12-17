@@ -12,6 +12,7 @@ from app_auth.utils.mappers import map_user_role_to_group_access
 from gitlab_wrapper.gitlab_dto import GroupDTO
 from gitlab_wrapper.gitlab_wrapper import GitLabWrapper
 from .models import Course, Membership, ProblemSet, Problem
+from app_auth.models import User
 from .serializers import CourseSerializer, MembershipSerializer, MembershipCreationSerializer, CourseDetailSerializer, \
     ProblemSetSerializer, ProblemSerializer
 
@@ -114,7 +115,8 @@ class MembershipCreateView(generics.CreateAPIView):
     def perform_create(self, serializer):
         with transaction.atomic():
             course = serializer.validated_data['course']
-            user = serializer.validated_data['user']
+            email = serializer.validated_data['email']
+            user = User.objects.get(email=email)
 
             # Check if the membership already exists
             existing_membership = Membership.objects.filter(course=course, user=user).first()
