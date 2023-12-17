@@ -23,7 +23,7 @@ export default function UsersTable({t}) {
     useEffect(() => {
         getUsers()
     }, [])
-    const [deleteUserReq, deleteUserLoader] = useRequest(DELETE_USER, "PUT");
+    const [deleteUserReq, deleteUserLoader] = useRequest(DELETE_USER, "DELETE");
 
     const handleDelete = () => {
         deleteUserReq(undefined, [
