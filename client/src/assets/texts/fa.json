@@ -1,9 +1,9 @@
 {
   "Login": {
     "title": "همیار تمرین گیت",
-    "studentNumber": "شماره دانشجویی",
+    "studentNumber": "ایمیل",
     "password": "رمز عبور",
-    "studentNumberError": "شماره دانشجویی نمی تواند خالی باشد",
+    "studentNumberError": "ایمیل نمی تواند خالی باشد",
     "passwordError": "رمز عبور نمیتواند خالی باشد",
     "login": "ورود"
   },
@@ -33,6 +33,7 @@
     "teacher": "استاد",
     "student": "دانشجو",
     "addUser": "اضافه کردن کاربر جدید",
+    "editUser": "ویرایش کاربر",
     "password": "کلمه عبور"
   },
   "Classes": {
@@ -47,11 +48,15 @@
     "deleteText":"آیا از حذف این کلاس مطمئن هستید؟",
     "submit": "تایید",
     "addClass": "اضافه کردن کلاس جدید",
+
+    "editClass": "ویرایش کلاس",
     "goBack": "بازگشت",
     "edit": "ویرایش",
     "hwList": "لیست تکالیف",
-    "stdList": "لیست دانشجویان",
+    "stdList": "لیست شرکت کنندگان",
     "addHW": "اضافه کردن تکلیف",
+    "editHW": "ویرایش تکلیف",
+    "addStudent": "اضافه کردن شرکت کننده",
     "startDate": "تاریخ شروع",
     "endDate": "تاریخ پایان",
     "firstName": "نام",

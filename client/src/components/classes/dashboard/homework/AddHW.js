@@ -64,7 +64,7 @@ const AddHW = ({t, slug,id}) => {
             display: 'flex', flexDirection: 'column', margin: 'auto', marginTop: 2,
         }}
     >
-        <div className={"font-bold  text-center text-xl md:text-3xl"}>{t('addHW')}</div>
+        <div className={"font-bold  text-center text-xl md:text-3xl"}>{!!id? t('editHW') : t('addHW')}</div>
         <div
             className={"pt-4 sm:pt-8  flex flex-col sm:flex-row gap-2"}
         >

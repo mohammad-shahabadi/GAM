@@ -15,12 +15,7 @@ const AddForm = ({t, slug}) => {
     const router = useRouter()
     const pathname = usePathname()
     const [formData, setFormData] = useState({
-        "email": "",
-        "password": "",
-        "role": "admin",
-        "first_name": "",
-        "last_name": "",
-        "student_number": ""
+        "email": "", "password": "", "role": "admin", "first_name": "", "last_name": "", "student_number": ""
     });
     const [signupReq, signupLoader] = useRequest(SIGNUP, "POST");
     const [userReq, userLoader] = useRequest(GET_USER, "GET");
@@ -30,9 +25,7 @@ const AddForm = ({t, slug}) => {
     };
     useEffect(() => {
         if (!!slug) {
-            userReq(undefined, [
-                {name: "id", value: slug},
-            ]).then((res) => {
+            userReq(undefined, [{name: "id", value: slug},]).then((res) => {
                 setFormData(res)
             }).catch(() => {
                 toast.error("something wrong happened")
@@ -45,9 +38,7 @@ const AddForm = ({t, slug}) => {
         if (!!slug) {
             let tempFormData = {...formData}
             delete tempFormData.password
-            updateUserReq(tempFormData, [
-                {name: "id", value: slug},
-            ]).then((res) => {
+            updateUserReq(tempFormData, [{name: "id", value: slug},]).then((res) => {
                 router.push('/admin/users')
             }).catch(() => {
                 toast.error("something wrong happened")
@@ -64,16 +55,12 @@ const AddForm = ({t, slug}) => {
             <BeatLoader color="#1976d2"/>
         </div>)
     }
-    return (
-        <form
+    return (<form
             style={{
-                display: 'flex',
-                flexDirection: 'column',
-                margin: 'auto',
-                marginTop: 2,
+                display: 'flex', flexDirection: 'column', margin: 'auto', marginTop: 2,
             }}
         >
-            <div className={"font-bold  text-center text-xl md:text-3xl"}>{t('addUser')}</div>
+            <div className={"font-bold  text-center text-xl md:text-3xl"}>{!!slug ? t('editUser') : t('addUser')}</div>
             <div
                 className={"pt-4 sm:pt-8  flex flex-col sm:flex-row gap-2"}
             >
@@ -85,8 +72,7 @@ const AddForm = ({t, slug}) => {
                             elevation={0}
                             className="shadow"
                             sx={{
-                                display: "flex", flexDirection: "column", gap: "1rem", p: 2,
-                                borderRadius: "16px"
+                                display: "flex", flexDirection: "column", gap: "1rem", p: 2, borderRadius: "16px"
                             }}
                         >
                             <TextField
@@ -128,8 +114,12 @@ const AddForm = ({t, slug}) => {
                             elevation={0}
                             className="shadow"
                             sx={{
-                                display: "flex", flexDirection: "column", gap: "1rem", p: 2,
-                                borderRadius: "16px", height: "100%"
+                                display: "flex",
+                                flexDirection: "column",
+                                gap: "1rem",
+                                p: 2,
+                                borderRadius: "16px",
+                                height: "100%"
                             }}
                         >
                             <TextField
@@ -141,8 +131,7 @@ const AddForm = ({t, slug}) => {
                                 margin="normal"
                                 sx={{margin: 1}}
                             />
-                            <TextField
-                                disabled={!!slug}
+                            {!slug && <TextField
                                 label={t('password')}
                                 type="password"
                                 name="password"
@@ -150,7 +139,7 @@ const AddForm = ({t, slug}) => {
                                 onChange={handleChange}
                                 margin="normal"
                                 sx={{margin: 1}}
-                            />
+                            />}
                             <FormControl sx={{margin: 1, minWidth: 120}}>
                                 <Select
                                     labelId={t('role')}
@@ -181,8 +170,7 @@ const AddForm = ({t, slug}) => {
                 disabled={!formData.email || (!slug && !formData.password) || !formData.student_number || !formData.first_name || !formData.last_name}
                 loading={signupLoader || updateUserLoader}
             />
-        </form>
-    );
+        </form>);
 };
 
 export default AddForm;

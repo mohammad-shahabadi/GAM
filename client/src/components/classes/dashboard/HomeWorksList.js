@@ -52,7 +52,7 @@ export default function HomeWorksList({t,course}) {
     const cols = mode ===1 ? [ t('title'), t('startDate'), t('endDate'), t('edit'), t('delete')] : [ t('title'), t('startDate'), t('endDate'), t('edit'), t('delete')]
 
     return (
-        <div>
+        <div className={"min-h-0"}>
             <div className={"w-full justify-end flex"}>
                 <Link className={"bg-[#ff5733] text-white py-2 px-4 mb-4"} href={pathname + "/homework/add"}>
                     {t('addHW')}

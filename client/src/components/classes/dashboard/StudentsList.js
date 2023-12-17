@@ -8,6 +8,7 @@ import {useRequest} from "@/hooks/useRequest";
 import {CREATE_MEMBERSHIP, DELETE_MEMBERSHIP,} from "@/apiList";
 import DeleteIcon from '@mui/icons-material/Delete';
 import useWindowSize from "@/hooks/useWindowSize";
+import {toast} from "react-toastify";
 
 export default function StudentsList({t, course, getClass}) {
     const [showDeleteModal, setShowDeleteModal] = useState(false)
@@ -17,7 +18,17 @@ export default function StudentsList({t, course, getClass}) {
     const [deleteReq, deleteLoader] = useRequest(DELETE_MEMBERSHIP, "DELETE");
 
     const handleDelete = () => {
+        deleteReq(undefined, [
+            {name: "id", value: selectedStudent.id},
+        ]).then((res) => {
+            getClass()
+            toast.success("Participant removed successfully")
 
+        }).catch(() => {
+            toast.error("Something wrong happened")
+        }).finally(()=>{
+            setShowDeleteModal(false)
+        })
     }
     const mode = useWindowSize()
     const router = useRouter()
@@ -41,9 +52,9 @@ export default function StudentsList({t, course, getClass}) {
     }
     const isLanguageMenuOpen = Boolean(anchorElLanguage)
     return (
-        <div>
+        <div className={"min-h-0"}>
             <div className={"w-full justify-end flex"}>
-                <Link className={"bg-[#ff5733] text-white py-2 px-4 mb-4"} href={pathname + "/users/add"}>
+                <Link className={"bg-[#ff5733] text-white py-2 px-4 mb-4"} href={pathname + "/students/add"}>
                     {t('addStd')}
                 </Link>
             </div>

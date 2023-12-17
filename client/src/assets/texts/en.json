@@ -1,9 +1,9 @@
 {
   "Login": {
-    "title": "Git assignment Manager",
-    "studentNumber": "Student Number",
+    "title": "Git Assignment Manager",
+    "studentNumber": "Email",
     "password": "Password",
-    "studentNumberError": "Student Number can not be empty.",
+    "studentNumberError": "Email can not be empty.",
     "passwordError": "Password can not be empty.",
     "login": "Login"
   },
@@ -33,6 +33,7 @@
     "teacher": "Teacher",
     "student": "Student",
     "addUser": "Add A New User",
+    "editUser": "Edit User",
     "password": "Password"
   },
   "Classes": {
@@ -47,10 +48,15 @@
     "deleteCancel": "Cancel",
     "submit": "Submit",
     "addClass": "Add A New Class",
+    "editClass": "Edit Class",
+
     "goBack": "Go Back",
     "hwList": "Homeworks List",
-    "stdList": "Students List",
+    "stdList": "Participants List",
     "addHW": "Add Homework",
+    "editHW": "Edit Homework",
+    "addStudent": "Add Participants",
+
     "startDate": "Start Date",
     "endDate": "End Date",
     "firstName": "First Name",

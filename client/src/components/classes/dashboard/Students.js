@@ -29,11 +29,10 @@ export default function Students({texts,course,getClass}) {
                                 src={arrow.src}/></div>
                         </div>
                         <div style={{
-                            transition: showContent ? "max-height 0.5s ease-out" : "max-height 0.5s ease-in",
-                            maxHeight: showContent ? "550px" : "0px"
+                            transition:"grid-template-rows 200ms",
+                            gridTemplateRows: showContent ? "1fr" : "0fr"
                         }}
-                             className={`border-none transition text-sm  lg:text-xl md:text-base overflow-auto  text-[var(--text2)]`}>
-                            <div style={{display: "block", height: "8px", content: ""}}/>
+                             className={`border-none grid text-sm  lg:text-xl md:text-base overflow-hidden  text-[var(--text2)]`}>
                             <StudentsList getClass={getClass} course={course} t={texts}/>
                         </div>
                     </div>
