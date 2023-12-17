@@ -187,9 +187,11 @@ class ModifyUserView(generics.UpdateAPIView):
             raise Exception('User not found')
         with transaction.atomic():
             serializer.save()
-            gitlab = GitLabWrapper()
-            full_name = f'{serializer.instance.first_name} {serializer.instance.last_name}'
-            update_user_gitlab_dto = UserDTO(id=serializer.instance.git_reference_id, name=full_name,
-                                             email=serializer.instance.email,
-                                             username=serializer.instance.email.split('@')[0])
-            gitlab.update_user(update_user_gitlab_dto)
+            if serializer.instance.is_superuser is False:
+                gitlab = GitLabWrapper()
+                full_name = f'{serializer.instance.first_name} {serializer.instance.last_name}'
+                update_user_gitlab_dto = UserDTO(id=serializer.instance.git_reference_id, name=full_name,
+                                                 email=serializer.instance.email,
+                                                 username=serializer.instance.email.split('@')[0])
+                gitlab.update_user(update_user_gitlab_dto)
+

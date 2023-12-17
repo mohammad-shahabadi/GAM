@@ -1,10 +1,13 @@
 from rest_framework import serializers
 
+from app_auth.serializers import UserSerializer
 from .models import Course, Membership, ProblemSet, Problem
 from app_auth.models import User
 
 
 class CourseSerializer(serializers.ModelSerializer):
+    members = UserSerializer(many=True, read_only=True)
+
     class Meta:
         model = Course
         fields = '__all__'
