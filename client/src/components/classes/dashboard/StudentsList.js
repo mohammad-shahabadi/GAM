@@ -32,7 +32,7 @@ export default function StudentsList({t, course, getClass}) {
     const handleRoleChange = (role) => {
         createReq({
             "course" : course.id,
-            "user" : selectedStudent.email,
+            "email" : selectedStudent.email,
             "role" : role
         }).then((res) => {
             getClass()
