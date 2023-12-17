@@ -15,7 +15,7 @@ from gitlab_wrapper.gitlab_dto import UserDTO
 from gitlab_wrapper.gitlab_wrapper import GitLabWrapper
 from .models import User
 from .permissions import AdminPermission, UnauthenticatedPermission, SelfPermission, TeacherOrAdminPermission
-from .serializers import UserSerializer, UserSoftDeleteSerializer
+from .serializers import UserSerializer, UserSoftDeleteSerializer, UserUpdateSerializer
 
 
 @api_view(['POST'])
@@ -171,7 +171,7 @@ class SoftDeleteUserView(generics.UpdateAPIView):
 
 class ModifyUserView(generics.UpdateAPIView):
     queryset = User.objects.all()
-    serializer_class = UserSerializer
+    serializer_class = UserUpdateSerializer
     permission_classes = [AdminPermission]
 
     def update(self, request, *args, **kwargs):
