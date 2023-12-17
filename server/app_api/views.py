@@ -100,6 +100,22 @@ class CourseDeleteView(generics.DestroyAPIView):
     serializer_class = CourseSerializer
     permission_classes = [IsTeacherOfCourseOrAdmin]
 
+    def destroy(self, request, *args, **kwargs):
+        try:
+            return super().destroy(request, *args, **kwargs)
+        except GitlabDeleteError as e:
+            return Response({'error': f'Class failed to delete in gitlab {e}'}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({'error': f'{e}'}, status=status.HTTP_400_BAD_REQUEST)
+
+    def perform_destroy(self, instance):
+        with transaction.atomic():
+            class_git_reference = instance.git_reference_id
+            instance.delete()
+            gitlab = GitLabWrapper()
+            gitlab.delete_group(class_git_reference)
+
+
 
 class MembershipCreateView(generics.CreateAPIView):
     serializer_class = MembershipCreationSerializer
