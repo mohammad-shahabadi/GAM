@@ -125,8 +125,7 @@ class GitLabWrapper:
         )
         create_project_dto.id = project.get_id()
         create_project_dto.http_url = project.http_url_to_repo
-
-        self.update_readme_project(readme_content, create_project_dto.id)
+        self.update_readme_project(create_project_dto.id, readme_content)
 
         return create_project_dto
 
