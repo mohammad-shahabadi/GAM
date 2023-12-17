@@ -123,7 +123,22 @@ class GitLabWrapper:
                 'initialize_with_readme': True
             }
         )
+        create_project_dto.id = project.get_id()
+        create_project_dto.http_url = project.http_url_to_repo
 
+        self.update_readme_project(readme_content, create_project_dto.id)
+
+        return create_project_dto
+
+    def update_project(self, project_id, update_project_dto: ProjectDTO) -> ProjectDTO:
+        project = self._gl.projects.update(
+            id=project_id,
+            new_data=update_project_dto.serialize_without_none()
+        )
+        return update_project_dto
+
+    def update_readme_project(self, project_id, readme_content):
+        project = self._gl.projects.get(project_id)
         project.commits.create(
             {
                 'branch': 'master',
@@ -137,17 +152,6 @@ class GitLabWrapper:
                 ]
             }
         )
-        create_project_dto.id = project.get_id()
-        create_project_dto.http_url = project.http_url_to_repo
-        return create_project_dto
-
-    def update_project(self, project_id, update_project_dto: ProjectDTO) -> ProjectDTO:
-        project = self._gl.projects.update(
-            id=project_id,
-            new_data=update_project_dto.serialize_without_none()
-        )
-        update_project_dto.id = project.get_id()
-        return update_project_dto
 
     def delete_project(self, project_id):
         self._gl.projects.delete(id=project_id)

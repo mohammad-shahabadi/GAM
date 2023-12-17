@@ -330,6 +330,21 @@ class ProblemDeleteView(generics.DestroyAPIView):
     serializer_class = ProblemSerializer
     permission_classes = [IsTeacherOrTaOfCourseOrAdminForProblem]
 
+    def destroy(self, request, *args, **kwargs):
+        try:
+            return super().destroy(request, *args, **kwargs)
+        except GitlabDeleteError as e:
+            return Response({'error': f'Problem failed to delete in gitlab {e}'}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({'error': f'{e}'}, status=status.HTTP_400_BAD_REQUEST)
+
+    def perform_destroy(self, instance):
+        with transaction.atomic():
+            problem_git_id = instance.git_reference_id
+            instance.delete()
+            gitlab = GitLabWrapper()
+            gitlab.delete_project(problem_git_id)
+
 
 class ProblemRetrieveView(generics.RetrieveAPIView):
     queryset = Problem.objects.all()
@@ -341,3 +356,33 @@ class ProblemUpdateView(generics.UpdateAPIView):
     queryset = Problem.objects.all()
     serializer_class = ProblemSerializer
     permission_classes = [IsTeacherOrTaOfCourseOrAdminForProblem]
+
+    def update(self, request, *args, **kwargs):
+        try:
+            return super().update(request, *args, **kwargs)
+        except GitlabUpdateError as e:
+            return Response({'error': f'Problem failed to update in gitlab {e}'},
+                            status=status.HTTP_400_BAD_REQUEST)
+        except GitlabCreateError as e:
+            return Response({'error': f'Failed to update README in gitlab {e}'},
+                            status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({'error': f'{e}'}, status=status.HTTP_400_BAD_REQUEST)
+
+    def perform_update(self, serializer):
+        with transaction.atomic():
+            content = serializer.instance.content
+            updated_content = serializer.validated_data.get('content')
+            problem = serializer.save()
+
+            gitlab = GitLabWrapper()
+            create_project_dto = ProjectDTO(
+                name=problem.title,
+                namespace_id=problem.problem_set.git_reference_id,
+                path=problem.git_path
+            )
+
+            gitlab.update_project(problem.git_reference_id, create_project_dto)
+            # Compare the existing data with the updated data
+            if updated_content != content:
+                gitlab.update_readme_project(problem.git_reference_id, updated_content)
