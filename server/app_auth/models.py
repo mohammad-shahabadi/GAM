@@ -5,7 +5,6 @@ from django.db import models
 # Create your models here.
 class User(AbstractUser):
     student_number = models.CharField(max_length=10, blank=True, null=True)
-    is_deleted = models.BooleanField(default=False)
     git_reference_id = models.IntegerField(blank=True, null=True)
     role = models.CharField(max_length=10)
 

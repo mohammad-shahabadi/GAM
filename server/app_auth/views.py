@@ -124,8 +124,6 @@ class DeactivateUserView(generics.UpdateAPIView):
             return Response({'error': f'{e}'}, status=status.HTTP_400_BAD_REQUEST)
 
     def perform_update(self, serializer):
-        if serializer.instance.is_deleted:
-            raise Exception('User not found')
         with transaction.atomic():
             if serializer.instance.email == "admin@admin.com":
                 raise Exception('Cannot delete admin')
@@ -142,27 +140,24 @@ class DeactivateUserView(generics.UpdateAPIView):
                 gitlab.deactivate_user(deactivate_user_gitlab_dto)
 
 
-class SoftDeleteUserView(generics.UpdateAPIView):
+class UserDeleteView(generics.DestroyAPIView):
     queryset = User.objects.all()
     serializer_class = UserSoftDeleteSerializer
     permission_classes = [AdminPermission]
 
-    def update(self, request, *args, **kwargs):
+    def destroy(self, request, *args, **kwargs):
         try:
-            return super().update(request, *args, **kwargs)
+            return super().destroy(request, *args, **kwargs)
         except GitlabDeleteError as e:
             return Response({'error': f'User failed to delete in gitlab {e}'}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({'error': f'{e}'}, status=status.HTTP_400_BAD_REQUEST)
 
-    def perform_update(self, serializer):
-        if serializer.instance.is_deleted:
-            raise Exception('User not found')
+    def perform_destroy(self, serializer):
         with transaction.atomic():
-            if serializer.instance.email == "admin@admin.com":
+            if serializer.instance.is_superuser:
                 raise Exception('Cannot delete admin')
-            serializer.instance.is_deleted = True
-            serializer.save()
+            serializer.instance.delete()
 
             gitlab = GitLabWrapper()
             delete_user_gitlab_dto = UserDTO(id=serializer.instance.git_reference_id)
@@ -183,8 +178,8 @@ class ModifyUserView(generics.UpdateAPIView):
             return Response({'error': f'{e}'}, status=status.HTTP_400_BAD_REQUEST)
 
     def perform_update(self, serializer):
-        if serializer.instance.is_deleted:
-            raise Exception('User not found')
+        if serializer.instance.is_superuser and serializer.validated_data['role'] != 'admin':
+            raise Exception('Can not change admin role')
         with transaction.atomic():
             serializer.save()
             if serializer.instance.is_superuser is False:
