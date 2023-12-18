@@ -18,6 +18,8 @@ services:
 
   postgres:
     image: postgres:16
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
     environment:
       POSTGRES_DB: gam
       POSTGRES_USER: root
@@ -49,3 +51,5 @@ services:
       - ./gitlab/logs:/var/log/gitlab
       - ./gitlab/data:/var/opt/gitlab
 
+volumes:
+  postgres_data:
