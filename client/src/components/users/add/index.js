@@ -52,125 +52,125 @@ const AddForm = ({t, slug}) => {
     };
     if (!!slug && userLoader) {
         return (<div className={"w-full h-screen flex items-center justify-center"}>
-            <BeatLoader color="#1976d2"/>
+            <BeatLoader color="#ff5733"/>
         </div>)
     }
     return (<form
-            style={{
-                display: 'flex', flexDirection: 'column', margin: 'auto', marginTop: 2,
-            }}
+        style={{
+            display: 'flex', flexDirection: 'column', margin: 'auto', marginTop: 2,
+        }}
+    >
+        <div className={"font-bold  text-center text-xl md:text-3xl"}>{!!slug ? t('editUser') : t('addUser')}</div>
+        <div
+            className={"pt-4 sm:pt-8  flex flex-col sm:flex-row gap-2"}
         >
-            <div className={"font-bold  text-center text-xl md:text-3xl"}>{!!slug ? t('editUser') : t('addUser')}</div>
-            <div
-                className={"pt-4 sm:pt-8  flex flex-col sm:flex-row gap-2"}
-            >
-                <div className={"w-full"}>
-                    <Box
-                        sx={{display: "flex", flexDirection: "column", gap: "1rem"}}
+            <div className={"w-full"}>
+                <Box
+                    sx={{display: "flex", flexDirection: "column", gap: "1rem"}}
+                >
+                    <Paper
+                        elevation={0}
+                        className="shadow"
+                        sx={{
+                            display: "flex", flexDirection: "column", gap: "1rem", p: 2, borderRadius: "16px"
+                        }}
                     >
-                        <Paper
-                            elevation={0}
-                            className="shadow"
-                            sx={{
-                                display: "flex", flexDirection: "column", gap: "1rem", p: 2, borderRadius: "16px"
-                            }}
-                        >
-                            <TextField
-                                label={t('firstName')}
-                                type="text"
-                                name="first_name"
-                                value={formData.first_name}
-                                onChange={handleChange}
-                                margin="normal"
-                                sx={{margin: 1}}
-                            />
-                            <TextField
-                                label={t('lastName')}
-                                type="text"
-                                name="last_name"
-                                value={formData.last_name}
-                                onChange={handleChange}
-                                margin="normal"
-                                sx={{margin: 1}}
-                            />
-                            <TextField
-                                label={t('stdNumber')}
-                                type="number"
-                                name="student_number"
-                                value={formData.student_number}
-                                onChange={handleChange}
-                                margin="normal"
-                                sx={{margin: 1}}
-                            />
-                        </Paper>
+                        <TextField
+                            label={t('firstName')}
+                            type="text"
+                            name="first_name"
+                            value={formData.first_name}
+                            onChange={handleChange}
+                            margin="normal"
+                            sx={{margin: 1}}
+                        />
+                        <TextField
+                            label={t('lastName')}
+                            type="text"
+                            name="last_name"
+                            value={formData.last_name}
+                            onChange={handleChange}
+                            margin="normal"
+                            sx={{margin: 1}}
+                        />
+                        <TextField
+                            label={t('stdNumber')}
+                            type="number"
+                            name="student_number"
+                            value={formData.student_number}
+                            onChange={handleChange}
+                            margin="normal"
+                            sx={{margin: 1}}
+                        />
+                    </Paper>
 
-                    </Box>
-                </div>
-                <div className={"w-full h-full"}>
-                    <Box
-                        sx={{display: "flex", flexDirection: "column", gap: "1rem"}}
+                </Box>
+            </div>
+            <div className={"w-full h-full"}>
+                <Box
+                    sx={{display: "flex", flexDirection: "column", gap: "1rem"}}
+                >
+                    <Paper
+                        elevation={0}
+                        className="shadow"
+                        sx={{
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: "1rem",
+                            p: 2,
+                            borderRadius: "16px",
+                            height: "100%"
+                        }}
                     >
-                        <Paper
-                            elevation={0}
-                            className="shadow"
-                            sx={{
-                                display: "flex",
-                                flexDirection: "column",
-                                gap: "1rem",
-                                p: 2,
-                                borderRadius: "16px",
-                                height: "100%"
-                            }}
-                        >
-                            <TextField
-                                label={t('email')}
-                                type="email"
-                                name="email"
-                                value={formData.email}
+                        {!slug && <TextField
+                            label={t('email')}
+                            type="email"
+                            name="email"
+                            value={formData.email}
+                            onChange={handleChange}
+                            margin="normal"
+                            sx={{margin: 1}}
+                        />}
+                        {!slug && <TextField
+                            label={t('password')}
+                            type="password"
+                            name="password"
+                            value={formData.password}
+                            onChange={handleChange}
+                            margin="normal"
+                            sx={{margin: 1}}
+                        />}
+                        <FormControl sx={{margin: 1, minWidth: 120}}>
+                            <Select
+                                labelId={t('role')}
+                                id="role"
+                                name="role"
+                                value={formData.role}
                                 onChange={handleChange}
-                                margin="normal"
-                                sx={{margin: 1}}
-                            />
-                            {!slug && <TextField
-                                label={t('password')}
-                                type="password"
-                                name="password"
-                                value={formData.password}
-                                onChange={handleChange}
-                                margin="normal"
-                                sx={{margin: 1}}
-                            />}
-                            <FormControl sx={{margin: 1, minWidth: 120}}>
-                                <Select
-                                    labelId={t('role')}
-                                    id="role"
-                                    name="role"
-                                    value={formData.role}
-                                    onChange={handleChange}
-                                >
-                                    <MenuItem value="admin">{t('admin')}</MenuItem>
-                                    <MenuItem value="student" selected={true}>{t('student')}</MenuItem>
-                                    <MenuItem value="teacher">{t('teacher')}</MenuItem>
-                                </Select>
-                            </FormControl>
-                        </Paper>
+                            >
+                                <MenuItem value="admin">{t('admin')}</MenuItem>
+                                <MenuItem value="student" selected={true}>{t('student')}</MenuItem>
+                                <MenuItem value="teacher">{t('teacher')}</MenuItem>
+                            </Select>
+                        </FormControl>
+                    </Paper>
 
 
-                    </Box>
-                </div>
-
+                </Box>
             </div>
 
+        </div>
 
-            <Button
-                type="primary"
-                caption={t('submit')}
-                className="mt-4 md:mt-8"
-                onClick={handleSubmit}
-                disabled={!formData.email || (!slug && !formData.password) || !formData.student_number || !formData.first_name || !formData.last_name}
-                loading={signupLoader || updateUserLoader}
-            />
-        </form>);
+
+        <Button
+            type="primary"
+            caption={t('submit')}
+            className="mt-4 md:mt-8"
+            onClick={handleSubmit}
+            disabled={!formData.email || (!slug && !formData.password) || !formData.student_number || !formData.first_name || !formData.last_name}
+            loading={signupLoader || updateUserLoader}
+        />
+    </form>);
 };
 
 export default AddForm;

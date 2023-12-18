@@ -5,17 +5,21 @@ import {Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow}
 import {Link, usePathname, useRouter} from "@/navigation";
 import CustomModal from "@/components/global/Modal";
 import {useRequest} from "@/hooks/useRequest";
-import {DELETE_COURSE, DELETE_USER, GET_ALL_USERS, GET_COURSES, UPDATE_USER} from "@/apiList";
+import {DELETE_COURSE, GET_COURSES, GET_COURSES_TEACHER} from "@/apiList";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import useWindowSize from "@/hooks/useWindowSize";
 import {toast} from "react-toastify";
+import Cookies from "js-cookie";
+
 export default function ClassesTable({t}) {
     const [showDeleteModal, setShowDeleteModal] = useState(false)
     const [selectedClass, setSelectedClass] = useState(null)
     const [classes, setClasses] = useState([])
-    const [getClassesReq, getClassesLoader] = useRequest(GET_COURSES, "GET");
-    const getClasses = ()=>{
+    const token = Cookies.get('gam-authorities');
+
+    const [getClassesReq, getClassesLoader] = useRequest(token === "admin" ? GET_COURSES : GET_COURSES_TEACHER, "GET");
+    const getClasses = () => {
         getClassesReq().then((res) => {
             setClasses(res.results)
         })
@@ -34,14 +38,14 @@ export default function ClassesTable({t}) {
 
         }).catch(() => {
             toast.error("Something wrong happened")
-        }).finally(()=>{
+        }).finally(() => {
             setShowDeleteModal(false)
         })
     }
     const mode = useWindowSize()
     const router = useRouter()
     const pathname = usePathname()
-    const cols = mode ===1 ? [ t('title'), t('description'), t('edit'), t('delete')] : [ t('title'), t('description'), t('edit'), t('delete')]
+    const cols = token === "admin" ? [t('title'), t('description'), t('edit'), t('delete')] : [t('title'), t('description'), t('role'), t('edit'), t('delete')]
 
     return (
         <div>
@@ -56,42 +60,55 @@ export default function ClassesTable({t}) {
             <div className={"h-full"} style={{width: '100%'}}>
                 <Suspense>
                     <TableContainer component={Paper}>
-                        <Table sx={{maxWidth:"100%"}} aria-label="simple table">
+                        <Table sx={{maxWidth: "100%"}} aria-label="simple table">
                             <TableHead className={"bg-[var(--background)]"}>
                                 <TableRow>
-                                    {cols.map((col,idx)=>{
-                                        return(<TableCell key={idx} align="center">
-                                         <div className={"font-bold"}>  {col}</div>
+                                    {cols.map((col, idx) => {
+                                        return (<TableCell key={idx} align="center">
+                                            <div className={"font-bold"}>  {col}</div>
                                         </TableCell>)
                                     })}
 
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {classes.map((course,idx) => (
+                                {classes.map((course, idx) => (
                                     <TableRow
                                         key={idx}
                                         sx={{'&:last-child td, &:last-child th': {border: 0}}}
                                     >
 
-                                        <TableCell onClick={()=>router.push(pathname+"/"+course.id)} className={"cursor-pointer "} align={"center"}  component="th" scope="row">
+                                        <TableCell onClick={() => router.push(pathname + "/" + course.id)}
+                                                   className={"cursor-pointer "} align={"center"} component="th"
+                                                   scope="row">
                                             <div>
-                                                {course.title || "-"}
+                                                {( token === "admin" ?course.title : course.course.title) || "-"}
                                             </div>
                                         </TableCell>
-                                        <TableCell onClick={()=>router.push(pathname+"/"+course.id)} className={"cursor-pointer"} align={"center"}  component="th" scope="row">
+                                        <TableCell onClick={() => router.push(pathname + "/" + course.id)}
+                                                   className={"cursor-pointer"} align={"center"} component="th"
+                                                   scope="row">
                                             <div>
-                                                {course.description || "-"}
+                                                {( token === "admin" ?course.description : course.course.description) || "-"}
+
                                             </div>
                                         </TableCell>
+                                        {token !== "admin" && <TableCell onClick={() => router.push(pathname + "/" + course.id)}
+                                                    className={"cursor-pointer"} align={"center"} component="th"
+                                                    scope="row">
+                                            <div>
+                                                {t(course.role)}
+                                            </div>
+                                        </TableCell>}
 
                                         <TableCell align={"center"} component="th" scope="row">
-                                            <div onClick={()=>router.push(pathname + "/edit/"+course.id)} className={"text-[#808080] cursor-pointer"}>
+                                            <div onClick={() => router.push(pathname + "/edit/" + course.id)}
+                                                 className={"text-[#808080] cursor-pointer"}>
                                                 <EditIcon/>
                                             </div>
                                         </TableCell>
                                         <TableCell align={"center"} component="th" scope="row">
-                                            <div onClick={()=>{
+                                            <div onClick={() => {
                                                 setSelectedClass(course)
                                                 setShowDeleteModal(true)
                                             }} className={"text-red-600 cursor-pointer"}>

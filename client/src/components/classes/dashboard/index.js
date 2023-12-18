@@ -36,7 +36,7 @@ const ClassDashboard = ({t, slug}) => {
 
     if (!!slug && classLoader) {
         return (<div className={"w-full h-screen flex items-center justify-center"}>
-            <BeatLoader color="#1976d2"/>
+            <BeatLoader color="#ff5733"/>
         </div>)
     }
     return (<div
@@ -44,12 +44,12 @@ const ClassDashboard = ({t, slug}) => {
             display: 'flex', flexDirection: 'column', margin: 'auto', marginTop: 2,
         }}
     >
-        <div className={"w-full justify-between flex"}>
-            <Link className={"bg-[#ff5733] text-white py-2 px-4 mb-4 max-h-fit"} href={pathname.startsWith('/admin') ? "/admin/classes" : "/teacher/classes"}>
-                {t('goBack')}
-            </Link>
+        {/*<div className={"w-full justify-between flex"}>*/}
+        {/*    <Link className={"bg-[#ff5733] text-white py-2 px-4 mb-4 max-h-fit"} href={pathname.startsWith('/admin') ? "/admin/classes" : "/teacher/classes"}>*/}
+        {/*        {t('goBack')}*/}
+        {/*    </Link>*/}
 
-        </div>
+        {/*</div>*/}
         <div>
             <div className={"font-bold  text-center text-3xl md:text-5xl"}>{course?.title}</div>
             <div className={"font-medium mt-2 text-center text-xl md:text-3xl"}>{course?.description}</div>

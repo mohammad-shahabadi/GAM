@@ -56,7 +56,7 @@ const AddHW = ({t, slug,id}) => {
     };
     if (!!id && HWLoader) {
         return (<div className={"w-full h-screen flex items-center justify-center"}>
-            <BeatLoader color="#1976d2"/>
+            <BeatLoader color="#ff5733"/>
         </div>)
     }
     return (<form

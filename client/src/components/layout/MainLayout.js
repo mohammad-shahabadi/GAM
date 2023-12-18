@@ -21,6 +21,7 @@ import {Link} from "@/navigation";
 import useWindowSize from "@/hooks/useWindowSize";
 import img1 from "../../assets/images/no-organization_prev_ui.png"
 import Image from "next/image";
+import Cookies from "js-cookie";
 const drawerWidth = 200;
 
 export default function MainLayout({children, locale}) {
@@ -37,6 +38,8 @@ export default function MainLayout({children, locale}) {
     const handleMenuClose = () => {
         setAnchorElLanguage(null)
     }
+    const token = Cookies.get('gam-authorities');
+    console.log(token)
     const isLanguageMenuOpen = Boolean(anchorElLanguage)
     const pathname = usePathname()
     const drawer = (
@@ -68,16 +71,16 @@ export default function MainLayout({children, locale}) {
                 <Divider/>
                 <List>
                     <ListItem disablePadding>
-                        <Link style={pathname === "/admin"? {backgroundColor:"#ff5733",color:"white"}:{}} className={"w-full"} href={"/admin"}>
+                        <Link style={pathname === ("/" + token)? {backgroundColor:"#ff5733",color:"white"}:{}} className={"w-full"} href={("/" + token)}>
                             <ListItemButton>
                                 <ListItemText sx={{textAlign: "start"}} primary={t('dashboard')}/>
                             </ListItemButton>
                         </Link>
 
                     </ListItem>
-                    {['users', 'classes'].map((text, index) => (
+                    {(token === "admin" ? ['users', 'classes'] : ['classes']).map((text, index) => (
                         <ListItem key={index} disablePadding>
-                            <Link style={pathname.startsWith("/admin/"+text)? {backgroundColor:"#ff5733",color:"white"}:{}} className={"w-full"} href={"/admin/"+text}>
+                            <Link style={pathname.startsWith(("/" + token+"/")+text)? {backgroundColor:"#ff5733",color:"white"}:{}} className={"w-full"} href={("/" + token+"/")+text}>
                                 <ListItemButton>
                                     <ListItemText sx={{textAlign: "start"}} primary={t(text)}/>
                                 </ListItemButton>

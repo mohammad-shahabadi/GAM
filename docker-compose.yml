@@ -27,17 +27,17 @@ services:
     ports:
       - "5439:5432"
 
-  frontend:
-    build: ./client
-    command: >
-      sh -c "npm run start"
-    volumes:
-      - ./client/src:/gam_frontend/src
-
-    ports:
-      - "3000:3000"
-    depends_on:
-      - web
+#  frontend:
+#    build: ./client
+#    command: >
+#      sh -c "npm run start"
+#    volumes:
+#      - ./client/src:/gam_frontend/src
+#
+#    ports:
+#      - "3000:3000"
+#    depends_on:
+#      - web
 
   gitlab:
     image: gitlab/gitlab-ce:16.6.1-ce.0

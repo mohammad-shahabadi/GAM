@@ -48,8 +48,8 @@ export function useRequest(url, method, token, loaderInitState) {
                             e?.response?.status === 403) && /// must be unified.
                         Cookies.get("gam-token")
                     ) {
-                        Cookies.remove("gam-token")
-                        window.location.reload();
+                        //Cookies.remove("gam-token")
+                        //window.location.reload();
                     } else {
                         throw e;
                     }
