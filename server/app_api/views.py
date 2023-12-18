@@ -14,7 +14,7 @@ from gitlab_wrapper.gitlab_wrapper import GitLabWrapper
 from .models import Course, Membership, ProblemSet, Problem
 from app_auth.models import User
 from .serializers import CourseSerializer, MembershipSerializer, MembershipCreationSerializer, CourseDetailSerializer, \
-    ProblemSetSerializer, ProblemSerializer
+    ProblemSetSerializer, ProblemSerializer, ProblemSetUpdateSerializer, ProblemUpdateSerializer
 
 
 class CourseCreateView(generics.CreateAPIView):
@@ -278,7 +278,7 @@ class ProblemSetRetrieveView(generics.RetrieveAPIView):
 
 class ProblemSetUpdateView(generics.UpdateAPIView):
     queryset = ProblemSet.objects.all()
-    serializer_class = ProblemSetSerializer
+    serializer_class = ProblemSetUpdateSerializer
     permission_classes = [IsTeacherOrTaOfCourseOrAdminForProblemSet]
 
     def update(self, request, *args, **kwargs):
@@ -309,7 +309,7 @@ class ProblemSetUpdateView(generics.UpdateAPIView):
 
 class ProblemSetPublishView(generics.UpdateAPIView):
     queryset = ProblemSet.objects.all()
-    serializer_class = ProblemSetSerializer
+    serializer_class = ProblemSetUpdateSerializer
     permission_classes = [IsTeacherOrTaOfCourseOrAdminForProblemSet]
 
     def update(self, request, *args, **kwargs):
@@ -341,9 +341,9 @@ class ProblemCreateView(generics.CreateAPIView):
 
     def perform_create(self, serializer):
         with transaction.atomic():
-            if serializer.instance.problem_set.published:
-                raise Exception('Cannot create problem in published problem set')
             problem = serializer.save()
+            if problem.problem_set.published:
+                raise Exception('Cannot create problem in published problem set')
             gitlab = GitLabWrapper()
             create_project_dto = ProjectDTO(
                 name=problem.title,
@@ -398,7 +398,7 @@ class ProblemRetrieveView(generics.RetrieveAPIView):
 
 class ProblemUpdateView(generics.UpdateAPIView):
     queryset = Problem.objects.all()
-    serializer_class = ProblemSerializer
+    serializer_class = ProblemUpdateSerializer
     permission_classes = [IsTeacherOrTaOfCourseOrAdminForProblem]
 
     def update(self, request, *args, **kwargs):
