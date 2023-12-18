@@ -57,7 +57,7 @@ class CourseDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Course
-        fields = ['id', 'title', 'description', 'memberships', 'password', 'professor']
+        fields = ['id', 'title', 'description', 'memberships', 'password', 'professor', 'term']
 
 
 class ProblemSetSerializer(serializers.ModelSerializer):
@@ -66,7 +66,19 @@ class ProblemSetSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class ProblemSetUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProblemSet
+        fields = ['title', 'start', 'end', 'published', 'git_path']
+
+
 class ProblemSerializer(serializers.ModelSerializer):
     class Meta:
         model = Problem
         fields = '__all__'
+
+
+class ProblemUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Problem
+        fields = ['title', 'priority', 'points', 'content', 'git_path']
