@@ -117,7 +117,6 @@ class CourseDeleteView(generics.DestroyAPIView):
             gitlab.delete_group(class_git_reference)
 
 
-
 class MembershipCreateView(generics.CreateAPIView):
     serializer_class = MembershipCreationSerializer
     permission_classes = [IsTeacherOfCourseOrAdminForMemberShip]
@@ -258,7 +257,8 @@ class ProblemSetDeleteView(generics.DestroyAPIView):
         try:
             return super().destroy(request, *args, **kwargs)
         except GitlabDeleteError as e:
-            return Response({'error': f'Problem set failed to delete in gitlab {e}'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': f'Problem set failed to delete in gitlab {e}'},
+                            status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({'error': f'{e}'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -292,6 +292,9 @@ class ProblemSetUpdateView(generics.UpdateAPIView):
 
     def perform_update(self, serializer):
         with transaction.atomic():
+            if serializer.instance.published:
+                raise Exception('Cannot update published problem set')
+
             problem_set = serializer.save()
             gitlab = GitLabWrapper()
             git_parent_group_id = problem_set.course.git_homeworks_reference_id
@@ -302,6 +305,24 @@ class ProblemSetUpdateView(generics.UpdateAPIView):
                                                     parent_id=git_parent_group_id
                                                     )
             gitlab.update_group(problem_set.git_reference_id, problem_set_group_gitlab_dto)
+
+
+class ProblemSetPublishView(generics.UpdateAPIView):
+    queryset = ProblemSet.objects.all()
+    serializer_class = ProblemSetSerializer
+    permission_classes = [IsTeacherOrTaOfCourseOrAdminForProblemSet]
+
+    def update(self, request, *args, **kwargs):
+        try:
+            return super().update(request, *args, **kwargs)
+        except Exception as e:
+            return Response({'error': f'{e}'}, status=status.HTTP_400_BAD_REQUEST)
+
+    def perform_update(self, serializer):
+        with transaction.atomic():
+            problem_set = serializer.save()
+            problem_set.published = True
+            problem_set.save()
 
 
 class ProblemCreateView(generics.CreateAPIView):
@@ -320,6 +341,8 @@ class ProblemCreateView(generics.CreateAPIView):
 
     def perform_create(self, serializer):
         with transaction.atomic():
+            if serializer.instance.problem_set.published:
+                raise Exception('Cannot create problem in published problem set')
             problem = serializer.save()
             gitlab = GitLabWrapper()
             create_project_dto = ProjectDTO(
@@ -359,6 +382,8 @@ class ProblemDeleteView(generics.DestroyAPIView):
 
     def perform_destroy(self, instance):
         with transaction.atomic():
+            if instance.problem_set.published:
+                raise Exception('Cannot delete problem in published problem set')
             problem_git_id = instance.git_reference_id
             instance.delete()
             gitlab = GitLabWrapper()
@@ -390,6 +415,8 @@ class ProblemUpdateView(generics.UpdateAPIView):
 
     def perform_update(self, serializer):
         with transaction.atomic():
+            if serializer.instance.problem_set.published:
+                raise Exception('Cannot update problem in published problem set')
             content = serializer.instance.content
             updated_content = serializer.validated_data.get('content')
             problem = serializer.save()
