@@ -315,14 +315,38 @@ class ProblemSetPublishView(generics.UpdateAPIView):
     def update(self, request, *args, **kwargs):
         try:
             return super().update(request, *args, **kwargs)
+        except GitlabCreateError as e:
+            return Response({'error': f'Forking questions failed in gitlab {e}'},
+                            status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({'error': f'{e}'}, status=status.HTTP_400_BAD_REQUEST)
 
     def perform_update(self, serializer):
         with transaction.atomic():
-            problem_set = serializer.save()
+            problem_set = serializer.instance
+            problems = self.get_problems(problem_set.id)
+            memberships = self.get_course_memberships(problem_set.course.id)
+
+            if problem_set.published:
+                raise Exception('Homework already published!')
+            if len(problems) == 0:
+                raise Exception('There are no questions for this homework')
+            if len(memberships) == 0:
+                raise Exception('There are no members to publish this homework')
+
             problem_set.published = True
             problem_set.save()
+
+            git = GitLabWrapper()
+            groups_git_dtos = [GroupDTO(id=membership.git_reference_id) for membership in memberships]
+            projects_git_dtos = [ProjectDTO(id=problem.git_reference_id) for problem in problems]
+            git.fork_projects_to_groups(projects_git_dtos, groups_git_dtos)
+
+    def get_course_memberships(self, course_id):
+        return Membership.objects.filter(course_id=course_id, role='student')
+
+    def get_problems(self, problem_set_id):
+        return Problem.objects.filter(problem_set_id=problem_set_id)
 
 
 class ProblemCreateView(generics.CreateAPIView):
