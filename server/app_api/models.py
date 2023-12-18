@@ -23,6 +23,7 @@ class Course(models.Model):
     password = models.CharField(max_length=255, blank=True, null=True,
                                 help_text="Optional password for joining the course")
     professor = models.CharField(max_length=255, blank=True, null=True)
+    term = models.CharField(max_length=255, blank=True, null=True)
     identifier_field = models.CharField(max_length=255, blank=True, null=True,
                                         help_text="Default field to use for identifier field")
     git_path = models.CharField(max_length=30)
@@ -35,8 +36,13 @@ class ProblemSet(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='problem_sets')
     start = models.DateTimeField(blank=True, null=True)
     end = models.DateTimeField(blank=True, null=True)
+    published = models.BooleanField(default=False)
     git_path = models.CharField(max_length=30)
     git_reference_id = models.IntegerField(blank=True, null=True)
+
+    def __str__(self):
+        return (self.title + " - " + self.course.title + " - " + str(self.start) + " - " + str(self.end) +
+                " - " + str(self.published))
 
 
 class Problem(models.Model):
@@ -55,3 +61,7 @@ class Problem(models.Model):
     #                                 allow_files=False, allow_folders=True)
     # gitlab_id = models.BigIntegerField(unique=True, blank=True)
     # gitlab_path = models.CharField(max_length=255, blank=True)
+
+    def __str__(self):
+        return (self.title + " - " + self.problem_set.title + " - " + str(self.priority) + " - " +
+                str(self.points) + " - " + str(self.content))
