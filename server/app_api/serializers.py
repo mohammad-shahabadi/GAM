@@ -57,7 +57,7 @@ class CourseDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Course
-        fields = ['id', 'title', 'description', 'memberships', 'password', 'professor']
+        fields = ['id', 'title', 'description', 'memberships', 'password', 'professor', 'term']
 
 
 class ProblemSetSerializer(serializers.ModelSerializer):
