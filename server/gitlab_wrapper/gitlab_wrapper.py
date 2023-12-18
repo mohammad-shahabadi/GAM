@@ -159,4 +159,4 @@ class GitLabWrapper:
         for group in groups:
             for project in projects:
                 project_git = self._gl.projects.get(project.id)
-                project_git.forks.create({'namespace_id': group.id, 'mr_default_target_self': False})
+                project_git.forks.create({'namespace_id': group.id})
