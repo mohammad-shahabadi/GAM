@@ -88,7 +88,7 @@ const AddHW = ({t, slug,id}) => {
                             margin="normal"
                             sx={{margin: 1}}
                         />
-                        {!!slug && <TextField
+                        {!id && <TextField
                             label={t('git_path')}
                             type="text"
                             name="git_path"

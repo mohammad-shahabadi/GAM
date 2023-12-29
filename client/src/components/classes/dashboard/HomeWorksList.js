@@ -79,17 +79,17 @@ export default function HomeWorksList({t,course}) {
                                         sx={{'&:last-child td, &:last-child th': {border: 0}}}
                                     >
 
-                                        <TableCell onClick={()=>router.push(pathname+"/"+hw.id)} className={"cursor-pointer "} align={"center"}  component="th" scope="row">
+                                        <TableCell onClick={()=>router.push(pathname+"/homework/"+hw.id)} className={"cursor-pointer "} align={"center"}  component="th" scope="row">
                                             <div>
                                                 {hw.title || "-"}
                                             </div>
                                         </TableCell>
-                                        <TableCell onClick={()=>router.push(pathname+"/"+hw.id)} className={"cursor-pointer"} align={"center"}  component="th" scope="row">
+                                        <TableCell onClick={()=>router.push(pathname+"/homework/"+hw.id)} className={"cursor-pointer"} align={"center"}  component="th" scope="row">
                                             <div>
                                                 {hw.start.slice(0,10) || "-"}
                                             </div>
                                         </TableCell>
-                                        <TableCell onClick={()=>router.push(pathname+"/"+hw.id)} className={"cursor-pointer"} align={"center"}  component="th" scope="row">
+                                        <TableCell onClick={()=>router.push(pathname+"/homework/"+hw.id)} className={"cursor-pointer"} align={"center"}  component="th" scope="row">
                                             <div>
                                                 {hw.end.slice(0,10) || "-"}
                                             </div>

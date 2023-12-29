@@ -31,7 +31,7 @@ export default function ClassesTable({t}) {
 
     const handleDelete = () => {
         deleteClassReq(undefined, [
-            {name: "id", value: selectedClass.course.id},
+            {name: "id", value: token === "admin" ? selectedClass.id : selectedClass.course.id},
         ]).then((res) => {
             getClasses()
             toast.success("Class removed successfully")
@@ -78,14 +78,14 @@ export default function ClassesTable({t}) {
                                         sx={{'&:last-child td, &:last-child th': {border: 0}}}
                                     >
 
-                                        <TableCell onClick={() => router.push(pathname + "/" + course.course.id)}
+                                        <TableCell onClick={() => router.push(pathname + "/" + (token === "admin" ? course.id:course.course.id))}
                                                    className={"cursor-pointer "} align={"center"} component="th"
                                                    scope="row">
                                             <div>
                                                 {( token === "admin" ?course.title : course.course.title) || "-"}
                                             </div>
                                         </TableCell>
-                                        <TableCell onClick={() => router.push(pathname + "/" + course.course.id)}
+                                        <TableCell onClick={() => router.push(pathname + "/" + (token === "admin" ? course.id:course.course.id))}
                                                    className={"cursor-pointer"} align={"center"} component="th"
                                                    scope="row">
                                             <div>
@@ -93,7 +93,7 @@ export default function ClassesTable({t}) {
 
                                             </div>
                                         </TableCell>
-                                        {token !== "admin" && <TableCell onClick={() => router.push(pathname + "/" + course.course.id)}
+                                        {token !== "admin" && <TableCell onClick={() => router.push(pathname + "/" + (token === "admin" ? course.id:course.course.id))}
                                                     className={"cursor-pointer"} align={"center"} component="th"
                                                     scope="row">
                                             <div>
@@ -102,7 +102,7 @@ export default function ClassesTable({t}) {
                                         </TableCell>}
 
                                         <TableCell align={"center"} component="th" scope="row">
-                                            <div onClick={() => router.push(pathname + "/edit/" + course.course.id)}
+                                            <div onClick={() => router.push(pathname + "/edit/" + (token === "admin" ? course.id:course.course.id))}
                                                  className={"text-[#808080] cursor-pointer"}>
                                                 <EditIcon/>
                                             </div>

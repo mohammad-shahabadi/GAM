@@ -52,9 +52,12 @@
 
     "goBack": "Go Back",
     "hwList": "Homeworks List",
+    "qList": "Questions List",
     "stdList": "Participants List",
     "addHW": "Add Homework",
     "editHW": "Edit Homework",
+    "addQ": "Add Question",
+    "editQ": "Edit Question",
     "addStudent": "Add Participants",
 
     "startDate": "Start Date",
@@ -69,7 +72,9 @@
     "deleteHWText": "Are you sure you want to remove this homework?",
     "ta": "TA",
     "teacher": "Teacher",
-    "student": "Student"
+    "student": "Student",
+    "priority": "Priority",
+    "points": "Points"
   },
   "Dashboard": {
     "welcome": "Welcome",
