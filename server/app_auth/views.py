@@ -106,7 +106,7 @@ class GetUserSelfInfoView(generics.RetrieveAPIView):
 class GetAllUsersView(generics.ListAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [AdminPermission]
+    permission_classes = [TeacherOrAdminPermission]
 
     def get_queryset(self):
         return User.objects.filter()
