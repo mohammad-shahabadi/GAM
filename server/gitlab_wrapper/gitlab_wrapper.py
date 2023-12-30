@@ -123,9 +123,17 @@ class GitLabWrapper:
                 'initialize_with_readme': True
             }
         )
+
+        self.update_readme_project(create_project_dto.id, readme_content)
+
+        # Create Branch for Students
+        project.branches.create({
+            'branch': 'dev',
+            'ref': 'master'
+        })
+
         create_project_dto.id = project.get_id()
         create_project_dto.http_url = project.http_url_to_repo
-        self.update_readme_project(create_project_dto.id, readme_content)
 
         return create_project_dto
 
