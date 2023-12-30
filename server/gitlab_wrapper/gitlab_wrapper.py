@@ -72,8 +72,15 @@ class GitLabWrapper:
         return update_group_dto
 
     def get_group(self, group_id):
-        return self._gl.groups.get(
+        group_git = self._gl.groups.get(
             id=group_id
+        )
+        return GroupDTO(
+            id=group_git.id,
+            name=group_git.name,
+            path=group_git.path,
+            parent_id=group_git.parent_id,
+            description=group_git.description
         )
 
     def delete_group(self, group_id):
@@ -123,6 +130,8 @@ class GitLabWrapper:
                 'initialize_with_readme': True
             }
         )
+        create_project_dto.id = project.get_id()
+        create_project_dto.http_url = project.http_url_to_repo
 
         self.update_readme_project(create_project_dto.id, readme_content)
 
@@ -132,8 +141,7 @@ class GitLabWrapper:
             'ref': 'master'
         })
 
-        create_project_dto.id = project.get_id()
-        create_project_dto.http_url = project.http_url_to_repo
+
 
         return create_project_dto
 
@@ -163,8 +171,10 @@ class GitLabWrapper:
     def delete_project(self, project_id):
         self._gl.projects.delete(id=project_id)
 
-    def fork_projects_to_groups(self, projects: [ProjectDTO], groups: [GroupDTO]):
+    def fork_projects_to_groups(self, super_group_to_create: GroupDTO, projects: [ProjectDTO], groups: [GroupDTO]):
         for group in groups:
+            super_group_to_create.parent_id = group.id
+            super_group = self.create_group(super_group_to_create)
             for project in projects:
                 project_git = self._gl.projects.get(project.id)
-                project_git.forks.create({'namespace_id': group.id})
+                project_git.forks.create({'namespace_id': super_group.id})

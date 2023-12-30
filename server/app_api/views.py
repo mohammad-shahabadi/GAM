@@ -338,9 +338,11 @@ class ProblemSetPublishView(generics.UpdateAPIView):
             problem_set.save()
 
             git = GitLabWrapper()
-            groups_git_dtos = [GroupDTO(id=membership.git_reference_id) for membership in memberships]
+            user_groups_git_dtos = [GroupDTO(id=membership.git_reference_id) for membership in memberships]
+            copy_problem_set_group = git.get_group(problem_set.git_reference_id)
+            copy_problem_set_group.id = None
             projects_git_dtos = [ProjectDTO(id=problem.git_reference_id) for problem in problems]
-            git.fork_projects_to_groups(projects_git_dtos, groups_git_dtos)
+            git.fork_projects_to_groups(copy_problem_set_group, projects_git_dtos, user_groups_git_dtos)
 
     def get_course_memberships(self, course_id):
         return Membership.objects.filter(course_id=course_id, role='student')
