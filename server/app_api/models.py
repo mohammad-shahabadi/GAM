@@ -73,6 +73,7 @@ class Submission(models.Model):
     pipeline_id = models.BigIntegerField()
     project_id = models.BigIntegerField()
     problem = models.ForeignKey(Problem, on_delete=models.CASCADE, related_name='submissions')
+    user = models.ForeignKey('app_auth.User', on_delete=models.CASCADE, related_name='submissions')
     test_result = models.JSONField(blank=True, null=True)
     passed_test_cases = models.FloatField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
