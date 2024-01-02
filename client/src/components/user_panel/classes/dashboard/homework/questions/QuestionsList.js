@@ -49,7 +49,7 @@ export default function QuestionsList({t,hw}) {
     }
     const router = useRouter()
     const pathname = usePathname()
-    const cols =  [ t('title'), t('priority'), t('points'), t('finalPoints')]
+    const cols =  [ t('title'), t('priority'), t('points')]
 
     return (
         <div className={"min-h-0"}>
@@ -75,26 +75,22 @@ export default function QuestionsList({t,hw}) {
                                         sx={{'&:last-child td, &:last-child th': {border: 0}}}
                                     >
 
-                                        <TableCell align={"center"}  component="th" scope="row">
+                                        <TableCell className={"cursor-pointer "} onClick={()=>router.push(pathname+"/questions/"+hw.id)} align={"center"}  component="th" scope="row">
                                             <div>
                                                 {hw.title || "-"}
                                             </div>
                                         </TableCell>
-                                        <TableCell  align={"center"}  component="th" scope="row">
+                                        <TableCell className={"cursor-pointer "} onClick={()=>router.push(pathname+"/questions/"+hw.id)} align={"center"}  component="th" scope="row">
                                             <div>
                                                 {hw.priority || "-"}
                                             </div>
                                         </TableCell>
-                                        <TableCell  align={"center"}  component="th" scope="row">
+                                        <TableCell className={"cursor-pointer "} onClick={()=>router.push(pathname+"/questions/"+hw.id)} align={"center"}  component="th" scope="row">
                                             <div>
                                                 {hw.points || "-"}
                                             </div>
                                         </TableCell>
-                                        <TableCell  align={"center"}  component="th" scope="row">
-                                            <div>
-                                                { "-"}
-                                            </div>
-                                        </TableCell>
+
 
 
                                     </TableRow>

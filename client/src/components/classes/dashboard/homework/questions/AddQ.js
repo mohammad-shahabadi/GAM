@@ -23,7 +23,49 @@ const AddQ = ({t, slug,id,classSlug}) => {
         "priority" : 1,
         "problem_set" : slug,
         "points" : 0,
-        "content": "**Hello world!!!**",
+        "content": "# Hw title\n" +
+            "\n" +
+            "hw description\n" +
+            "\n" +
+            "### input example\n" +
+            "```\n" +
+            "987654321\n" +
+            "123456789\n" +
+            "```\n" +
+            "\n" +
+            "### output example   \n" +
+            "```\n" +
+            "121932631112635269\n" +
+            "```\n" +
+            "\n" +
+            "<ul>\n" +
+            "<li>\n" +
+            "clone in your computer: \n" +
+            "\n" +
+            "```\n" +
+            "git clone your_repo_url\n" +
+            "cd your_repo_dir\n" +
+            "```\n" +
+            "</li>\n" +
+            "\n" +
+            "<li>\n" +
+            "run tests from terminal:\n" +
+            "\n" +
+            "```\n" +
+            "mvn clean test\n" +
+            "```\n" +
+            "</li>\n" +
+            "\n" +
+            "<li>\n" +
+            "push changes to the repository:\n" +
+            "\n" +
+            "```\n" +
+            "git add . \n" +
+            "git commit -m \"commit message\"\n" +
+            "git push\n" +
+            "```\n" +
+            "</li>\n" +
+            "</ul>\n",
         "git_path" : ""
     });
     const [addQReq, addQLoader] = useRequest(CREATE_Q, "POST");
@@ -123,7 +165,10 @@ const AddQ = ({t, slug,id,classSlug}) => {
                             margin="normal"
                             sx={{margin: 1}}
                         />
-                        <MDEditor value={formData.content} onChange={(value)=>setFormData({...formData,content: value})} />
+                        <div dir={"ltr"}>
+                            <MDEditor value={formData.content} onChange={(value)=>setFormData({...formData,content: value})} />
+
+                        </div>
 
                     </Paper>
                 </Box>

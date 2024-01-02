@@ -41,9 +41,12 @@ export const GET_QS = `${HOST}/api/problem_sets/:id/problems`; //GET
 export const DELETE_HW = `${HOST}/api/problem_sets/:id/delete`; //DELETE
 export const CREATE_HW = `${HOST}/api/problemsets/create`; //POST
 export const UPDATE_HW = `${HOST}/api/problem_sets/:id/update`; //PATCH
+export const PUBLISH_HW = `${HOST}/api/problem_sets/:id/publish`; //PATCH
 // Questions
 
 export const GET_Q = `${HOST}/api/problems/:id`; //GET
+export const USER_GET_Q = `${HOST}/api/repositories/:id`; //GET
+
 
 export const DELETE_Q = `${HOST}/api/problems/:id/delete`; //DELETE
 export const CREATE_Q = `${HOST}/api/problems/create`; //POST

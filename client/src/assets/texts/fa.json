@@ -8,6 +8,8 @@
     "login": "ورود"
   },
   "Layout": {
+    "questions": "سوالات",
+
     "title": "گام",
     "dashboard": "خانه",
     "users": "کاربران",
@@ -76,7 +78,10 @@
     "teacher": "استاد",
     "student": "دانشجو",
     "priority": "اولویت",
-    "points": "امتیازات"
+    "points": "امتیازات",
+    "status": "وضعیت",
+    "publish": "انتشار",
+    "published": "منتشر شده"
   },
   "Dashboard": {
     "welcome": "خوش آمدید",

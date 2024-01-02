@@ -9,6 +9,8 @@
   },
   "Layout": {
     "title": "GAM",
+    "questions": "Questions",
+
     "dashboard": "Dashboard",
     "users": "Users",
     "classes": "Classes",
@@ -49,7 +51,6 @@
     "submit": "Submit",
     "addClass": "Add A New Class",
     "editClass": "Edit Class",
-
     "goBack": "Go Back",
     "hwList": "Homeworks List",
     "qList": "Questions List",
@@ -74,7 +75,10 @@
     "teacher": "Teacher",
     "student": "Student",
     "priority": "Priority",
-    "points": "Points"
+    "points": "Points",
+    "status": "Status",
+    "publish": "Publish",
+    "published": "Published"
   },
   "Dashboard": {
     "welcome": "Welcome",

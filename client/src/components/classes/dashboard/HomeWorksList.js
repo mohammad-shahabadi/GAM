@@ -7,7 +7,7 @@ import CustomModal from "@/components/global/Modal";
 import {useRequest} from "@/hooks/useRequest";
 import {
     DELETE_HW,
-    GET_COURSE_HWS,
+    GET_COURSE_HWS, PUBLISH_HW,
 } from "@/apiList";
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -32,6 +32,7 @@ export default function HomeWorksList({t,course}) {
 
     }, [course])
     const [deleteHWReq, deleteHWLoader] = useRequest(DELETE_HW, "DELETE");
+    const [publishHWReq, publishHWLoader] = useRequest(PUBLISH_HW, "PATCH");
 
     const handleDelete = () => {
         deleteHWReq(undefined, [
@@ -46,10 +47,21 @@ export default function HomeWorksList({t,course}) {
             setShowDeleteModal(false)
         })
     }
+    const handlePublish = (id) => {
+        publishHWReq(undefined, [
+            {name: "id", value: id},
+        ]).then((res) => {
+            getHWs()
+            toast.success("Homework published successfully")
+
+        }).catch(() => {
+            toast.error("Something wrong happened")
+        })
+    }
     const mode = useWindowSize()
     const router = useRouter()
     const pathname = usePathname()
-    const cols = mode ===1 ? [ t('title'), t('startDate'), t('endDate'), t('edit'), t('delete')] : [ t('title'), t('startDate'), t('endDate'), t('edit'), t('delete')]
+    const cols = [ t('title'), t('startDate'), t('endDate'),t('status'), t('edit'), t('delete')]
 
     return (
         <div className={"min-h-0"}>
@@ -92,6 +104,11 @@ export default function HomeWorksList({t,course}) {
                                         <TableCell onClick={()=>router.push(pathname+"/homework/"+hw.id)} className={"cursor-pointer"} align={"center"}  component="th" scope="row">
                                             <div>
                                                 {hw.end.slice(0,10) || "-"}
+                                            </div>
+                                        </TableCell>
+                                        <TableCell onClick={()=>true} align={"center"}  component="th" scope="row">
+                                            <div>
+                                                {hw.published ? <div>{t('published')}</div>:<button onClick={()=>handlePublish(hw.id)} className={"bg-green-500 text-white cursor-pointer py-2 px-4 rounded-xl"}>{t('publish')}</button>}
                                             </div>
                                         </TableCell>
                                         <TableCell align={"center"} component="th" scope="row">
