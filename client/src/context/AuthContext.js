@@ -29,7 +29,7 @@ const isValidTeacher = () => {
 };
 const isValidUser = () => {
     const token = Cookies.get('gam-authorities');
-    return !!(token && token.indexOf('student') > -1);
+    return !!(token && token.indexOf('user') > -1);
 };
 
 const AuthProvider = ({children}) => {
@@ -54,7 +54,7 @@ const AuthProvider = ({children}) => {
         loginReq({email: stdNum, password}, null).then((res) => {
             setToken(res.token)
             Cookies.set('gam-token', res.token, {expires: 1})
-            Cookies.set('gam-authorities', res.role, {expires: 1})
+            Cookies.set('gam-authorities', res.role === "student" ? "user" : res.role, {expires: 1})
             console.log(res)
         }).finally(() => {
             setLoading(false)

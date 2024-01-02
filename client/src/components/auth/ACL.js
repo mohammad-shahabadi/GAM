@@ -17,8 +17,8 @@ const ACL = ({
 
     useEffect(() => {
         let tempAuthorized = true
-        console.log(pathname, "isAdmin: ", isAdmin, "isUser: ", isUser,"isTeacher: ", isTeacher)
-        console.log(Cookies.get('gam-authorities'))
+        //console.log(pathname, "isAdmin: ", isAdmin, "isUser: ", isUser,"isTeacher: ", isTeacher)
+        //console.log(Cookies.get('gam-authorities'))
         if (pathname.startsWith('/admin') && !isAdmin) {
             tempAuthorized = false
             router.push('/')
