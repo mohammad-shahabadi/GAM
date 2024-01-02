@@ -4,6 +4,7 @@ from dataclasses import dataclass
 import yaml
 from decouple import config
 
+
 @dataclass
 class Stage:
     name: str
@@ -36,9 +37,6 @@ def create_stages() -> [Stage]:
         render_fork_update_stage()
     ]
     return stages
-
-
-print('ss')
 
 
 def render_fork_update_stage():

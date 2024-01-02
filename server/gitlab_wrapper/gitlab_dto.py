@@ -1,7 +1,7 @@
-from .base_dto import BaseDTO
+from dataclasses import dataclass
 from typing import List, Optional
-from datetime import datetime
-from dataclasses import dataclass, field
+
+from .base_dto import BaseDTO
 
 
 class GroupDTO(BaseDTO):
@@ -37,20 +37,25 @@ class UserDTO(BaseDTO):
 
 
 class ProjectDTO(BaseDTO):
-    def __init__(self, id=None, name=None, path=None, namespace_id=None):
+    def __init__(self, id=None, name=None, path=None, namespace_id=None, http_url=None):
         super().__init__(
             id=id,
             name=name,
             path=path,
             namespace_id=namespace_id,
-            http_url=None
+            http_url=http_url
         )
         self.id = id
         self.name = name
         self.path = path
         self.namespace_id = namespace_id
-        self.http_url = None
+        self.http_url = http_url
 
+@dataclass
+class WebhookDTO(BaseDTO):
+    project_id: int
+    url: str
+    push_events: int
 
 @dataclass
 class UserDTO2(BaseDTO):

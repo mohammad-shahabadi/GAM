@@ -67,6 +67,14 @@ class Problem(models.Model):
                 str(self.points) + " - " + str(self.content))
 
 
+class Repository(models.Model):
+    git_reference_id = models.BigIntegerField(unique=True, blank=True)
+    git_path = models.CharField(max_length=30)
+    git_http_url = models.CharField(max_length=255, blank=True, null=True)
+    problem = models.ForeignKey(Problem, on_delete=models.CASCADE, related_name='repositories')
+    membership = models.ForeignKey(Membership, on_delete=models.CASCADE, related_name='repositories')
+
+
 class Submission(models.Model):
     status = models.CharField(max_length=15)
     commit_sha = models.CharField(max_length=69)

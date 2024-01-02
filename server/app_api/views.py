@@ -4,15 +4,15 @@ from rest_framework import generics
 from rest_framework import status
 from rest_framework.response import Response
 
+from app_auth.models import User
 from app_auth.permissions import TeacherOrAdminPermission, AllAuthenticatedPermission, IsPartOfCourseOrAdmin, \
     AdminPermission, IsTeacherOfCourseOrAdmin, IsTeacherOfCourseOrAdminForMemberShip, IsPartOfCourseOrAdminForProblem, \
     IsPartOfCourseOrAdminForProblemSet, IsTeacherOrTaOfCourseOrAdminForProblemSet, \
     IsTeacherOrTaOfCourseOrAdminForProblem
 from app_auth.utils.mappers import map_user_role_to_group_access
-from gitlab_wrapper.gitlab_dto import GroupDTO, ProjectDTO
+from gitlab_wrapper.gitlab_dto import GroupDTO, ProjectDTO, WebhookDTO
 from gitlab_wrapper.gitlab_wrapper import GitLabWrapper
-from .models import Course, Membership, ProblemSet, Problem
-from app_auth.models import User
+from .models import Course, Membership, ProblemSet, Problem, Repository
 from .serializers import CourseSerializer, MembershipSerializer, MembershipCreationSerializer, CourseDetailSerializer, \
     ProblemSetSerializer, ProblemSerializer, ProblemSetUpdateSerializer, ProblemUpdateSerializer
 
@@ -184,7 +184,6 @@ class MembershipDeleteView(generics.DestroyAPIView):
             return Response({'error': f'{e}'}, status=status.HTTP_400_BAD_REQUEST)
 
     def perform_destroy(self, instance):
-        print(instance, 'sdasasdads')
         with transaction.atomic():
             user_git_reference = instance.user.git_reference_id
             membership_get_reference = instance.git_reference_id
@@ -337,12 +336,47 @@ class ProblemSetPublishView(generics.UpdateAPIView):
             problem_set.published = True
             problem_set.save()
 
-            git = GitLabWrapper()
-            user_groups_git_dtos = [GroupDTO(id=membership.git_reference_id) for membership in memberships]
-            copy_problem_set_group = git.get_group(problem_set.git_reference_id)
-            copy_problem_set_group.id = None
-            projects_git_dtos = [ProjectDTO(id=problem.git_reference_id) for problem in problems]
-            git.fork_projects_to_groups(copy_problem_set_group, projects_git_dtos, user_groups_git_dtos)
+            self.create_problem_set_groups_in_git(memberships, problem_set, problems)
+
+    def create_problem_set_groups_in_git(
+            self,
+            memberships: [Membership],
+            problem_set: ProblemSet,
+            problems: [Problem]
+    ):
+        git = GitLabWrapper()
+        user_problem_set_group = git.get_group(problem_set.git_reference_id)
+        user_problem_set_group.id = None
+        for membership in memberships:
+            user_problem_set_group.parent_id = membership.git_reference_id
+            user_problem_set_git = git.create_group(user_problem_set_group)
+            for problem in problems:
+                forked_project_id = git.fork_project(problem.git_reference_id, user_problem_set_git.id)
+                forked_project = git.get_project(forked_project_id)
+
+                git.create_webhook(
+                    WebhookDTO(
+                        project_id=forked_project.id,
+                        url='https://webhook.site/b7fd9e79-d774-44b2-a87d-e254f4dd72d7',
+                        push_events=1
+                    )
+                )
+
+                Repository(
+                    problem=problem,
+                    membership=membership,
+                    git_reference_id=forked_project.id,
+                    git_path=forked_project.path,
+                    git_http_url=forked_project.http_url
+                ).save()
+
+    def create_repositories(self, forked_projects: [ProjectDTO]):
+        for fork_project in forked_projects:
+            Repository(
+                git_reference_id=fork_project.id,
+                git_path=fork_project.path,
+                git_http_url=fork_project.http_url
+            ).save()
 
     def get_course_memberships(self, course_id):
         return Membership.objects.filter(course_id=course_id, role='student')
