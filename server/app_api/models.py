@@ -65,3 +65,24 @@ class Problem(models.Model):
     def __str__(self):
         return (self.title + " - " + self.problem_set.title + " - " + str(self.priority) + " - " +
                 str(self.points) + " - " + str(self.content))
+
+
+class Submission(models.Model):
+    # class Status(models.TextChoices):
+    #     CREATED = 'CREATED', 'created'
+    #     PENDING = 'PENDING', 'pending'
+    #     RUNNING = 'RUNNING', 'running'
+    #     JUDGED = 'JUDGED', 'judged'
+    #     CANCELLED = 'CANCELLED', 'cancelled'
+    #     FAILED = 'ERRORED', 'errored'
+
+    # status = models.CharField(max_length=15, choices=Status.choices, default=Status.PENDING)
+    status = models.CharField(max_length=15)
+    commit_sha = models.CharField(max_length=69)
+    pipeline_id = models.BigIntegerField()
+    project_id = models.BigIntegerField()  # todo change this to foreign key
+    # public_log = models.TextField(blank=True, null=True)
+    # private_log = models.TextField(blank=True, null=True)
+    passed_test_cases = models.FloatField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
