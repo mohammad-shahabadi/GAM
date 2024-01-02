@@ -1,4 +1,7 @@
 from .base_dto import BaseDTO
+from typing import List, Optional
+from datetime import datetime
+from dataclasses import dataclass, field
 
 
 class GroupDTO(BaseDTO):
@@ -47,3 +50,72 @@ class ProjectDTO(BaseDTO):
         self.path = path
         self.namespace_id = namespace_id
         self.http_url = None
+
+
+@dataclass
+class UserDTO2(BaseDTO):
+    id: int
+    name: str
+    username: str
+    avatar_url: str
+    email: str
+
+
+@dataclass
+class ProjectDTO2(BaseDTO):
+    id: int
+    name: str
+    description: str
+    web_url: str
+    avatar_url: Optional[str]
+    git_ssh_url: str
+    git_http_url: str
+    namespace: str
+    visibility_level: int
+    path_with_namespace: str
+    default_branch: str
+    ci_config_path: str
+
+
+@dataclass
+class CommitAuthorDTO(BaseDTO):
+    name: str
+    email: str
+
+
+@dataclass
+class CommitDTO(BaseDTO):
+    id: str
+    message: str
+    title: str
+    timestamp: str
+    url: str
+    author: CommitAuthorDTO
+
+
+@dataclass
+class ObjectAttributesDTO(BaseDTO):
+    id: int
+    ref: str
+    tag: bool
+    sha: str
+    before_sha: str
+    source: str
+    status: str
+    detailed_status: str
+    stages: List[str]
+    created_at: str
+    finished_at: str
+    duration: int
+    queued_duration: int
+    variables: List[BaseDTO]
+
+
+@dataclass
+class GitlabWebhookPipelinePayloadDTO(BaseDTO):
+    object_kind: str
+    object_attributes: ObjectAttributesDTO
+    merge_request: Optional[BaseDTO]
+    user: UserDTO2
+    project: ProjectDTO2
+    commit: CommitDTO

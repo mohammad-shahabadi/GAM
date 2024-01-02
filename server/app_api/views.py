@@ -377,7 +377,7 @@ class ProblemCreateView(generics.CreateAPIView):
                 path=problem.git_path
             )
             project_gitlab = gitlab.create_project(problem.content, create_project_dto)
-
+            gitlab.initiate_java_project(project_gitlab.id)
             problem.git_reference_id = project_gitlab.id
             problem.git_http_url = project_gitlab.http_url
 
@@ -458,3 +458,4 @@ class ProblemUpdateView(generics.UpdateAPIView):
             # Compare the existing data with the updated data
             if updated_content != content:
                 gitlab.update_readme_project(problem.git_reference_id, updated_content)
+

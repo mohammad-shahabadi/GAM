@@ -1,9 +1,9 @@
 from decouple import config
 from gitlab import Gitlab
-
 from .gitlab_dto import GroupDTO, UserDTO, ProjectDTO
+from .webhook_dto import TestReportDTO
 from .gitlab_enum import GroupAccessLevel
-
+import os
 
 class GitLabWrapper:
     def __init__(self):
@@ -178,3 +178,26 @@ class GitLabWrapper:
             for project in projects:
                 project_git = self._gl.projects.get(project.id)
                 project_git.forks.create({'namespace_id': super_group.id})
+
+    def initiate_java_project(self, project_id):
+        project = self._gl.projects.get(project_id)
+
+        java_base_files_path = '../resources/gitlab/java_repo_base'
+        directory_path = os.path.join(os.path.dirname(__file__), java_base_files_path)
+        print(directory_path)
+        project.commits.create({
+            'branch': 'master',
+            'actions': [{
+                'action': 'create',
+                'file_path': file[len(directory_path) + 1:],
+                'content': open(file, 'r').read(),
+                'encoding': 'text'
+            } for file in [os.path.join(root, file) for root, _, files in os.walk(directory_path) for file in files]],
+            'commit_message': 'initiate java project'
+        })
+
+    def get_test_report(self, project_id, pipeline_id) -> TestReportDTO:
+        project = self._gl.projects.get(project_id)
+        pipeline = project.pipelines.get(pipeline_id)
+        return pipeline.test_report.get()
+

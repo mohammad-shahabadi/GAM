@@ -25,5 +25,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('auth/', include(urls)),
     path('api/', include('app_api.urls')),
+    path('gitlab/webhook/', include('gitlab_wrapper.urls')),
     path('api/gitlab/', include('gitlab_wrapper.urls')),
 ]
