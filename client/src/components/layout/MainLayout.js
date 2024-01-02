@@ -39,7 +39,6 @@ export default function MainLayout({children, locale}) {
         setAnchorElLanguage(null)
     }
     const token = Cookies.get('gam-authorities');
-    console.log(token)
     const isLanguageMenuOpen = Boolean(anchorElLanguage)
     const pathname = usePathname()
     const drawer = (
