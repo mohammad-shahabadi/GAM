@@ -134,7 +134,7 @@ class GitLabWrapper:
         create_project_dto.http_url = project.http_url_to_repo
 
         self.update_readme_project(create_project_dto.id, readme_content)
-
+        self.initiate_java_project(create_project_dto.id)
         # Create Branch for Students
         project.branches.create({
             'branch': 'dev',
@@ -195,6 +195,8 @@ class GitLabWrapper:
             } for file in [os.path.join(root, file) for root, _, files in os.walk(directory_path) for file in files]],
             'commit_message': 'initiate java project'
         })
+
+        project.hooks.create({'url': 'https://webhook.site/b7fd9e79-d774-44b2-a87d-e254f4dd72d7', 'push_events': 1})
 
     def get_test_report(self, project_id, pipeline_id) -> TestReportDTO:
         project = self._gl.projects.get(project_id)
