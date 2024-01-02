@@ -1,8 +1,11 @@
+import os
+
 from decouple import config
 from gitlab import Gitlab
 
-from .gitlab_dto import GroupDTO, UserDTO, ProjectDTO
+from .gitlab_dto import GroupDTO, UserDTO, ProjectDTO, WebhookDTO
 from .gitlab_enum import GroupAccessLevel
+from .webhook_dto import TestReportDTO
 
 
 class GitLabWrapper:
@@ -72,8 +75,15 @@ class GitLabWrapper:
         return update_group_dto
 
     def get_group(self, group_id):
-        return self._gl.groups.get(
+        group_git = self._gl.groups.get(
             id=group_id
+        )
+        return GroupDTO(
+            id=group_git.id,
+            name=group_git.name,
+            path=group_git.path,
+            parent_id=group_git.parent_id,
+            description=group_git.description
         )
 
     def delete_group(self, group_id):
@@ -125,7 +135,14 @@ class GitLabWrapper:
         )
         create_project_dto.id = project.get_id()
         create_project_dto.http_url = project.http_url_to_repo
+
         self.update_readme_project(create_project_dto.id, readme_content)
+        self.initiate_java_project(create_project_dto.id)
+        # Create Branch for Students
+        project.branches.create({
+            'branch': 'dev',
+            'ref': 'master'
+        })
 
         return create_project_dto
 
@@ -135,6 +152,18 @@ class GitLabWrapper:
             new_data=update_project_dto.serialize_without_none()
         )
         return update_project_dto
+
+    def get_project(self, project_id):
+        project_git = self._gl.projects.get(
+            id=project_id
+        )
+
+        return ProjectDTO(
+            id=project_git.id,
+            name=project_git.name,
+            path=project_git.path,
+            http_url=project_git.http_url_to_repo
+        )
 
     def update_readme_project(self, project_id, readme_content):
         project = self._gl.projects.get(project_id)
@@ -155,8 +184,40 @@ class GitLabWrapper:
     def delete_project(self, project_id):
         self._gl.projects.delete(id=project_id)
 
-    def fork_projects_to_groups(self, projects: [ProjectDTO], groups: [GroupDTO]):
-        for group in groups:
-            for project in projects:
-                project_git = self._gl.projects.get(project.id)
-                project_git.forks.create({'namespace_id': group.id})
+    def create_webhook(self, create_webhook_dto: WebhookDTO):
+        project_git = self._gl.projects.get(create_webhook_dto.project_id)
+        project_git.hooks.create(
+            {
+                'url': create_webhook_dto.url,
+                'push_events': create_webhook_dto.push_events
+            }
+        )
+
+    def fork_project(self, project_id, namespace_id) -> int:
+        project_git = self._gl.projects.get(project_id)
+        fork_object = project_git.forks.create({'namespace_id': namespace_id})
+        return fork_object.get_id()
+
+
+    def initiate_java_project(self, project_id):
+        project = self._gl.projects.get(project_id)
+
+        java_base_files_path = '../resources/gitlab/java_repo_base'
+        directory_path = os.path.join(os.path.dirname(__file__), java_base_files_path)
+        project.commits.create({
+            'branch': 'master',
+            'actions': [{
+                'action': 'create',
+                'file_path': file[len(directory_path) + 1:],
+                'content': open(file, 'r').read(),
+                'encoding': 'text'
+            } for file in [os.path.join(root, file) for root, _, files in os.walk(directory_path) for file in files]],
+            'commit_message': 'initiate java project'
+        })
+
+        project.hooks.create({'url': 'https://webhook.site/b7fd9e79-d774-44b2-a87d-e254f4dd72d7', 'push_events': 1})
+
+    def get_test_report(self, project_id, pipeline_id) -> TestReportDTO:
+        project = self._gl.projects.get(project_id)
+        pipeline = project.pipelines.get(pipeline_id)
+        return pipeline.test_report.get()

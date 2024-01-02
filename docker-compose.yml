@@ -42,6 +42,8 @@ services:
   gitlab:
     image: gitlab/gitlab-ce:16.6.1-ce.0
     restart: always
+    environment:
+      GITLAB_OMNIBUS_CONFIG: external_url 'http://localhost'
     ports:
       - "80:80"
       - "443:443"

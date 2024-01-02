@@ -65,3 +65,24 @@ class Problem(models.Model):
     def __str__(self):
         return (self.title + " - " + self.problem_set.title + " - " + str(self.priority) + " - " +
                 str(self.points) + " - " + str(self.content))
+
+
+class Repository(models.Model):
+    git_reference_id = models.BigIntegerField(unique=True, blank=True)
+    git_path = models.CharField(max_length=30)
+    git_http_url = models.CharField(max_length=255, blank=True, null=True)
+    problem = models.ForeignKey(Problem, on_delete=models.CASCADE, related_name='repositories')
+    membership = models.ForeignKey(Membership, on_delete=models.CASCADE, related_name='repositories')
+
+
+class Submission(models.Model):
+    status = models.CharField(max_length=15)
+    commit_sha = models.CharField(max_length=69)
+    pipeline_id = models.BigIntegerField()
+    project_id = models.BigIntegerField()
+    problem = models.ForeignKey(Problem, on_delete=models.CASCADE, related_name='submissions')
+    user = models.ForeignKey('app_auth.User', on_delete=models.CASCADE, related_name='submissions')
+    test_result = models.JSONField(blank=True, null=True)
+    passed_test_cases = models.FloatField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
