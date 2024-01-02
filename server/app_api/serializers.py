@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from app_auth.serializers import UserSerializer
-from .models import Course, Membership, ProblemSet, Problem, Submission
+from .models import Course, Membership, ProblemSet, Problem, Submission, Repository
 from app_auth.models import User
 
 
@@ -87,4 +87,10 @@ class ProblemUpdateSerializer(serializers.ModelSerializer):
 class SubmissionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Submission
+        fields = '__all__'
+
+
+class RepositorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Repository
         fields = '__all__'

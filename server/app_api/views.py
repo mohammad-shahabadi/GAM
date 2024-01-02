@@ -8,13 +8,13 @@ from app_auth.models import User
 from app_auth.permissions import TeacherOrAdminPermission, AllAuthenticatedPermission, IsPartOfCourseOrAdmin, \
     AdminPermission, IsTeacherOfCourseOrAdmin, IsTeacherOfCourseOrAdminForMemberShip, IsPartOfCourseOrAdminForProblem, \
     IsPartOfCourseOrAdminForProblemSet, IsTeacherOrTaOfCourseOrAdminForProblemSet, \
-    IsTeacherOrTaOfCourseOrAdminForProblem
+    IsTeacherOrTaOfCourseOrAdminForProblem, GetRepositoryPermission
 from app_auth.utils.mappers import map_user_role_to_group_access
 from gitlab_wrapper.gitlab_dto import GroupDTO, ProjectDTO, WebhookDTO
 from gitlab_wrapper.gitlab_wrapper import GitLabWrapper
 from .models import Course, Membership, ProblemSet, Problem, Repository
 from .serializers import CourseSerializer, MembershipSerializer, MembershipCreationSerializer, CourseDetailSerializer, \
-    ProblemSetSerializer, ProblemSerializer, ProblemSetUpdateSerializer, ProblemUpdateSerializer
+    ProblemSetSerializer, ProblemSerializer, ProblemSetUpdateSerializer, ProblemUpdateSerializer, RepositorySerializer
 
 
 class CourseCreateView(generics.CreateAPIView):
@@ -492,3 +492,13 @@ class ProblemUpdateView(generics.UpdateAPIView):
             if updated_content != content:
                 gitlab.update_readme_project(problem.git_reference_id, updated_content)
 
+
+class RepositoryRetrieveView(generics.RetrieveAPIView):
+    serializer_class = RepositorySerializer
+    permission_classes = [GetRepositoryPermission]
+    lookup_field = 'problem_id'
+
+    def get_queryset(self):
+        user = self.request.user
+        problem_id = self.kwargs['problem_id']
+        return Repository.objects.filter(membership__user_id=user.id, problem_id=problem_id).order_by('-id')

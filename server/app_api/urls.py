@@ -19,7 +19,7 @@ from .views import (
     ProblemUpdateView,
     ProblemDeleteView,
     ProblemListView,
-    ProblemSetPublishView
+    ProblemSetPublishView, RepositoryRetrieveView
 )
 
 urlpatterns = [
@@ -43,4 +43,5 @@ urlpatterns = [
     path('problems/<int:pk>/update', ProblemUpdateView.as_view(), name='problem-update'),
     path('problems/<int:pk>/delete', ProblemDeleteView.as_view(), name='problem-delete'),
     path('problem_sets/<int:problem_set_id>/problems', ProblemListView.as_view(), name='problem-set-problems'),
+    path('repositories/<int:problem_id>', RepositoryRetrieveView.as_view(), name='repository-retrieve'),
 ]

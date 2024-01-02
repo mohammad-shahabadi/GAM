@@ -103,3 +103,11 @@ class IsPartOfCourseOrAdminForProblem(permissions.BasePermission):
         return (obj.problem_set.course.members.filter(id=user.id).exists()
                 or
                 User.objects.filter(id=user.id, role='admin').exists())
+
+
+class GetRepositoryPermission(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        user = request.user
+        return (user.role != 'student'
+                or
+                obj.membership.user.id == user.id)
