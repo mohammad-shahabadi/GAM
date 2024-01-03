@@ -45,7 +45,7 @@
     "description": "Description",
     "delete": "Delete",
     "edit": "Edit",
-    "deleteText": "Are you sure you want to delete this Class?",
+    "deleteText": "Are you sure you want to delete this?",
     "deleteConfirm": "Confirm",
     "deleteCancel": "Cancel",
     "submit": "Submit",
@@ -78,7 +78,12 @@
     "points": "Points",
     "status": "Status",
     "publish": "Publish",
-    "published": "Published"
+    "published": "Published",
+    "userName": "User",
+    "problemTitle": "Problem",
+    "s-header": "Submissions",
+    "f-s-header": "Final Submissions"
+
   },
   "Dashboard": {
     "welcome": "Welcome",

@@ -1,6 +1,0 @@
-{
-  "dependencies": {
-    "@uiw/react-md-editor": "^3.6.0",
-    "next-remove-imports": "^1.0.12"
-  }
-}

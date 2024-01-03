@@ -81,7 +81,11 @@
     "points": "امتیازات",
     "status": "وضعیت",
     "publish": "انتشار",
-    "published": "منتشر شده"
+    "published": "منتشر شده",
+    "userName": "دانشجو",
+    "problemTitle": "سوال",
+    "s-header": "ارسال ها",
+    "f-s-header": "ارسال های نهایی"
   },
   "Dashboard": {
     "welcome": "خوش آمدید",

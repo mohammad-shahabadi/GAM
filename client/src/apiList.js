@@ -51,3 +51,11 @@ export const USER_GET_Q = `${HOST}/api/repositories/:id`; //GET
 export const DELETE_Q = `${HOST}/api/problems/:id/delete`; //DELETE
 export const CREATE_Q = `${HOST}/api/problems/create`; //POST
 export const UPDATE_Q = `${HOST}/api/problems/:id/update`; //PATCH
+// Submissions
+
+export const GET_S = `${HOST}/api/problem_sets/:id/submissions`; //GET
+export const GET_FINAL_S = `${HOST}/api/problem_sets/:id/submissions/final`; //GET
+
+
+export const DELETE_S = `${HOST}/api/submissions/:id/delete`; //DELETE
+export const UPDATE_S = `${HOST}/api/submissions/:id/update`; //PATCH
