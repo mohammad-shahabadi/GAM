@@ -397,7 +397,7 @@ class ProblemSetPublishView(generics.UpdateAPIView):
                 git.create_webhook(
                     WebhookDTO(
                         project_id=forked_project.id,
-                        url='https://webhook.site/3b97cf6b-3d7a-4a3b-8d94-de0889fbbb3c',
+                        url='http://localhost:8000/gitlab/webhook/pipeline',
                         pipeline_events=1
                     )
                 )
@@ -437,8 +437,8 @@ class ProblemSetPublishView(generics.UpdateAPIView):
 
     def add_ci_cd_path(self, git: GitLabWrapper, forked_project_id):
         update_project_dto = ProjectDTO()
-#         update_project_dto.ci_config_path = gitlab_ci_renderer.get_ci_config_path()
-#         git.update_project(forked_project_id,update_project_dto)
+        update_project_dto.ci_config_path = gitlab_ci_renderer.get_ci_config_path()
+        git.update_project(forked_project_id,update_project_dto)
 
 
 class ProblemCreateView(generics.CreateAPIView):
@@ -466,7 +466,7 @@ class ProblemCreateView(generics.CreateAPIView):
                 name=problem.title,
                 namespace_id=problem.problem_set.git_reference_id,
                 path=problem.git_path,
-#                 ci_config_path=gitlab_ci_renderer.get_ci_config_path()
+                ci_config_path=gitlab_ci_renderer.get_ci_config_path()
             )
             project_gitlab = gitlab.create_project(problem.content, create_project_dto)
             problem.git_reference_id = project_gitlab.id
