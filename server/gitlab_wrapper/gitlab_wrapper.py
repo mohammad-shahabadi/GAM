@@ -3,7 +3,7 @@ import os
 from decouple import config
 from gitlab import Gitlab
 
-from .gitlab_dto import GroupDTO, UserDTO, ProjectDTO, WebhookDTO
+from .gitlab_dto import GroupDTO, UserDTO, ProjectDTO, WebhookDTO, VariableDTO
 from .gitlab_enum import GroupAccessLevel
 from .webhook_dto import TestReportDTO
 
@@ -88,6 +88,11 @@ class GitLabWrapper:
 
     def delete_group(self, group_id):
         self._gl.groups.delete(id=group_id)
+
+    def create_group_variable(self, group_id, variable_dto: VariableDTO):
+        self._gl.groups.get(group_id).variables.create(
+            data=variable_dto.serialize_without_none()
+        )
 
     def add_user_to_group(self, user_id, group_id, access_level: GroupAccessLevel):
         group = self._gl.groups.get(group_id)

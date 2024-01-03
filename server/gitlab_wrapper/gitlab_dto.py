@@ -37,25 +37,29 @@ class UserDTO(BaseDTO):
 
 
 class ProjectDTO(BaseDTO):
-    def __init__(self, id=None, name=None, path=None, namespace_id=None, http_url=None):
+    def __init__(self, id=None, name=None, path=None, namespace_id=None, http_url=None, ci_config_path=None):
         super().__init__(
             id=id,
             name=name,
             path=path,
             namespace_id=namespace_id,
-            http_url=http_url
+            http_url=http_url,
+            ci_config_path=ci_config_path
         )
         self.id = id
         self.name = name
         self.path = path
         self.namespace_id = namespace_id
         self.http_url = http_url
+        self.ci_config_path = ci_config_path
+
 
 @dataclass
 class WebhookDTO(BaseDTO):
     project_id: int
     url: str
     pipeline_events: int
+
 
 @dataclass
 class UserDTO2(BaseDTO):
@@ -124,3 +128,11 @@ class GitlabWebhookPipelinePayloadDTO(BaseDTO):
     user: UserDTO2
     project: ProjectDTO2
     commit: CommitDTO
+
+
+@dataclass
+class VariableDTO(BaseDTO):
+    key: str
+    value: str
+    protected: bool
+    masked: bool

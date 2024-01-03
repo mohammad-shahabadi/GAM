@@ -1,3 +1,4 @@
+from decouple import config
 from django.db import transaction
 from gitlab.exceptions import GitlabCreateError, GitlabUpdateError, GitlabDeleteError
 from rest_framework import generics
@@ -10,8 +11,9 @@ from app_auth.permissions import TeacherOrAdminPermission, AllAuthenticatedPermi
     IsPartOfCourseOrAdminForProblemSet, IsTeacherOrTaOfCourseOrAdminForProblemSet, \
     IsTeacherOrTaOfCourseOrAdminForProblem, CanModifySubmission, GetRepositoryPermission
 from app_auth.utils.mappers import map_user_role_to_group_access
-from gitlab_wrapper.gitlab_dto import GroupDTO, ProjectDTO, WebhookDTO
+from gitlab_wrapper.gitlab_dto import GroupDTO, ProjectDTO, WebhookDTO, VariableDTO
 from gitlab_wrapper.gitlab_wrapper import GitLabWrapper
+from gitlab_wrapper.helper import gitlab_ci_renderer
 from .models import Course, Membership, ProblemSet, Problem, Submission, Repository
 from .serializers import CourseSerializer, MembershipSerializer, MembershipCreationSerializer, CourseDetailSerializer, \
     ProblemSetSerializer, ProblemSerializer, ProblemSetUpdateSerializer, ProblemUpdateSerializer, \
@@ -58,6 +60,32 @@ class CourseCreateView(generics.CreateAPIView):
             course.git_reference_id = gitlab_group.id
             course.git_homeworks_reference_id = gitlab_homework_group.id
             course.save()
+            self.create_course_variables_in_git(gitlab, course)
+
+    def create_course_variables_in_git(self, git: GitLabWrapper, course: Course):
+        print("COURSE SECRET : ")
+        print(course.git_secret_key)
+        course_reference_variable = VariableDTO(
+            key='GAM_COURSE_ID',
+            value=str(course.id),
+            protected=False,
+            masked=False
+        )
+        course_git_secret_key = VariableDTO(
+            key='GAM_COURSE_SECRET',
+            value=course.git_secret_key,
+            protected=False,
+            masked=True
+        )
+        gam_external_url = VariableDTO(
+            key='GAM_EXTERNAL_URL',
+            value=config('EXTERNAL_URL'),
+            protected=False,
+            masked=True
+        )
+        git.create_group_variable(course.git_reference_id, course_reference_variable)
+        git.create_group_variable(course.git_reference_id, course_git_secret_key)
+        git.create_group_variable(course.git_reference_id, gam_external_url)
 
 
 class CourseListView(generics.ListAPIView):
@@ -236,6 +264,16 @@ class ProblemSetCreateView(generics.CreateAPIView):
             gitlab_group = gitlab.create_group(problem_set_group_gitlab_dto)
             problem_set.git_reference_id = gitlab_group.id
             serializer.save()
+            self.create_problem_set_variables_in_git(gitlab, problem_set)
+
+    def create_problem_set_variables_in_git(self, git: GitLabWrapper, problem_set: ProblemSet):
+        course_reference_variable = VariableDTO(
+            key='GAM_PROBLEM_SET_ID',
+            value=str(problem_set.id),
+            protected=False,
+            masked=False
+        )
+        git.create_group_variable(problem_set.git_reference_id, course_reference_variable)
 
 
 class ProblemSetListView(generics.ListAPIView):
@@ -351,6 +389,7 @@ class ProblemSetPublishView(generics.UpdateAPIView):
         for membership in memberships:
             user_problem_set_group.parent_id = membership.git_reference_id
             user_problem_set_git = git.create_group(user_problem_set_group)
+            self.create_problem_set_user_variables_in_git(git, problem_set.id, user_problem_set_git.id)
             for problem in problems:
                 forked_project_id = git.fork_project(problem.git_reference_id, user_problem_set_git.id)
                 forked_project = git.get_project(forked_project_id)
@@ -362,6 +401,8 @@ class ProblemSetPublishView(generics.UpdateAPIView):
                         pipeline_events=1
                     )
                 )
+
+                self.add_ci_cd_path(git, forked_project_id)
 
                 Repository(
                     problem=problem,
@@ -385,6 +426,20 @@ class ProblemSetPublishView(generics.UpdateAPIView):
     def get_problems(self, problem_set_id):
         return Problem.objects.filter(problem_set_id=problem_set_id)
 
+    def create_problem_set_user_variables_in_git(self, git: GitLabWrapper, problem_set_id, problem_set_user_git_id):
+        course_reference_variable = VariableDTO(
+            key='GAM_PROBLEM_SET_ID',
+            value=str(problem_set_id),
+            protected=False,
+            masked=False
+        )
+        git.create_group_variable(problem_set_user_git_id, course_reference_variable)
+
+    def add_ci_cd_path(self, git: GitLabWrapper, forked_project_id):
+        update_project_dto = ProjectDTO()
+        update_project_dto.ci_config_path = gitlab_ci_renderer.get_ci_config_path()
+        git.update_project(forked_project_id,update_project_dto)
+
 
 class ProblemCreateView(generics.CreateAPIView):
     queryset = Problem.objects.all()
@@ -406,15 +461,16 @@ class ProblemCreateView(generics.CreateAPIView):
             if problem.problem_set.published:
                 raise Exception('Cannot create problem in published problem set')
             gitlab = GitLabWrapper()
+
             create_project_dto = ProjectDTO(
                 name=problem.title,
                 namespace_id=problem.problem_set.git_reference_id,
-                path=problem.git_path
+                path=problem.git_path,
+                ci_config_path=gitlab_ci_renderer.get_ci_config_path()
             )
             project_gitlab = gitlab.create_project(problem.content, create_project_dto)
             problem.git_reference_id = project_gitlab.id
             problem.git_http_url = project_gitlab.http_url
-
             serializer.save()
 
 

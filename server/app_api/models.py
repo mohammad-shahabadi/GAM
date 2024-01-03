@@ -1,4 +1,5 @@
 from django.db import models
+import secrets
 
 
 # Create your models here.
@@ -27,8 +28,17 @@ class Course(models.Model):
     identifier_field = models.CharField(max_length=255, blank=True, null=True,
                                         help_text="Default field to use for identifier field")
     git_path = models.CharField(max_length=30)
+    git_secret_key = models.CharField(max_length=50, unique=True, blank=True)
     git_reference_id = models.IntegerField(blank=True, null=True)
     git_homeworks_reference_id = models.IntegerField(blank=True, null=True)
+
+    def save(
+            self, force_insert=False, force_update=False, using=None, update_fields=None
+    ):
+        if not self.git_secret_key:
+            self.git_secret_key = secrets.token_hex(10)
+
+        super().save(force_insert, force_update, using, update_fields)
 
 
 class ProblemSet(models.Model):

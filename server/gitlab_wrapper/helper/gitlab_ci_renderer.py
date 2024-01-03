@@ -10,11 +10,16 @@ class Stage:
     name: str
     script_name: str
     only: [str]
+    artifacts: dict or None
 
 
 '''
 Attention : Your bash file in scripts should contain "&&" for each command since yml file only supports this type 
 '''
+
+
+def get_ci_config_path():
+    return """http://${GAM_EXTERNAL_URL}/api/gitlab/${GAM_COURSE_ID}/${GAM_COURSE_SECRET}/${GAM_PROBLEM_SET_ID}/gitlab-ci.yml"""
 
 
 def generate_gitlab_ci_contents():
@@ -23,18 +28,22 @@ def generate_gitlab_ci_contents():
 
     for stage in stages:
         gitlab_ci["stages"].append(stage.name)
-        gitlab_ci[stage.name] = {
+        stage_data = {
             "stage": stage.name,
             "script": render_script(stage.script_name),
             "only": stage.only,
         }
+        if stage.artifacts is not None:
+            stage_data['artifacts'] = stage.artifacts
+        gitlab_ci[stage.name] = stage_data
     return yaml.dump(gitlab_ci)
 
 
 # Add Your stage here
 def create_stages() -> [Stage]:
     stages = [
-        render_fork_update_stage()
+        render_fork_update_stage(),
+        render_java_test_stage()
     ]
     return stages
 
@@ -43,7 +52,24 @@ def render_fork_update_stage():
     return Stage(
         name='fork_update',
         script_name='fork_update',
-        only=['master']
+        only=['master'],
+        artifacts=None
+    )
+
+
+def render_java_test_stage():
+    return Stage(
+        name='junit_tests',
+        script_name='junit_tests',
+        only=['dev'],
+        artifacts={
+            'reports': {
+                'junit': [
+                    'target/surefire-reports/TEST-*.xml',
+                    'target/failsafe-reports/TEST-*.xml'
+                ]
+            }
+        }
     )
 
 
