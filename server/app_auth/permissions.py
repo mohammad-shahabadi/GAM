@@ -105,6 +105,16 @@ class IsPartOfCourseOrAdminForProblem(permissions.BasePermission):
                 User.objects.filter(id=user.id, role='admin').exists())
 
 
+class CanModifySubmission(permissions.BasePermission):  # todo make sure it works
+    def has_object_permission(self, request, view, obj):
+        user = request.user
+        return (User.objects.filter(id=user.id, role='admin').exists()
+                or
+                (obj.problem_set.course.members.filter(id=user.id).exists()
+                 and
+                 obj.problem_set.course.members.filter(id=user.id).first().role != 'student'))
+
+
 class GetRepositoryPermission(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         user = request.user
