@@ -14,12 +14,15 @@ export default function Submissions({t, hw_id, isFinal}) {
 
     const [showDeleteModal, setShowDeleteModal] = useState(false)
     const [selectedSub, setSelectedSub] = useState(null)
+
     const [subs, setSubs] = useState([])
     const token = Cookies.get('gam-authorities');
 
     const [getSubsReq, getSubsLoader] = useRequest(isFinal ? GET_FINAL_S : GET_S, "GET");
     const getSubs = () => {
-        getSubsReq().then((res) => {
+        getSubsReq(undefined,[
+            {name: "id", value: hw_id},
+        ]).then((res) => {
             setSubs(res.results)
         })
     }
@@ -60,7 +63,7 @@ export default function Submissions({t, hw_id, isFinal}) {
     }
     const router = useRouter()
     const pathname = usePathname()
-    const cols = token === "user" ? [t('userName'), t('problemTitle'), t('status'), t('score')] : [t('userName'), t('problemTitle'), t('status'), t('score'),t('edit')]
+    const cols = token === "user" ? [t('userName'), t('problemTitle'), t('status'), t('score')] : [t('userName'), t('problemTitle'), t('status'), t('score'),t('delete')]
 
     return (
         <div>
@@ -124,7 +127,7 @@ export default function Submissions({t, hw_id, isFinal}) {
                                             align={"center"} component="th"
                                             scope="row">
                                             <div>
-                                                <input className={"w-8 h-4 rounded-md"} onChange={(e)=>handleChange(e.target.value,sub.total_score)} type={"number"} value={sub.total_score * sub.score_ratio}/>
+                                                <input className={"w-8 !h-8 border rounded-md"} onChange={(e)=>handleChange(e.target.value,sub.total_score)} type={"number"} value={sub.total_score * sub.score_ratio}/>
                                             </div>
                                         </TableCell>}
                                         {token !=="user" && <TableCell align={"center"} component="th" scope="row">
