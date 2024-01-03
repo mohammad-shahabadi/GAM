@@ -87,8 +87,28 @@ class ProblemUpdateSerializer(serializers.ModelSerializer):
 class SubmissionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Submission
-        fields = '__all__'
+        fields = ['score_ratio', 'is_final']
 
+
+class SubmissionListViewSerializer(serializers.ModelSerializer):
+    user_name = serializers.SerializerMethodField()
+    problem_title = serializers.SerializerMethodField()
+    total_score = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Submission
+        fields = ['status', 'commit_sha', 'pipeline_id', 'repository', 'test_result',
+                  'total_score', 'score_ratio', 'is_final', 'created_at', 'updated_at', 'user_name', 'problem_title']
+
+    def get_user_name(self, obj):
+        user = obj.repository.membership.user
+        return user.first_name + " " + user.last_name
+
+    def get_problem_title(self, obj):
+        return obj.repository.problem.title
+
+    def get_total_score(self, obj):
+        return obj.repository.problem.points
 
 class RepositorySerializer(serializers.ModelSerializer):
     class Meta:
