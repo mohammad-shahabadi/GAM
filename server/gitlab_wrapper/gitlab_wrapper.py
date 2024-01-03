@@ -202,7 +202,7 @@ class GitLabWrapper:
     def initiate_java_project(self, project_id):
         project = self._gl.projects.get(project_id)
 
-        java_base_files_path = '../resources/gitlab/java_repo_base'
+        java_base_files_path = 'helper/resources/gitlabs/java_repo_base'
         directory_path = os.path.join(os.path.dirname(__file__), java_base_files_path)
         project.commits.create({
             'branch': 'master',
