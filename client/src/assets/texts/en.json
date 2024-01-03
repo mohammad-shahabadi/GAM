@@ -39,6 +39,7 @@
     "password": "Password"
   },
   "Classes": {
+    "score" : "Score",
     "git_path": "Git Path",
     "header": "Classes List",
     "title": "Title",
