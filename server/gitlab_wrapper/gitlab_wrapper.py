@@ -189,7 +189,7 @@ class GitLabWrapper:
         project_git.hooks.create(
             {
                 'url': create_webhook_dto.url,
-                'push_events': create_webhook_dto.push_events
+                'pipeline_events': create_webhook_dto.pipeline_events
             }
         )
 
@@ -214,8 +214,6 @@ class GitLabWrapper:
             } for file in [os.path.join(root, file) for root, _, files in os.walk(directory_path) for file in files]],
             'commit_message': 'initiate java project'
         })
-
-        project.hooks.create({'url': 'https://webhook.site/b7fd9e79-d774-44b2-a87d-e254f4dd72d7', 'push_events': 1})
 
     def get_test_report(self, project_id, pipeline_id) -> TestReportDTO:
         project = self._gl.projects.get(project_id)

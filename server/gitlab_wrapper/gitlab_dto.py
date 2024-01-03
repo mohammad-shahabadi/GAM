@@ -55,7 +55,7 @@ class ProjectDTO(BaseDTO):
 class WebhookDTO(BaseDTO):
     project_id: int
     url: str
-    push_events: int
+    pipeline_events: int
 
 @dataclass
 class UserDTO2(BaseDTO):
