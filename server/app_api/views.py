@@ -358,7 +358,7 @@ class ProblemSetPublishView(generics.UpdateAPIView):
                 git.create_webhook(
                     WebhookDTO(
                         project_id=forked_project.id,
-                        url='https://webhook.site/b7fd9e79-d774-44b2-a87d-e254f4dd72d7',
+                        url='http://localhost:8000/gitlab/webhook/pipeline',
                         pipeline_events=1
                     )
                 )
