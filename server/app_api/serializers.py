@@ -97,7 +97,7 @@ class SubmissionListViewSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Submission
-        fields = ['status', 'commit_sha', 'pipeline_id', 'repository', 'test_result',
+        fields = ['id', 'status', 'commit_sha', 'pipeline_id', 'repository', 'test_result',
                   'total_score', 'score_ratio', 'is_final', 'created_at', 'updated_at', 'user_name', 'problem_title']
 
     def get_user_name(self, obj):
