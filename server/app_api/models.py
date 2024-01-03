@@ -82,5 +82,6 @@ class Submission(models.Model):
     repository = models.ForeignKey(Repository, on_delete=models.CASCADE, related_name='submissions')
     test_result = models.JSONField(blank=True, null=True)
     score_ratio = models.FloatField(default=0)
+    is_final = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
