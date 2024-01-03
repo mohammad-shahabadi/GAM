@@ -19,7 +19,12 @@ from .views import (
     ProblemUpdateView,
     ProblemDeleteView,
     ProblemListView,
-    ProblemSetPublishView, RepositoryRetrieveView
+    ProblemSetPublishView,
+    RepositoryRetrieveView,
+    SubmissionListView,
+    FinalSubmissionListView,
+    SubmissionUpdateView,
+    SubmissionDeleteView
 )
 
 urlpatterns = [
@@ -44,4 +49,8 @@ urlpatterns = [
     path('problems/<int:pk>/delete', ProblemDeleteView.as_view(), name='problem-delete'),
     path('problem_sets/<int:problem_set_id>/problems', ProblemListView.as_view(), name='problem-set-problems'),
     path('repositories/<int:problem_id>', RepositoryRetrieveView.as_view(), name='repository-retrieve'),
+    path('problem_sets/<int:problem_set_id>/submissions', SubmissionListView.as_view(), name='submission-list'),
+    path('problem_sets/<int:problem_set_id>/submissions/final', FinalSubmissionListView.as_view(), name='submission-list'),
+    path('submissions/<int:pk>/update', SubmissionUpdateView.as_view(), name='submission-update'),
+    path('submissions/<int:pk>/delete', SubmissionDeleteView.as_view(), name='submission-delete'),
 ]

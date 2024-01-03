@@ -8,13 +8,14 @@ from app_auth.models import User
 from app_auth.permissions import TeacherOrAdminPermission, AllAuthenticatedPermission, IsPartOfCourseOrAdmin, \
     AdminPermission, IsTeacherOfCourseOrAdmin, IsTeacherOfCourseOrAdminForMemberShip, IsPartOfCourseOrAdminForProblem, \
     IsPartOfCourseOrAdminForProblemSet, IsTeacherOrTaOfCourseOrAdminForProblemSet, \
-    IsTeacherOrTaOfCourseOrAdminForProblem, GetRepositoryPermission
+    IsTeacherOrTaOfCourseOrAdminForProblem, CanModifySubmission, GetRepositoryPermission
 from app_auth.utils.mappers import map_user_role_to_group_access
 from gitlab_wrapper.gitlab_dto import GroupDTO, ProjectDTO, WebhookDTO
 from gitlab_wrapper.gitlab_wrapper import GitLabWrapper
-from .models import Course, Membership, ProblemSet, Problem, Repository
+from .models import Course, Membership, ProblemSet, Problem, Submission, Repository
 from .serializers import CourseSerializer, MembershipSerializer, MembershipCreationSerializer, CourseDetailSerializer, \
-    ProblemSetSerializer, ProblemSerializer, ProblemSetUpdateSerializer, ProblemUpdateSerializer, RepositorySerializer
+    ProblemSetSerializer, ProblemSerializer, ProblemSetUpdateSerializer, ProblemUpdateSerializer, \
+    SubmissionSerializer, RepositorySerializer,SubmissionListViewSerializer
 
 
 class CourseCreateView(generics.CreateAPIView):
@@ -358,7 +359,7 @@ class ProblemSetPublishView(generics.UpdateAPIView):
                     WebhookDTO(
                         project_id=forked_project.id,
                         url='https://webhook.site/b7fd9e79-d774-44b2-a87d-e254f4dd72d7',
-                        push_events=1
+                        pipeline_events=1
                     )
                 )
 
@@ -502,3 +503,63 @@ class RepositoryRetrieveView(generics.RetrieveAPIView):
         user = self.request.user
         problem_id = self.kwargs['problem_id']
         return Repository.objects.filter(membership__user_id=user.id, problem_id=problem_id).order_by('-id')
+
+class SubmissionListView(generics.ListAPIView):
+    serializer_class = SubmissionListViewSerializer
+    permission_classes = [AllAuthenticatedPermission]
+
+    def get_queryset(self):
+        problem_set_id = self.kwargs.get('problem_set_id')
+        user = ProblemSet.objects.get(id=problem_set_id).course.members.filter(id=self.request.user.id).first()
+        if user and user.role == 'student':
+            return Submission.objects.filter(repository__problem__problem_set_id=problem_set_id,
+                                             repository__membership__user=self.request.user)
+        else:
+            return Submission.objects.filter(repository__problem__problem_set_id=problem_set_id)
+
+class FinalSubmissionListView(generics.ListAPIView):
+    serializer_class = SubmissionListViewSerializer
+    permission_classes = [AllAuthenticatedPermission]
+
+    def get_queryset(self):
+        problem_set_id = self.kwargs.get('problem_set_id')
+        user = ProblemSet.objects.get(id=problem_set_id).course.members.filter(id=self.request.user.id).first()
+        if user and user.role == 'student':
+            return Submission.objects.filter(repository__problem__problem_set_id=problem_set_id,
+                                             repository__membership__user=self.request.user,
+                                             is_final=True)
+        else:
+            return Submission.objects.filter(repository__problem__problem_set_id=problem_set_id,
+                                             is_final=True)
+
+
+class SubmissionUpdateView(generics.UpdateAPIView):
+    queryset = Submission.objects.all()
+    serializer_class = SubmissionSerializer
+    permission_classes = [CanModifySubmission]
+
+    def update(self, request, *args, **kwargs):
+        try:
+            return super().update(request, *args, **kwargs)
+        except Exception as e:
+            return Response({'error': f'{e}'}, status=status.HTTP_400_BAD_REQUEST)
+
+    def perform_update(self, serializer):
+        with transaction.atomic():
+            return serializer.save()
+
+
+class SubmissionDeleteView(generics.DestroyAPIView):
+    queryset = Submission.objects.all()
+    serializer_class = SubmissionSerializer
+    permission_classes = [CanModifySubmission]
+
+    def destroy(self, request, *args, **kwargs):
+        try:
+            return super().destroy(request, *args, **kwargs)
+        except Exception as e:
+            return Response({'error': f'{e}'}, status=status.HTTP_400_BAD_REQUEST)
+
+    def perform_destroy(self, instance):
+        with transaction.atomic():
+            instance.delete()
