@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from .gitlab_wrapper import GitLabWrapper
 from .webhook_dto import GitlabWebhookPipelinePayloadDTO, TestReportDTO
-from app_api.models import Submission
+from app_api.models import Submission, Repository
 from django.http import HttpResponse
 from .helper import gitlab_ci_renderer
 
@@ -22,12 +22,11 @@ def gitlabPipelineWebhook(request):
         payload_data = request.data
 
         # Deserialize the JSON payload into the DTO
-        webhook_dto = GitlabWebhookPipelinePayloadDTO(**payload_data)
 
-        if webhook_dto.object_kind == "pipeline" and webhook_dto.object_attributes['status'] == "success":
-            gitlab = GitLabWrapper()
-            test_report = gitlab.get_test_report(webhook_dto.project['id'], webhook_dto.object_attributes['id'])
-            save_test_result_by_project_id(webhook_dto, test_report)
+        if payload_data['object_kind'] == "pipeline":
+            webhook_dto = GitlabWebhookPipelinePayloadDTO(**payload_data)
+            if webhook_dto.object_attributes['status'] == "success":
+                save_test_result_by_pipeline_event(webhook_dto)
 
         # You can also send a response back to the client
         return Response({'status': 'Webhook received successfully'}, status=status.HTTP_200_OK)
@@ -37,10 +36,26 @@ def gitlabPipelineWebhook(request):
         return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
-def save_test_result_by_project_id(webhook_dto: GitlabWebhookPipelinePayloadDTO, test_report: TestReportDTO):
-    # print("saving project submission with id : ", webhook_dto.project.id)
-    submission = Submission(project_id=webhook_dto.project['id'], pipeline_id=webhook_dto.object_attributes['id'],
-                            passed_test_cases=test_report.success_count / test_report.total_count,
-                            commit_sha=webhook_dto.commit['id'],
-                            status=webhook_dto.object_attributes['status'])
-    submission.save()
+def save_test_result_by_pipeline_event(webhook_dto: GitlabWebhookPipelinePayloadDTO):
+    # todo handle case when pipeline is not successful
+    if webhook_dto.object_attributes['status'] == "success":
+        gitlab = GitLabWrapper()
+        test_report = gitlab.get_test_report(webhook_dto.project['id'], webhook_dto.object_attributes['id'])
+        existing_final_submission = Submission.objects.filter(repository__git_reference_id=webhook_dto.project['id'],
+                                                              is_final=True).first()
+
+        submission, created = Submission.objects.update_or_create(
+            commit_sha=webhook_dto.commit['id'],
+            defaults={
+                'test_result': test_report.test_suites,
+                'status': webhook_dto.object_attributes['status'],
+                'score_ratio': test_report.success_count / test_report.total_count,
+                'pipeline_id': webhook_dto.object_attributes['id'],
+                'repository': Repository.objects.get(git_reference_id=webhook_dto.project['id']),
+                'is_final': True if (test_report.success_count / test_report.total_count) > (existing_final_submission.score_ratio if existing_final_submission else -1) else False
+            }
+        )
+
+        if existing_final_submission and submission.is_final:
+            existing_final_submission.is_final = False
+            existing_final_submission.save()
