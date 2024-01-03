@@ -39,6 +39,7 @@
     "password": "کلمه عبور"
   },
   "Classes": {
+    "score" : "نمره",
     "git_path": "آدرس گیت",
     "header": "لیست کلاس ها",
     "title": "نام",
