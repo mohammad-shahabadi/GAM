@@ -106,6 +106,18 @@ DATABASES = {
     }
 }
 
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': 'redis://redis:6379/1',  # Assumes Redis is running in a Docker container named 'redis'
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+            'CACHE_TIMEOUT_SECONDS': 60 * 15
+        }
+    }
+}
+CACHE_TIMEOUT_SECONDS = 60 * 15
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
