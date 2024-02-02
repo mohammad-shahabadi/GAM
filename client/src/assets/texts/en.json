@@ -35,8 +35,10 @@
     "teacher": "Teacher",
     "student": "Student",
     "addUser": "Add A New User",
+    "addUsers": "Add New Users",
     "editUser": "Edit User",
-    "password": "Password"
+    "password": "Password",
+    "importUser": "Import Users"
   },
   "Classes": {
     "score" : "Score",

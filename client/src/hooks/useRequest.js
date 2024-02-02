@@ -39,10 +39,10 @@ export function useRequest(url, method, token, loaderInitState) {
                     toast.error("Network lost!");
                 }
                 if (e.code === "ERR_CANCELED") {
-                    console.log(e.code);
+                    toast.error("Request canceled!");
                 } else {
                     setLoading(false);
-
+                    toast.error(e?.message || "Something Wrong Happened");
                     if (
                         (e?.response?.status === 401 ||
                             e?.response?.status === 403) && /// must be unified.

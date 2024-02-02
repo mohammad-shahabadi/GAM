@@ -23,11 +23,13 @@ const AddStudent = ({t, slug}) => {
     const [searchReq, searchLoader] = useRequest(SEARCH_USERS, "GET");
 
     const handleChange = (event) => {
-        const value = event.target.value
+        const value = event.target.value?.toLowerCase()
         if(value.length > 2){
             searchReq(undefined, [{name: "id", value: value},]).then((res) => {
                 setSearchUsers(res.results)
             })
+        } else {
+            setSearchUsers([])
         }
         setFormData({
             ...formData,
@@ -38,7 +40,7 @@ const AddStudent = ({t, slug}) => {
         event.preventDefault();
 
             addStudentReq(formData).then((res) => {
-                router.push((pathname.startsWith('/admin') ? "/admin/classes/" : "/teacher/classes/") + slug)
+                //router.push((pathname.startsWith('/admin') ? "/admin/classes/" : "/teacher/classes/") + slug)
             })
 
 
@@ -118,7 +120,7 @@ const AddStudent = ({t, slug}) => {
             caption={t('submit')}
             className="mt-4 md:mt-8"
             onClick={handleSubmit}
-            disabled={!formData.email || !(searchUsers.length > 0) }
+            //disabled={!formData.email || !(searchUsers.length > 0) }
             loading={addStudentLoader}
         />
     </form>);

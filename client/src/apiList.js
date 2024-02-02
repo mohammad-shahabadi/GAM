@@ -7,6 +7,7 @@ if (!process.env.NODE_ENV || process.env.NODE_ENV === "development") {
 }
 
 // Auth
+export const BATCH_SIGNUP = `${HOST}/auth/users/import`; //POST
 export const SIGNUP = `${HOST}/auth/signup`; //POST
 export const LOGIN = `${HOST}/auth/login`; //POST
 

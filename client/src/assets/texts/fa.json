@@ -35,8 +35,11 @@
     "teacher": "استاد",
     "student": "دانشجو",
     "addUser": "اضافه کردن کاربر جدید",
+    "addUsers": "اضافه کردن کاربران جدید",
+
     "editUser": "ویرایش کاربر",
-    "password": "کلمه عبور"
+    "password": "کلمه عبور",
+    "importUser": "اضافه کردن گروهی"
   },
   "Classes": {
     "score" : "نمره",
@@ -88,6 +91,7 @@
     "s-header": "ارسال ها",
     "f-s-header": "ارسال های نهایی",
     "results": "نتایج:"
+
   },
   "Dashboard": {
     "welcome": "خوش آمدید",

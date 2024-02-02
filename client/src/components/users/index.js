@@ -49,9 +49,15 @@ export default function UsersTable({t}) {
                 <div className={"font-bold text-3xl"}>
                     {t('header')}
                 </div>
-                <Link className={"bg-[#ff5733] text-white py-2 px-4 mb-4"} href={'/admin/users/add'}>
-                    {t('addUser')}
-                </Link>
+                <div className={" flex gap-1"}>
+                    <Link className={"bg-[#ff5733] text-white py-2 px-4 mb-4"} href={'/admin/users/import'}>
+                        {t('importUser')}
+                    </Link>
+                    <Link className={"bg-[#ff5733] text-white py-2 px-4 mb-4"} href={'/admin/users/add'}>
+                        {t('addUser')}
+                    </Link>
+                </div>
+
             </div>
             <div className={"h-full"} style={{width: '100%'}}>
                 <Suspense>
