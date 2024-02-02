@@ -5,6 +5,7 @@ from django.conf import settings
 # from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.hashers import make_password, check_password
 from django.db import transaction
+from django.db.models import Q
 from gitlab.exceptions import GitlabCreateError, GitlabUpdateError, GitlabDeleteError
 # from django.contrib.auth.models import User
 from rest_framework import status, generics
@@ -110,6 +111,30 @@ class GetAllUsersView(generics.ListAPIView):
 
     def get_queryset(self):
         return User.objects.filter()
+
+
+class UserSearchListView(generics.ListAPIView):
+    serializer_class = UserSerializer
+    permission_classes = [TeacherOrAdminPermission]
+
+    def get_queryset(self):
+        search_param = self.request.query_params.get('q', None)
+
+        if search_param:
+            # Perform case-insensitive search on multiple fields
+            queryset = User.objects.filter(
+                Q(student_number__icontains=search_param) |
+                Q(email__icontains=search_param) |
+                Q(first_name__icontains=search_param) |
+                Q(last_name__icontains=search_param)
+            )
+        else:
+            # If no search parameter is provided, return all users
+            queryset = User.objects.all()
+
+        queryset = queryset.exclude(email='admin@admin.com')
+
+        return queryset
 
 
 class DeactivateUserView(generics.UpdateAPIView):
