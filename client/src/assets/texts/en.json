@@ -83,7 +83,8 @@
     "userName": "User",
     "problemTitle": "Problem",
     "s-header": "Submissions",
-    "f-s-header": "Final Submissions"
+    "f-s-header": "Final Submissions",
+    "results": "Results:"
 
   },
   "Dashboard": {

@@ -86,7 +86,8 @@
     "userName": "دانشجو",
     "problemTitle": "سوال",
     "s-header": "ارسال ها",
-    "f-s-header": "ارسال های نهایی"
+    "f-s-header": "ارسال های نهایی",
+    "results": "نتایج:"
   },
   "Dashboard": {
     "welcome": "خوش آمدید",

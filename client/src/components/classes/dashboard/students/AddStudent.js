@@ -2,12 +2,13 @@ import React, {useEffect, useState} from 'react';
 import TextField from '@mui/material/TextField';
 import Button from "@/components/global/Button";
 import {useRequest} from "@/hooks/useRequest";
-import {CREATE_HW, CREATE_MEMBERSHIP, GET_HW, UPDATE_HW} from "@/apiList";
+import {CREATE_HW, CREATE_MEMBERSHIP, GET_HW, GET_USER, SEARCH_USERS, UPDATE_HW} from "@/apiList";
 import {usePathname, useRouter} from "@/navigation";
 import {Box, Paper} from "@mui/material";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
+import {toast} from "react-toastify";
 
 const AddStudent = ({t, slug}) => {
     const router = useRouter()
@@ -17,11 +18,20 @@ const AddStudent = ({t, slug}) => {
         "email" : "",
         "role" : "student"
     });
+    const [searchUsers, setSearchUsers] = useState([]);
     const [addStudentReq, addStudentLoader] = useRequest(CREATE_MEMBERSHIP, "POST");
+    const [searchReq, searchLoader] = useRequest(SEARCH_USERS, "GET");
+
     const handleChange = (event) => {
+        const value = event.target.value
+        if(value.length > 2){
+            searchReq(undefined, [{name: "id", value: value},]).then((res) => {
+                setSearchUsers(res.results)
+            })
+        }
         setFormData({
             ...formData,
-            [event.target.name]:  event.target.value
+            [event.target.name]:  value
         });
     };
     const handleSubmit = (event) => {
@@ -51,7 +61,7 @@ const AddStudent = ({t, slug}) => {
                         elevation={0}
                         className="shadow"
                         sx={{
-                            display: "flex", flexDirection: "column", gap: "1rem", p: 2, borderRadius: "16px"
+                            display: "flex", flexDirection: "column", gap: "4px", p: 2, borderRadius: "16px"
                         }}
                     >
                         <TextField
@@ -63,6 +73,25 @@ const AddStudent = ({t, slug}) => {
                             margin="normal"
                             sx={{margin: 1}}
                         />
+                         <div className={"m-2 font-bold"}>
+                            {t('results')}
+                        </div>
+                        {searchUsers.map((user)=>{
+                            return (<div >
+                                <div onClick={()=>setFormData({
+                                    ...formData,
+                                    email:  user.email
+                                })} className={"mx-3 text-purple-800 cursor-pointer hover:text-red-600 flex"}>
+                                    <div className={""}>
+                                        {user.first_name}-{user.last_name}
+                                    </div>
+                                    <div className={"mx-2"}>
+                                        {user.email}
+                                    </div>
+                                </div>
+
+                            </div>)
+                        })}
                         <FormControl sx={{margin: 1, minWidth: 120}}>
                             <Select
                                 labelId={t('role')}
@@ -89,7 +118,7 @@ const AddStudent = ({t, slug}) => {
             caption={t('submit')}
             className="mt-4 md:mt-8"
             onClick={handleSubmit}
-            disabled={!formData.email}
+            disabled={!formData.email || !(searchUsers.length > 0) }
             loading={addStudentLoader}
         />
     </form>);

@@ -17,6 +17,7 @@ export const GET_USER = `${HOST}/auth/users/:id`; //GET
 export const UPDATE_USER = `${HOST}/auth/users/:id/update`; //PATCH
 export const DELETE_USER = `${HOST}/auth/users/:id/delete`; //PATCH
 export const GET_USER_COURSES = `${HOST}/api/memberships/list`; //GET
+export const SEARCH_USERS = `${HOST}/auth/users/search?q=:id`; //GET
 
 // Classes
 
