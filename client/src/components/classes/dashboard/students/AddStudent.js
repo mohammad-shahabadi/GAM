@@ -78,8 +78,8 @@ const AddStudent = ({t, slug}) => {
                          <div className={"m-2 font-bold"}>
                             {t('results')}
                         </div>
-                        {searchUsers.map((user)=>{
-                            return (<div >
+                        {searchUsers.map((user,idx)=>{
+                            return (<div key={idx} >
                                 <div onClick={()=>setFormData({
                                     ...formData,
                                     email:  user.email
