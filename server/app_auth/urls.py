@@ -2,7 +2,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
 from .views import login, signup, GetAllUsersView, GetUserByIDView, ModifyUserView, DeactivateUserView, \
-    UserDeleteView, GetUserSelfInfoView, UserSearchListView
+    UserDeleteView, GetUserSelfInfoView, UserSearchListView, import_users_from_csv
 
 urlpatterns = [
     path('signup', signup, name='signup'),
@@ -14,4 +14,5 @@ urlpatterns = [
     path('users/<int:pk>/deactivate', DeactivateUserView.as_view(), name='deactivate_user'),
     path('users/<int:pk>/delete', UserDeleteView.as_view(), name='delete_user'),
     path('users/search', UserSearchListView.as_view(), name='user-search'),
+    path('users/import', import_users_from_csv, name='import_users_from_csv'),
 ]
