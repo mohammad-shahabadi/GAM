@@ -11,13 +11,13 @@ from app_auth.permissions import TeacherOrAdminPermission, AllAuthenticatedPermi
     IsPartOfCourseOrAdminForProblemSet, IsTeacherOrTaOfCourseOrAdminForProblemSet, \
     IsTeacherOrTaOfCourseOrAdminForProblem, CanModifySubmission, GetRepositoryPermission
 from app_auth.utils.mappers import map_user_role_to_group_access
-from gitlab_wrapper.gitlab_dto import GroupDTO, ProjectDTO, WebhookDTO, VariableDTO
+from gitlab_wrapper.gitlab_dto import GroupDTO, ProjectDTO, VariableDTO
 from gitlab_wrapper.gitlab_wrapper import GitLabWrapper
 from gitlab_wrapper.helper import gitlab_ci_renderer
 from .models import Course, Membership, ProblemSet, Problem, Submission, Repository
 from .serializers import CourseSerializer, MembershipSerializer, MembershipCreationSerializer, CourseDetailSerializer, \
     ProblemSetSerializer, ProblemSerializer, ProblemSetUpdateSerializer, ProblemUpdateSerializer, \
-    SubmissionSerializer, RepositorySerializer,SubmissionListViewSerializer
+    SubmissionSerializer, RepositorySerializer, SubmissionListViewSerializer
 
 
 class CourseCreateView(generics.CreateAPIView):
@@ -40,27 +40,27 @@ class CourseCreateView(generics.CreateAPIView):
             if user.is_superuser is False:
                 Membership.objects.create(course=course, user=user, role='teacher')
 
-            gitlab = GitLabWrapper()
-            create_group_gitlab_dto = GroupDTO(name=course.title,
-                                               path=course.git_path,
-                                               description=course.description)
-            gitlab_group = gitlab.create_group(create_group_gitlab_dto)
-            # Group for storing homeworks and assignments created in panel
-            homeworks_group_gitlab_dto = GroupDTO(name='Homeworks',
-                                                  path='homeworks',
-                                                  parent_id=gitlab_group.id
-                                                  )
-            gitlab_homework_group = gitlab.create_group(homeworks_group_gitlab_dto)
-
-            user_gitlab_access = map_user_role_to_group_access(user.role)
-
-            if user.is_superuser is False:
-                gitlab.add_user_to_group(user_id=user.git_reference_id, group_id=gitlab_group.id,
-                                         access_level=user_gitlab_access)
-            course.git_reference_id = gitlab_group.id
-            course.git_homeworks_reference_id = gitlab_homework_group.id
+            # gitlab = GitLabWrapper()
+            # create_group_gitlab_dto = GroupDTO(name=course.title,
+            #                                    path=course.git_path,
+            #                                    description=course.description)
+            # gitlab_group = gitlab.create_group(create_group_gitlab_dto)
+            # # Group for storing homeworks and assignments created in panel
+            # homeworks_group_gitlab_dto = GroupDTO(name='Homeworks',
+            #                                       path='homeworks',
+            #                                       parent_id=gitlab_group.id
+            #                                       )
+            # gitlab_homework_group = gitlab.create_group(homeworks_group_gitlab_dto)
+            #
+            # user_gitlab_access = map_user_role_to_group_access(user.role)
+            #
+            # if user.is_superuser is False:
+            #     gitlab.add_user_to_group(user_id=user.git_reference_id, group_id=gitlab_group.id,
+            #                              access_level=user_gitlab_access)
+            course.git_reference_id = 12
+            course.git_homeworks_reference_id = 12
             course.save()
-            self.create_course_variables_in_git(gitlab, course)
+            # self.create_course_variables_in_git(gitlab, course)
 
     def create_course_variables_in_git(self, git: GitLabWrapper, course: Course):
         print("COURSE SECRET : ")
@@ -118,11 +118,11 @@ class CourseUpdateView(generics.UpdateAPIView):
     def perform_update(self, serializer):
         with transaction.atomic():
             course = serializer.save()
-            gitlab = GitLabWrapper()
-            create_group_gitlab_dto = GroupDTO(name=course.title,
-                                               path=course.git_path,
-                                               description=course.description)
-            gitlab.update_group(course.git_reference_id, create_group_gitlab_dto)
+            # gitlab = GitLabWrapper()
+            # create_group_gitlab_dto = GroupDTO(name=course.title,
+            #                                    path=course.git_path,
+            #                                    description=course.description)
+            # gitlab.update_group(course.git_reference_id, create_group_gitlab_dto)
 
 
 class CourseDeleteView(generics.DestroyAPIView):
@@ -142,8 +142,8 @@ class CourseDeleteView(generics.DestroyAPIView):
         with transaction.atomic():
             class_git_reference = instance.git_reference_id
             instance.delete()
-            gitlab = GitLabWrapper()
-            gitlab.delete_group(class_git_reference)
+            # gitlab = GitLabWrapper()
+            # gitlab.delete_group(class_git_reference)
 
 
 class MembershipCreateView(generics.CreateAPIView):
@@ -167,7 +167,7 @@ class MembershipCreateView(generics.CreateAPIView):
             # Check if the membership already exists
             existing_membership = Membership.objects.filter(course=course, user=user).first()
 
-            gitlab = GitLabWrapper()
+            # gitlab = GitLabWrapper()
             user_gitlab_access = map_user_role_to_group_access(user.role)
 
             if user.is_superuser:
@@ -179,9 +179,9 @@ class MembershipCreateView(generics.CreateAPIView):
                 existing_membership.save()
                 serializer.instance = existing_membership
 
-                gitlab.update_user_access_group(user.git_reference_id,
-                                                existing_membership.git_reference_id,
-                                                user_gitlab_access)
+                # gitlab.update_user_access_group(user.git_reference_id,
+                #                                 existing_membership.git_reference_id,
+                #                                 user_gitlab_access)
             else:
                 # If the membership doesn't exist, create it
                 membership = serializer.save()
@@ -193,9 +193,9 @@ class MembershipCreateView(generics.CreateAPIView):
                                                    description=course.description,
                                                    parent_id=course.git_reference_id
                                                    )
-                gitlab_group = gitlab.create_group(create_group_gitlab_dto)
-                gitlab.add_user_to_group(user.git_reference_id, gitlab_group.id, user_gitlab_access)
-                membership.git_reference_id = gitlab_group.id
+                # gitlab_group = gitlab.create_group(create_group_gitlab_dto)
+                # gitlab.add_user_to_group(user.git_reference_id, gitlab_group.id, user_gitlab_access)
+                membership.git_reference_id = 12
                 membership.save()
 
 
@@ -218,12 +218,12 @@ class MembershipDeleteView(generics.DestroyAPIView):
             membership_get_reference = instance.git_reference_id
             instance.delete()
 
-            gitlab = GitLabWrapper()
-            gitlab.delete_user_from_group(user_git_reference, membership_get_reference)
+            # gitlab = GitLabWrapper()
+            # gitlab.delete_user_from_group(user_git_reference, membership_get_reference)
             # Update title and path of membership subgroup to mark as deleted
-            membership_group_git = gitlab.get_group(membership_get_reference)
-            membership_group_git.name = f'{membership_group_git.name}-deleted-{membership_group_git.id}'
-            membership_group_git.path = f'{membership_group_git.path}-deleted-{membership_group_git.id}'
+            membership_group_git = 12
+            membership_group_git.name = f'{membership_group_git.name}-deleted-'
+            membership_group_git.path = f'{membership_group_git.path}-deleted-'
             membership_group_git.save()
 
 
@@ -253,18 +253,18 @@ class ProblemSetCreateView(generics.CreateAPIView):
     def perform_create(self, serializer):
         with transaction.atomic():
             problem_set = serializer.save()
-            gitlab = GitLabWrapper()
+            # gitlab = GitLabWrapper()
             git_parent_group_id = problem_set.course.git_homeworks_reference_id
             assert git_parent_group_id is not None, 'Course homeworks git reference id is not set'
 
-            problem_set_group_gitlab_dto = GroupDTO(name=problem_set.title,
-                                                    path=problem_set.git_path,
-                                                    parent_id=git_parent_group_id
-                                                    )
-            gitlab_group = gitlab.create_group(problem_set_group_gitlab_dto)
-            problem_set.git_reference_id = gitlab_group.id
+            # problem_set_group_gitlab_dto = GroupDTO(name=problem_set.title,
+            #                                         path=problem_set.git_path,
+            #                                         parent_id=git_parent_group_id
+            #                                         )
+            # gitlab_group = gitlab.create_group(problem_set_group_gitlab_dto)
+            problem_set.git_reference_id = 12
             serializer.save()
-            self.create_problem_set_variables_in_git(gitlab, problem_set)
+            # self.create_problem_set_variables_in_git(gitlab, problem_set)
 
     def create_problem_set_variables_in_git(self, git: GitLabWrapper, problem_set: ProblemSet):
         course_reference_variable = VariableDTO(
@@ -304,8 +304,8 @@ class ProblemSetDeleteView(generics.DestroyAPIView):
         with transaction.atomic():
             problem_set_git_group_id = instance.git_reference_id
             instance.delete()
-            gitlab = GitLabWrapper()
-            gitlab.delete_group(problem_set_git_group_id)
+            # gitlab = GitLabWrapper()
+            # gitlab.delete_group(problem_set_git_group_id)
 
 
 class ProblemSetRetrieveView(generics.RetrieveAPIView):
@@ -334,15 +334,15 @@ class ProblemSetUpdateView(generics.UpdateAPIView):
                 raise Exception('Cannot update published problem set')
 
             problem_set = serializer.save()
-            gitlab = GitLabWrapper()
+            # gitlab = GitLabWrapper()
             git_parent_group_id = problem_set.course.git_homeworks_reference_id
             assert git_parent_group_id is not None, 'Course homeworks git reference id is not set'
 
-            problem_set_group_gitlab_dto = GroupDTO(name=problem_set.title,
-                                                    path=problem_set.git_path,
-                                                    parent_id=git_parent_group_id
-                                                    )
-            gitlab.update_group(problem_set.git_reference_id, problem_set_group_gitlab_dto)
+            # problem_set_group_gitlab_dto = GroupDTO(name=problem_set.title,
+            #                                         path=problem_set.git_path,
+            #                                         parent_id=git_parent_group_id
+            #                                         )
+            # gitlab.update_group(problem_set.git_reference_id, problem_set_group_gitlab_dto)
 
 
 class ProblemSetPublishView(generics.UpdateAPIView):
@@ -375,7 +375,7 @@ class ProblemSetPublishView(generics.UpdateAPIView):
             problem_set.published = True
             problem_set.save()
 
-            self.create_problem_set_groups_in_git(memberships, problem_set, problems)
+            # self.create_problem_set_groups_in_git(memberships, problem_set, problems)
 
     def create_problem_set_groups_in_git(
             self,
@@ -383,34 +383,36 @@ class ProblemSetPublishView(generics.UpdateAPIView):
             problem_set: ProblemSet,
             problems: [Problem]
     ):
-        git = GitLabWrapper()
-        user_problem_set_group = git.get_group(problem_set.git_reference_id)
-        user_problem_set_group.id = None
-        for membership in memberships:
-            user_problem_set_group.parent_id = membership.git_reference_id
-            user_problem_set_git = git.create_group(user_problem_set_group)
-            self.create_problem_set_user_variables_in_git(git, problem_set.id, user_problem_set_git.id)
-            for problem in problems:
-                forked_project_id = git.fork_project(problem.git_reference_id, user_problem_set_git.id)
-                forked_project = git.get_project(forked_project_id)
+        pass
 
-                git.create_webhook(
-                    WebhookDTO(
-                        project_id=forked_project.id,
-                        url='http://localhost:8000/gitlab/webhook/pipeline',
-                        pipeline_events=1
-                    )
-                )
-
-                self.add_ci_cd_path(git, forked_project_id)
-
-                Repository(
-                    problem=problem,
-                    membership=membership,
-                    git_reference_id=forked_project.id,
-                    git_path=forked_project.path,
-                    git_http_url=forked_project.http_url
-                ).save()
+    # git = GitLabWrapper()
+    # user_problem_set_group = git.get_group(problem_set.git_reference_id)
+    # user_problem_set_group.id = None
+    # for membership in memberships:
+    #     user_problem_set_group.parent_id = membership.git_reference_id
+    #     user_problem_set_git = git.create_group(user_problem_set_group)
+    #     self.create_problem_set_user_variables_in_git(git, problem_set.id, user_problem_set_git.id)
+    #     for problem in problems:
+    #         forked_project_id = git.fork_project(problem.git_reference_id, user_problem_set_git.id)
+    #         forked_project = git.get_project(forked_project_id)
+    #
+    #         git.create_webhook(
+    #             WebhookDTO(
+    #                 project_id=forked_project.id,
+    #                 url='http://localhost:8000/gitlab/webhook/pipeline',
+    #                 pipeline_events=1
+    #             )
+    #         )
+    #
+    #         self.add_ci_cd_path(git, forked_project_id)
+    #
+    #         Repository(
+    #             problem=problem,
+    #             membership=membership,
+    #             git_reference_id=forked_project.id,
+    #             git_path=forked_project.path,
+    #             git_http_url=forked_project.http_url
+    #         ).save()
 
     def create_repositories(self, forked_projects: [ProjectDTO]):
         for fork_project in forked_projects:
@@ -438,7 +440,7 @@ class ProblemSetPublishView(generics.UpdateAPIView):
     def add_ci_cd_path(self, git: GitLabWrapper, forked_project_id):
         update_project_dto = ProjectDTO()
         update_project_dto.ci_config_path = gitlab_ci_renderer.get_ci_config_path()
-        git.update_project(forked_project_id,update_project_dto)
+        git.update_project(forked_project_id, update_project_dto)
 
 
 class ProblemCreateView(generics.CreateAPIView):
@@ -460,17 +462,17 @@ class ProblemCreateView(generics.CreateAPIView):
             problem = serializer.save()
             if problem.problem_set.published:
                 raise Exception('Cannot create problem in published problem set')
-            gitlab = GitLabWrapper()
+            # gitlab = GitLabWrapper()
 
-            create_project_dto = ProjectDTO(
-                name=problem.title,
-                namespace_id=problem.problem_set.git_reference_id,
-                path=problem.git_path,
-                ci_config_path=gitlab_ci_renderer.get_ci_config_path()
-            )
-            project_gitlab = gitlab.create_project(problem.content, create_project_dto)
-            problem.git_reference_id = project_gitlab.id
-            problem.git_http_url = project_gitlab.http_url
+            # create_project_dto = ProjectDTO(
+            #     name=problem.title,
+            #     namespace_id=problem.problem_set.git_reference_id,
+            #     path=problem.git_path,
+            #     ci_config_path=gitlab_ci_renderer.get_ci_config_path()
+            # )
+            # project_gitlab = gitlab.create_project(problem.content, create_project_dto)
+            problem.git_reference_id = 12
+            problem.git_http_url = 'sssss'
             serializer.save()
 
 
@@ -502,8 +504,8 @@ class ProblemDeleteView(generics.DestroyAPIView):
                 raise Exception('Cannot delete problem in published problem set')
             problem_git_id = instance.git_reference_id
             instance.delete()
-            gitlab = GitLabWrapper()
-            gitlab.delete_project(problem_git_id)
+            # gitlab = GitLabWrapper()
+            # gitlab.delete_project(problem_git_id)
 
 
 class ProblemRetrieveView(generics.RetrieveAPIView):
@@ -537,17 +539,17 @@ class ProblemUpdateView(generics.UpdateAPIView):
             updated_content = serializer.validated_data.get('content')
             problem = serializer.save()
 
-            gitlab = GitLabWrapper()
-            create_project_dto = ProjectDTO(
-                name=problem.title,
-                namespace_id=problem.problem_set.git_reference_id,
-                path=problem.git_path
-            )
+            # gitlab = GitLabWrapper()
+            # create_project_dto = ProjectDTO(
+            #     name=problem.title,
+            #     namespace_id=problem.problem_set.git_reference_id,
+            #     path=problem.git_path
+            # )
 
-            gitlab.update_project(problem.git_reference_id, create_project_dto)
+            # gitlab.update_project(problem.git_reference_id, create_project_dto)
             # Compare the existing data with the updated data
-            if updated_content != content:
-                gitlab.update_readme_project(problem.git_reference_id, updated_content)
+            # if updated_content != content:
+            # gitlab.update_readme_project(problem.git_reference_id, updated_content)
 
 
 class RepositoryRetrieveView(generics.RetrieveAPIView):
@@ -559,6 +561,7 @@ class RepositoryRetrieveView(generics.RetrieveAPIView):
         user = self.request.user
         problem_id = self.kwargs['problem_id']
         return Repository.objects.filter(membership__user_id=user.id, problem_id=problem_id).order_by('-id')
+
 
 class SubmissionListView(generics.ListAPIView):
     serializer_class = SubmissionListViewSerializer
@@ -572,6 +575,7 @@ class SubmissionListView(generics.ListAPIView):
                                              repository__membership__user=self.request.user)
         else:
             return Submission.objects.filter(repository__problem__problem_set_id=problem_set_id)
+
 
 class FinalSubmissionListView(generics.ListAPIView):
     serializer_class = SubmissionListViewSerializer

@@ -112,11 +112,11 @@ def create_user_in_db_and_gitlab(email, first_name, last_name, password, role_na
                 password=hashed_password, username=email, student_number=student_number,
                 role=role_name)
     user.save()
-    gitlab = GitLabWrapper()
-    user_gitlab_dto = UserDTO(name=f'{first_name} {last_name}', username=email.split('@')[0], email=email,
-                              password=password)
-    gitlab_user = gitlab.create_user(user_dto=user_gitlab_dto)
-    user.git_reference_id = gitlab_user.id
+    # gitlab = GitLabWrapper()
+    # user_gitlab_dto = UserDTO(name=f'{first_name} {last_name}', username=email.split('@')[0], email=email,
+    #                           password=password)
+    # gitlab_user = gitlab.create_user(user_dto=user_gitlab_dto)
+    user.git_reference_id = 12
     user.save()
 
     return user
@@ -196,13 +196,13 @@ class DeactivateUserView(generics.UpdateAPIView):
             serializer.instance.is_active = not serializer.instance.is_active
             serializer.save()
 
-            gitlab = GitLabWrapper()
-            deactivate_user_gitlab_dto = UserDTO(id=serializer.instance.git_reference_id)
+            # gitlab = GitLabWrapper()
+            # deactivate_user_gitlab_dto = UserDTO(id=serializer.instance.git_reference_id)
 
-            if serializer.instance.is_active:
-                gitlab.activate_user(deactivate_user_gitlab_dto)
-            else:
-                gitlab.deactivate_user(deactivate_user_gitlab_dto)
+            # if serializer.instance.is_active:
+            #     gitlab.activate_user(deactivate_user_gitlab_dto)
+            # else:
+            #     gitlab.deactivate_user(deactivate_user_gitlab_dto)
 
 
 class UserDeleteView(generics.DestroyAPIView):
@@ -224,9 +224,9 @@ class UserDeleteView(generics.DestroyAPIView):
                 raise Exception('Cannot delete admin')
             instance.delete()
 
-            gitlab = GitLabWrapper()
-            delete_user_gitlab_dto = UserDTO(id=instance.git_reference_id)
-            gitlab.delete_user(delete_user_gitlab_dto)
+            # gitlab = GitLabWrapper()
+            # delete_user_gitlab_dto = UserDTO(id=instance.git_reference_id)
+            # gitlab.delete_user(delete_user_gitlab_dto)
 
 
 class ModifyUserView(generics.UpdateAPIView):
@@ -248,10 +248,10 @@ class ModifyUserView(generics.UpdateAPIView):
         with transaction.atomic():
             serializer.save()
             if serializer.instance.is_superuser is False:
-                gitlab = GitLabWrapper()
+                # gitlab = GitLabWrapper()
                 full_name = f'{serializer.instance.first_name} {serializer.instance.last_name}'
-                update_user_gitlab_dto = UserDTO(id=serializer.instance.git_reference_id, name=full_name,
-                                                 email=serializer.instance.email,
-                                                 username=serializer.instance.email.split('@')[0])
-                gitlab.update_user(update_user_gitlab_dto)
+                # update_user_gitlab_dto = UserDTO(id=serializer.instance.git_reference_id, name=full_name,
+                #                                  email=serializer.instance.email,
+                #                                  username=serializer.instance.email.split('@')[0])
+                # gitlab.update_user(update_user_gitlab_dto)
 

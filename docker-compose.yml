@@ -40,19 +40,19 @@ services:
     depends_on:
       - web
 
-  gitlab:
-    image: gitlab/gitlab-ce:16.6.1-ce.0
-    restart: always
-    environment:
-      GITLAB_OMNIBUS_CONFIG: external_url 'http://localhost'
-    ports:
-      - "80:80"
-      - "443:443"
-      - "1002:22"
-    volumes:
-      - ./gitlab/config:/etc/gitlab
-      - ./gitlab/logs:/var/log/gitlab
-      - ./gitlab/data:/var/opt/gitlab
+#  gitlab:
+#    image: gitlab/gitlab-ce:16.6.1-ce.0
+#    restart: always
+#    environment:
+#      GITLAB_OMNIBUS_CONFIG: external_url 'http://localhost'
+#    ports:
+#      - "80:80"
+#      - "443:443"
+#      - "1002:22"
+#    volumes:
+#      - ./gitlab/config:/etc/gitlab
+#      - ./gitlab/logs:/var/log/gitlab
+#      - ./gitlab/data:/var/opt/gitlab
 
   redis:
     image: redis:7.2.2-alpine
