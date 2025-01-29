@@ -15,7 +15,7 @@ const AddForm = ({t, slug}) => {
     const router = useRouter()
     const pathname = usePathname()
     const [formData, setFormData] = useState({
-        "email": "", "password": "", "role": "admin", "first_name": "", "last_name": "", "student_number": ""
+        "email": "", "password": "", "role": "student", "first_name": "", "last_name": "", "student_number": ""
     });
     const [signupReq, signupLoader] = useRequest(SIGNUP, "POST");
     const [userReq, userLoader] = useRequest(GET_USER, "GET");
@@ -148,8 +148,8 @@ const AddForm = ({t, slug}) => {
                                 value={formData.role}
                                 onChange={handleChange}
                             >
-                                <MenuItem value="admin">{t('admin')}</MenuItem>
                                 <MenuItem value="student" selected={true}>{t('student')}</MenuItem>
+                                <MenuItem value="admin">{t('admin')}</MenuItem>
                                 <MenuItem value="teacher">{t('teacher')}</MenuItem>
                             </Select>
                         </FormControl>

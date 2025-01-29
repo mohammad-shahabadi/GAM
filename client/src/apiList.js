@@ -1,10 +1,10 @@
-let HOST;
+let HOST = 'http://localhost:8000';
 
-if (!process.env.NODE_ENV || process.env.NODE_ENV === "development") {
-    HOST = process.env.REACT_APP_TEST_HOST;
-} else {
-    HOST = process.env.REACT_APP_HOST;
-}
+// if (!process.env.NODE_ENV || process.env.NODE_ENV === "development") {
+//     HOST = process.env.REACT_APP_TEST_HOST;
+// } else {
+//     HOST = process.env.REACT_APP_HOST;
+// }
 
 // Auth
 export const BATCH_SIGNUP = `${HOST}/auth/users/import`; //POST
