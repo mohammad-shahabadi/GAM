@@ -12,4 +12,5 @@ RUN pip install -r requirements.txt
 
 EXPOSE 8000
 
-RUN python manage.py collectstatic --noinput
+# Dummy values only satisfy settings at build time; real ones come from server/.env at runtime
+RUN SECRET_KEY=build-only POSTGRES_USER=build POSTGRES_PASSWORD=build python manage.py collectstatic --noinput

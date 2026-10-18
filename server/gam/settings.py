@@ -13,7 +13,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 import os
 from pathlib import Path
 
-from decouple import config
+from decouple import Csv, config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DEBUG', default=False, cast=bool)
 
 # Application definition
 
@@ -98,11 +98,11 @@ WSGI_APPLICATION = 'gam.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('POSTGRES_DB', 'gam'),
-        'USER': os.environ.get('POSTGRES_USER', 'root'),
-        'PASSWORD': os.environ.get('POSTGRES_PASSWORD', 'root'),
-        'HOST': os.environ.get('POSTGRES_HOST', 'postgres'),  # Assuming your PostgreSQL service in Docker Compose is named 'postgres'
-        'PORT': '5432',
+        'NAME': config('POSTGRES_DB', default='gam'),
+        'USER': config('POSTGRES_USER'),
+        'PASSWORD': config('POSTGRES_PASSWORD'),
+        'HOST': config('POSTGRES_HOST', default='postgres'),  # Assuming your PostgreSQL service in Docker Compose is named 'postgres'
+        'PORT': config('POSTGRES_PORT', default='5432'),
     }
 }
 
@@ -160,6 +160,6 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-ALLOWED_HOSTS = ['*']
-CORS_ORIGIN_ALLOW_ALL = True
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,web', cast=Csv())
+CORS_ALLOWED_ORIGINS = config('CORS_ALLOWED_ORIGINS', default='http://localhost:3000', cast=Csv())
 CORS_ALLOW_CREDENTIALS = True

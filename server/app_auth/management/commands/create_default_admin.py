@@ -1,5 +1,6 @@
 # yourapp/management/commands/create_default_user.py
 
+from decouple import config
 from django.contrib.auth.hashers import make_password
 from django.core.management.base import BaseCommand
 
@@ -11,8 +12,8 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        email = 'admin@admin.com'
-        password = 'admin'
+        email = config('DEFAULT_ADMIN_EMAIL', default='admin@admin.com')
+        password = config('DEFAULT_ADMIN_PASSWORD')
 
         if not User.objects.filter(email=email).exists():
 

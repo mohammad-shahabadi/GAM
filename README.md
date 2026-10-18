@@ -61,7 +61,7 @@ This starts the whole stack, including a local GitLab instance:
 | PostgreSQL | localhost:5439 |
 | Redis | localhost:6379 |
 
-On startup the backend applies migrations and creates a default admin account (`python manage.py create_default_admin`). The local GitLab container can take a few minutes to become available on first run.
+On startup the backend applies migrations and creates a default admin account (`python manage.py create_default_admin`) using `DEFAULT_ADMIN_EMAIL` and `DEFAULT_ADMIN_PASSWORD` from `server/.env`. The local GitLab container can take a few minutes to become available on first run.
 
 ## Project structure
 
