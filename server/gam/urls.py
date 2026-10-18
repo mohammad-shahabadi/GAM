@@ -14,7 +14,7 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from app_auth import urls
+from accounts import urls
 from django.contrib import admin
 from django.urls import path, include
 
@@ -24,7 +24,7 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('auth/', include(urls)),
-    path('api/', include('app_api.urls')),
+    path('api/', include('courses.urls')),
     path('gitlab/webhook/', include('gitlab_wrapper.urls')),
     path('api/gitlab/', include('gitlab_wrapper.urls')),
 ]

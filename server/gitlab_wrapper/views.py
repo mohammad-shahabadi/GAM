@@ -6,9 +6,9 @@ from rest_framework.decorators import api_view, authentication_classes, permissi
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
-from app_api.models import Course, ProblemSet, Submission, Repository
+from courses.models import Course, ProblemSet, Submission, Repository
 from .gitlab_wrapper import GitLabWrapper
-from .helper import gitlab_ci_renderer
+from .ci import gitlab_ci_renderer
 from .webhook_dto import GitlabWebhookPipelinePayloadDTO
 
 
@@ -29,7 +29,7 @@ def render_gitlab_ci(request, course_id, key, problem_set):
 @api_view(['POST'])
 @authentication_classes([])
 @permission_classes([AllowAny])  # GitLab authenticates with the X-Gitlab-Token header instead
-def gitlabPipelineWebhook(request):
+def gitlab_pipeline_webhook(request):
     try:
         payload_data = request.data
 

@@ -8,15 +8,15 @@ from rest_framework import status
 from rest_framework.exceptions import AuthenticationFailed, NotAuthenticated, PermissionDenied
 from rest_framework.response import Response
 
-from app_auth.models import User
-from app_auth.permissions import TeacherOrAdminPermission, AllAuthenticatedPermission, IsPartOfCourseOrAdmin, \
+from accounts.models import User
+from accounts.permissions import TeacherOrAdminPermission, AllAuthenticatedPermission, IsPartOfCourseOrAdmin, \
     AdminPermission, IsTeacherOfCourseOrAdmin, IsTeacherOfCourseOrAdminForMemberShip, IsPartOfCourseOrAdminForProblem, \
     IsPartOfCourseOrAdminForProblemSet, IsTeacherOrTaOfCourseOrAdminForProblemSet, \
     IsTeacherOrTaOfCourseOrAdminForProblem, CanModifySubmission, GetRepositoryPermission, is_admin, course_role
-from app_auth.utils.mappers import map_user_role_to_group_access
+from accounts.utils.mappers import map_user_role_to_group_access
 from gitlab_wrapper.gitlab_dto import GroupDTO, ProjectDTO, WebhookDTO, VariableDTO
 from gitlab_wrapper.gitlab_wrapper import GitLabWrapper
-from gitlab_wrapper.helper import gitlab_ci_renderer
+from gitlab_wrapper.ci import gitlab_ci_renderer
 from .models import Course, Membership, ProblemSet, Problem, Submission, Repository
 from .serializers import CourseSerializer, MembershipSerializer, MembershipCreationSerializer, CourseDetailSerializer, \
     ProblemSetSerializer, ProblemSerializer, ProblemSetUpdateSerializer, ProblemUpdateSerializer, \

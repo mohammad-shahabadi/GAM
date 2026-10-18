@@ -1,8 +1,8 @@
 from rest_framework import serializers
 
-from app_auth.serializers import UserSerializer
+from accounts.serializers import UserSerializer
 from .models import Course, Membership, ProblemSet, Problem, Submission, Repository
-from app_auth.models import User
+from accounts.models import User
 
 
 class CourseSerializer(serializers.ModelSerializer):

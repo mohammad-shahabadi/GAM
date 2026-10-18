@@ -1,6 +1,6 @@
 from rest_framework import permissions
 
-from app_api.models import Membership, ProblemSet
+from courses.models import Membership, ProblemSet
 
 STAFF_COURSE_ROLES = ('teacher', 'ta')
 

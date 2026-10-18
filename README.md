@@ -36,9 +36,9 @@ Django REST API (:8000) ──► PostgreSQL
 
 The backend is split into Django apps:
 
-- `app_api`: courses, assignments, submissions and grading endpoints
-- `app_auth`: authentication and user roles
-- `gitlab_wrapper`: wrapper around the GitLab API and webhook handling
+- `courses`: courses, assignments, submissions and grading endpoints
+- `accounts`: authentication and user roles
+- `gitlab_wrapper`: wrapper around the GitLab API, webhook handling and CI config generation
 
 ## Getting started
 
@@ -70,8 +70,8 @@ GAM/
 ├── client/              # Next.js frontend
 │   └── src/
 ├── server/              # Django backend
-│   ├── app_api/
-│   ├── app_auth/
+│   ├── accounts/
+│   ├── courses/
 │   ├── gitlab_wrapper/
 │   └── gam/             # project settings and URLs
 └── docker-compose.yml

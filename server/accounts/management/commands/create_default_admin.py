@@ -4,7 +4,7 @@ from decouple import config
 from django.contrib.auth.hashers import make_password
 from django.core.management.base import BaseCommand
 
-from app_auth.models import User
+from accounts.models import User
 
 
 class Command(BaseCommand):

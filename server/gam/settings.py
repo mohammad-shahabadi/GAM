@@ -36,8 +36,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'app_auth.apps.AppAuthConfig',
-    'app_api.apps.AppApiConfig',
+    'accounts.apps.AccountsConfig',
+    'courses.apps.CoursesConfig',
     'gitlab_wrapper.apps.GitlabWrapperConfig',
     'rest_framework',
     'corsheaders'
@@ -58,7 +58,7 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         # 'rest_framework.authentication.BasicAuthentication',
         # 'rest_framework.authentication.SessionAuthentication',
-        'app_auth.authentication.JWTAuthentication'
+        'accounts.authentication.JWTAuthentication'
     ],
     # Deny by default; endpoints that must be public opt out explicitly
     'DEFAULT_PERMISSION_CLASSES': ['rest_framework.permissions.IsAuthenticated'],

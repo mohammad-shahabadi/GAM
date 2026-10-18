@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 import secrets
 
@@ -5,7 +6,7 @@ import secrets
 # Create your models here.
 class Membership(models.Model):
     course = models.ForeignKey('Course', on_delete=models.CASCADE, related_name='memberships')
-    user = models.ForeignKey('app_auth.User', on_delete=models.CASCADE, related_name='memberships')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='memberships')
     # course permissions
     role = models.CharField(max_length=255, blank=True, default='student')
     git_reference_id = models.IntegerField(blank=True, null=True)
@@ -20,7 +21,7 @@ class Membership(models.Model):
 class Course(models.Model):
     title = models.CharField(max_length=50)
     description = models.CharField(max_length=255, blank=True, null=True)
-    members = models.ManyToManyField('app_auth.User', through=Membership)
+    members = models.ManyToManyField(settings.AUTH_USER_MODEL, through=Membership)
     password = models.CharField(max_length=255, blank=True, null=True,
                                 help_text="Optional password for joining the course")
     professor = models.CharField(max_length=255, blank=True, null=True)
