@@ -1,15 +1,18 @@
 from decouple import config
 from django.db import transaction
+from django.http import Http404
+from django.shortcuts import get_object_or_404
 from gitlab.exceptions import GitlabCreateError, GitlabUpdateError, GitlabDeleteError
 from rest_framework import generics
 from rest_framework import status
+from rest_framework.exceptions import AuthenticationFailed, NotAuthenticated, PermissionDenied
 from rest_framework.response import Response
 
 from app_auth.models import User
 from app_auth.permissions import TeacherOrAdminPermission, AllAuthenticatedPermission, IsPartOfCourseOrAdmin, \
     AdminPermission, IsTeacherOfCourseOrAdmin, IsTeacherOfCourseOrAdminForMemberShip, IsPartOfCourseOrAdminForProblem, \
     IsPartOfCourseOrAdminForProblemSet, IsTeacherOrTaOfCourseOrAdminForProblemSet, \
-    IsTeacherOrTaOfCourseOrAdminForProblem, CanModifySubmission, GetRepositoryPermission
+    IsTeacherOrTaOfCourseOrAdminForProblem, CanModifySubmission, GetRepositoryPermission, is_admin, course_role
 from app_auth.utils.mappers import map_user_role_to_group_access
 from gitlab_wrapper.gitlab_dto import GroupDTO, ProjectDTO, WebhookDTO, VariableDTO
 from gitlab_wrapper.gitlab_wrapper import GitLabWrapper
@@ -29,6 +32,8 @@ class CourseCreateView(generics.CreateAPIView):
             return super().create(request, *args, **kwargs)
         except GitlabCreateError as e:
             return Response({'error': f'Class failed to create in gitlab {e}'}, status=status.HTTP_400_BAD_REQUEST)
+        except (NotAuthenticated, AuthenticationFailed, PermissionDenied, Http404):
+            raise  # let DRF return the proper 401/403/404
         except Exception as e:
             return Response({'error': f'{e}'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -63,8 +68,6 @@ class CourseCreateView(generics.CreateAPIView):
             self.create_course_variables_in_git(gitlab, course)
 
     def create_course_variables_in_git(self, git: GitLabWrapper, course: Course):
-        print("COURSE SECRET : ")
-        print(course.git_secret_key)
         course_reference_variable = VariableDTO(
             key='GAM_COURSE_ID',
             value=str(course.id),
@@ -86,6 +89,17 @@ class CourseCreateView(generics.CreateAPIView):
         git.create_group_variable(course.git_reference_id, course_reference_variable)
         git.create_group_variable(course.git_reference_id, course_git_secret_key)
         git.create_group_variable(course.git_reference_id, gam_external_url)
+
+        # The fork_update CI stage needs an API token to push to student forks. It lives only on the
+        # teacher-owned Homeworks group (student forks sit outside it) and is protected, so it's
+        # only exposed to pipelines on protected branches of the original problem repos.
+        gitlab_api_token = VariableDTO(
+            key='GITLAB_API_PRIVATE_TOKEN',
+            value=config('ACCESS_TOKEN'),
+            protected=True,
+            masked=True
+        )
+        git.create_group_variable(course.git_homeworks_reference_id, gitlab_api_token)
 
 
 class CourseListView(generics.ListAPIView):
@@ -112,6 +126,8 @@ class CourseUpdateView(generics.UpdateAPIView):
             return super().update(request, *args, **kwargs)
         except GitlabUpdateError as e:
             return Response({'error': f'Class failed to update in gitlab {e}'}, status=status.HTTP_400_BAD_REQUEST)
+        except (NotAuthenticated, AuthenticationFailed, PermissionDenied, Http404):
+            raise  # let DRF return the proper 401/403/404
         except Exception as e:
             return Response({'error': f'{e}'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -135,6 +151,8 @@ class CourseDeleteView(generics.DestroyAPIView):
             return super().destroy(request, *args, **kwargs)
         except GitlabDeleteError as e:
             return Response({'error': f'Class failed to delete in gitlab {e}'}, status=status.HTTP_400_BAD_REQUEST)
+        except (NotAuthenticated, AuthenticationFailed, PermissionDenied, Http404):
+            raise  # let DRF return the proper 401/403/404
         except Exception as e:
             return Response({'error': f'{e}'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -155,6 +173,8 @@ class MembershipCreateView(generics.CreateAPIView):
             return super().create(request, *args, **kwargs)
         except GitlabCreateError as e:
             return Response({'error': f'Membership failed to create in gitlab {e}'}, status=status.HTTP_400_BAD_REQUEST)
+        except (NotAuthenticated, AuthenticationFailed, PermissionDenied, Http404):
+            raise  # let DRF return the proper 401/403/404
         except Exception as e:
             return Response({'error': f'{e}'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -209,6 +229,8 @@ class MembershipDeleteView(generics.DestroyAPIView):
             return super().destroy(request, *args, **kwargs)
         except GitlabDeleteError as e:
             return Response({'error': f'Membership failed to delete in gitlab {e}'}, status=status.HTTP_400_BAD_REQUEST)
+        except (NotAuthenticated, AuthenticationFailed, PermissionDenied, Http404):
+            raise  # let DRF return the proper 401/403/404
         except Exception as e:
             return Response({'error': f'{e}'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -247,6 +269,8 @@ class ProblemSetCreateView(generics.CreateAPIView):
         except GitlabCreateError as e:
             return Response({'error': f'Problem set failed to create in gitlab {e}'},
                             status=status.HTTP_400_BAD_REQUEST)
+        except (NotAuthenticated, AuthenticationFailed, PermissionDenied, Http404):
+            raise  # let DRF return the proper 401/403/404
         except Exception as e:
             return Response({'error': f'{e}'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -297,6 +321,8 @@ class ProblemSetDeleteView(generics.DestroyAPIView):
         except GitlabDeleteError as e:
             return Response({'error': f'Problem set failed to delete in gitlab {e}'},
                             status=status.HTTP_400_BAD_REQUEST)
+        except (NotAuthenticated, AuthenticationFailed, PermissionDenied, Http404):
+            raise  # let DRF return the proper 401/403/404
         except Exception as e:
             return Response({'error': f'{e}'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -325,6 +351,8 @@ class ProblemSetUpdateView(generics.UpdateAPIView):
         except GitlabUpdateError as e:
             return Response({'error': f'Problem set failed to update in gitlab {e}'},
                             status=status.HTTP_400_BAD_REQUEST)
+        except (NotAuthenticated, AuthenticationFailed, PermissionDenied, Http404):
+            raise  # let DRF return the proper 401/403/404
         except Exception as e:
             return Response({'error': f'{e}'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -356,6 +384,8 @@ class ProblemSetPublishView(generics.UpdateAPIView):
         except GitlabCreateError as e:
             return Response({'error': f'Forking questions failed in gitlab {e}'},
                             status=status.HTTP_400_BAD_REQUEST)
+        except (NotAuthenticated, AuthenticationFailed, PermissionDenied, Http404):
+            raise  # let DRF return the proper 401/403/404
         except Exception as e:
             return Response({'error': f'{e}'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -397,8 +427,9 @@ class ProblemSetPublishView(generics.UpdateAPIView):
                 git.create_webhook(
                     WebhookDTO(
                         project_id=forked_project.id,
-                        url='http://localhost:8000/gitlab/webhook/pipeline',
-                        pipeline_events=1
+                        url=f"http://{config('EXTERNAL_URL')}/gitlab/webhook/pipeline",
+                        pipeline_events=1,
+                        token=problem_set.course.git_secret_key
                     )
                 )
 
@@ -452,6 +483,8 @@ class ProblemCreateView(generics.CreateAPIView):
         except GitlabCreateError as e:
             return Response({'error': f'Problem failed to create in gitlab {e}'},
                             status=status.HTTP_400_BAD_REQUEST)
+        except (NotAuthenticated, AuthenticationFailed, PermissionDenied, Http404):
+            raise  # let DRF return the proper 401/403/404
         except Exception as e:
             return Response({'error': f'{e}'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -493,6 +526,8 @@ class ProblemDeleteView(generics.DestroyAPIView):
             return super().destroy(request, *args, **kwargs)
         except GitlabDeleteError as e:
             return Response({'error': f'Problem failed to delete in gitlab {e}'}, status=status.HTTP_400_BAD_REQUEST)
+        except (NotAuthenticated, AuthenticationFailed, PermissionDenied, Http404):
+            raise  # let DRF return the proper 401/403/404
         except Exception as e:
             return Response({'error': f'{e}'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -526,6 +561,8 @@ class ProblemUpdateView(generics.UpdateAPIView):
         except GitlabCreateError as e:
             return Response({'error': f'Failed to update README in gitlab {e}'},
                             status=status.HTTP_400_BAD_REQUEST)
+        except (NotAuthenticated, AuthenticationFailed, PermissionDenied, Http404):
+            raise  # let DRF return the proper 401/403/404
         except Exception as e:
             return Response({'error': f'{e}'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -560,33 +597,34 @@ class RepositoryRetrieveView(generics.RetrieveAPIView):
         problem_id = self.kwargs['problem_id']
         return Repository.objects.filter(membership__user_id=user.id, problem_id=problem_id).order_by('-id')
 
+def visible_submissions(user, problem_set_id):
+    """Admins and course staff see every submission; students see only their own; non-members see nothing."""
+    problem_set = get_object_or_404(ProblemSet, id=problem_set_id)
+    submissions = Submission.objects.filter(repository__problem__problem_set_id=problem_set_id)
+    if is_admin(user):
+        return submissions
+    role = course_role(user, problem_set.course_id)
+    if role is None:
+        raise PermissionDenied('You are not a member of this course')
+    if role == 'student':
+        return submissions.filter(repository__membership__user=user)
+    return submissions
+
+
 class SubmissionListView(generics.ListAPIView):
     serializer_class = SubmissionListViewSerializer
     permission_classes = [AllAuthenticatedPermission]
 
     def get_queryset(self):
-        problem_set_id = self.kwargs.get('problem_set_id')
-        user = ProblemSet.objects.get(id=problem_set_id).course.members.filter(id=self.request.user.id).first()
-        if user and user.role == 'student':
-            return Submission.objects.filter(repository__problem__problem_set_id=problem_set_id,
-                                             repository__membership__user=self.request.user)
-        else:
-            return Submission.objects.filter(repository__problem__problem_set_id=problem_set_id)
+        return visible_submissions(self.request.user, self.kwargs.get('problem_set_id'))
+
 
 class FinalSubmissionListView(generics.ListAPIView):
     serializer_class = SubmissionListViewSerializer
     permission_classes = [AllAuthenticatedPermission]
 
     def get_queryset(self):
-        problem_set_id = self.kwargs.get('problem_set_id')
-        user = ProblemSet.objects.get(id=problem_set_id).course.members.filter(id=self.request.user.id).first()
-        if user and user.role == 'student':
-            return Submission.objects.filter(repository__problem__problem_set_id=problem_set_id,
-                                             repository__membership__user=self.request.user,
-                                             is_final=True)
-        else:
-            return Submission.objects.filter(repository__problem__problem_set_id=problem_set_id,
-                                             is_final=True)
+        return visible_submissions(self.request.user, self.kwargs.get('problem_set_id')).filter(is_final=True)
 
 
 class SubmissionUpdateView(generics.UpdateAPIView):
@@ -597,6 +635,8 @@ class SubmissionUpdateView(generics.UpdateAPIView):
     def update(self, request, *args, **kwargs):
         try:
             return super().update(request, *args, **kwargs)
+        except (NotAuthenticated, AuthenticationFailed, PermissionDenied, Http404):
+            raise  # let DRF return the proper 401/403/404
         except Exception as e:
             return Response({'error': f'{e}'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -613,6 +653,8 @@ class SubmissionDeleteView(generics.DestroyAPIView):
     def destroy(self, request, *args, **kwargs):
         try:
             return super().destroy(request, *args, **kwargs)
+        except (NotAuthenticated, AuthenticationFailed, PermissionDenied, Http404):
+            raise  # let DRF return the proper 401/403/404
         except Exception as e:
             return Response({'error': f'{e}'}, status=status.HTTP_400_BAD_REQUEST)
 

@@ -1,15 +1,25 @@
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
+import secrets
+
+from django.http import HttpResponse, Http404
 from rest_framework import status
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
+
+from app_api.models import Course, ProblemSet, Submission, Repository
 from .gitlab_wrapper import GitLabWrapper
-from .webhook_dto import GitlabWebhookPipelinePayloadDTO, TestReportDTO
-from app_api.models import Submission, Repository
-from django.http import HttpResponse
 from .helper import gitlab_ci_renderer
+from .webhook_dto import GitlabWebhookPipelinePayloadDTO
 
 
 def render_gitlab_ci(request, course_id, key, problem_set):
-    #TODO: add verification of course and key
+    # Called by GitLab CI with the course's GAM_COURSE_SECRET variable in the URL
+    course = Course.objects.filter(id=course_id).first()
+    if course is None or not secrets.compare_digest(key.encode(), course.git_secret_key.encode()):
+        raise Http404
+    if not ProblemSet.objects.filter(id=problem_set, course=course).exists():
+        raise Http404
+
     gitlab_ci_yml = gitlab_ci_renderer.generate_gitlab_ci_contents()
     response = HttpResponse(gitlab_ci_yml, content_type='application/x-yaml')
     response['Content-Disposition'] = 'attachment; filename="gitlab-ci.yml"'
@@ -17,19 +27,24 @@ def render_gitlab_ci(request, course_id, key, problem_set):
 
 
 @api_view(['POST'])
+@authentication_classes([])
+@permission_classes([AllowAny])  # GitLab authenticates with the X-Gitlab-Token header instead
 def gitlabPipelineWebhook(request):
     try:
-        # Assuming the webhook payload is in JSON format
         payload_data = request.data
 
-        # Deserialize the JSON payload into the DTO
+        repository = Repository.objects.select_related('problem__problem_set__course').filter(
+            git_reference_id=payload_data.get('project', {}).get('id')).first()
+        received_token = request.headers.get('X-Gitlab-Token', '')
+        if repository is None or not secrets.compare_digest(
+                received_token.encode(), repository.problem.problem_set.course.git_secret_key.encode()):
+            return Response({'error': 'Invalid webhook token'}, status=status.HTTP_403_FORBIDDEN)
 
         if payload_data['object_kind'] == "pipeline":
             webhook_dto = GitlabWebhookPipelinePayloadDTO(**payload_data)
             if webhook_dto.object_attributes['status'] == "success":
                 save_test_result_by_pipeline_event(webhook_dto)
 
-        # You can also send a response back to the client
         return Response({'status': 'Webhook received successfully'}, status=status.HTTP_200_OK)
 
     except Exception as e:

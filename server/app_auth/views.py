@@ -5,15 +5,18 @@ from django.conf import settings
 # from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.hashers import make_password, check_password
 from django.db import transaction
+from django.http import Http404
 from django.db.models import Q
 from gitlab.exceptions import GitlabCreateError, GitlabUpdateError, GitlabDeleteError
 # from django.contrib.auth.models import User
 from rest_framework import status, generics
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.exceptions import AuthenticationFailed, NotAuthenticated, PermissionDenied
 from rest_framework.response import Response
 
 from gitlab_wrapper.gitlab_dto import UserDTO
 from gitlab_wrapper.gitlab_wrapper import GitLabWrapper
+from .authentication import invalidate_user_cache
 from .models import User
 from .permissions import AdminPermission, UnauthenticatedPermission, SelfPermission, TeacherOrAdminPermission
 from .serializers import UserSerializer, UserSoftDeleteSerializer, UserUpdateSerializer
@@ -65,6 +68,8 @@ def login(request):
         return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
     if check_password(password, user.password):
+        if not user.is_active:
+            return Response({'error': 'User is deactivated'}, status=status.HTTP_403_FORBIDDEN)
         token = create_jwt_token(user)
         return Response({'token': token, 'role': user.role}, status=status.HTTP_200_OK)
     else:
@@ -172,7 +177,7 @@ class UserSearchListView(generics.ListAPIView):
             # If no search parameter is provided, return all users
             queryset = User.objects.all()
 
-        queryset = queryset.exclude(email='admin@admin.com')
+        queryset = queryset.exclude(is_superuser=True)
 
         return queryset
 
@@ -185,16 +190,19 @@ class DeactivateUserView(generics.UpdateAPIView):
     def update(self, request, *args, **kwargs):
         try:
             return super().update(request, *args, **kwargs)
+        except (NotAuthenticated, AuthenticationFailed, PermissionDenied, Http404):
+            raise  # let DRF return the proper 401/403/404
         except Exception as e:
             return Response({'error': f'{e}'}, status=status.HTTP_400_BAD_REQUEST)
 
     def perform_update(self, serializer):
         with transaction.atomic():
-            if serializer.instance.email == "admin@admin.com":
-                raise Exception('Cannot delete admin')
+            if serializer.instance.is_superuser:
+                raise Exception('Cannot deactivate admin')
 
             serializer.instance.is_active = not serializer.instance.is_active
             serializer.save()
+            invalidate_user_cache(serializer.instance.id)
 
             gitlab = GitLabWrapper()
             deactivate_user_gitlab_dto = UserDTO(id=serializer.instance.git_reference_id)
@@ -215,6 +223,8 @@ class UserDeleteView(generics.DestroyAPIView):
             return super().destroy(request, *args, **kwargs)
         except GitlabDeleteError as e:
             return Response({'error': f'User failed to delete in gitlab {e}'}, status=status.HTTP_400_BAD_REQUEST)
+        except (NotAuthenticated, AuthenticationFailed, PermissionDenied, Http404):
+            raise  # let DRF return the proper 401/403/404
         except Exception as e:
             return Response({'error': f'{e}'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -222,7 +232,9 @@ class UserDeleteView(generics.DestroyAPIView):
         with transaction.atomic():
             if instance.is_superuser:
                 raise Exception('Cannot delete admin')
+            user_id = instance.id
             instance.delete()
+            invalidate_user_cache(user_id)
 
             gitlab = GitLabWrapper()
             delete_user_gitlab_dto = UserDTO(id=instance.git_reference_id)
@@ -239,14 +251,17 @@ class ModifyUserView(generics.UpdateAPIView):
             return super().update(request, *args, **kwargs)
         except GitlabUpdateError as e:
             return Response({'error': f'User failed to update in gitlab {e}'}, status=status.HTTP_400_BAD_REQUEST)
+        except (NotAuthenticated, AuthenticationFailed, PermissionDenied, Http404):
+            raise  # let DRF return the proper 401/403/404
         except Exception as e:
             return Response({'error': f'{e}'}, status=status.HTTP_400_BAD_REQUEST)
 
     def perform_update(self, serializer):
-        if serializer.instance.is_superuser and serializer.validated_data['role'] != 'admin':
+        if serializer.instance.is_superuser and serializer.validated_data.get('role', 'admin') != 'admin':
             raise Exception('Can not change admin role')
         with transaction.atomic():
             serializer.save()
+            invalidate_user_cache(serializer.instance.id)
             if serializer.instance.is_superuser is False:
                 gitlab = GitLabWrapper()
                 full_name = f'{serializer.instance.first_name} {serializer.instance.last_name}'

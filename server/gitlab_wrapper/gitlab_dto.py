@@ -59,6 +59,7 @@ class WebhookDTO(BaseDTO):
     project_id: int
     url: str
     pipeline_events: int
+    token: Optional[str] = None
 
 
 @dataclass

@@ -2,7 +2,6 @@ import os
 from dataclasses import dataclass
 
 import yaml
-from decouple import config
 
 
 @dataclass
@@ -87,7 +86,7 @@ def get_script(script_file_name):
 
 
 def pre_script():
-    gitlab_access_token = config('ACCESS_TOKEN')
+    # GITLAB_API_PRIVATE_TOKEN is injected by GitLab as a protected, masked group variable
+    # (see CourseCreateView). Never render the token itself into this file: it's served over HTTP.
     return """set -e &&
-      GITLAB_API_PRIVATE_TOKEN="{}" &&
-    """.format(gitlab_access_token)
+    """

@@ -10,7 +10,9 @@ class CourseSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Course
-        fields = '__all__'
+        # git_secret_key authenticates GitLab CI and webhooks; it must never leave the server
+        exclude = ['git_secret_key']
+        read_only_fields = ['git_reference_id', 'git_homeworks_reference_id']
 
 
 class MemberShipCourseSerializer(serializers.ModelSerializer):

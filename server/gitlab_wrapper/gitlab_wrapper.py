@@ -194,7 +194,8 @@ class GitLabWrapper:
         project_git.hooks.create(
             {
                 'url': create_webhook_dto.url,
-                'pipeline_events': create_webhook_dto.pipeline_events
+                'pipeline_events': create_webhook_dto.pipeline_events,
+                'token': create_webhook_dto.token
             }
         )
 
