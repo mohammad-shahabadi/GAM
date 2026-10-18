@@ -1,111 +1,78 @@
-# README: Setup for GAM Project
+# GAM — GitLab Assignment Manager
 
-This repository contains a Docker Compose configuration to run the GAM (Gitlab Assignment Manager) project. The project is composed of several services, including a Django web application, PostgreSQL database, a React-based frontend, and GitLab for version control.
+A web platform for running programming courses on top of GitLab. Instructors create assignments, students submit through GitLab repositories, and GAM tracks submissions automatically, runs grading pipelines and flags similar code.
 
-## Prerequisites
-- Docker and Docker Compose installed on your machine.
+## Features
 
-## Running the GAM Project
+- **GitLab integration**: creates and manages course groups, assignment repositories and student access through the GitLab API (python-gitlab)
+- **Webhook-driven submission tracking**: GitLab webhooks record every push as a submission in real time, with no polling
+- **Automated grading**: submissions run through GitLab CI pipelines and results are collected back into the platform
+- **Code-similarity detection**: compares submissions to flag possible plagiarism for instructor review
+- **Authentication**: SSO and JWT-based auth with role-based access for instructors and students
+- **Multilingual frontend** built with Next.js and next-intl
 
-To start the GAM project, use the following steps:
+## Tech stack
 
-1. Clone the repository:
+| Layer | Technologies |
+|---|---|
+| Backend | Python, Django 4.2, Django REST Framework, PyJWT |
+| Data | PostgreSQL 16, Redis 7 (caching) |
+| Integration | GitLab CE, GitLab REST API (python-gitlab), webhooks, GitLab CI |
+| Frontend | Next.js 14, React 18, MUI, NextAuth, next-intl |
+| Infrastructure | Docker, Docker Compose, Gunicorn |
 
-   ```bash
-   git clone [<repository_url>](https://github.com/Khalilolgod/GAM.git)
-   cd GAM
-   ```
+## Architecture
 
-2. Build and run the Docker Compose services:
+```
+Next.js client (:3000)
+        │  REST / JWT
+        ▼
+Django REST API (:8000) ──► PostgreSQL
+   │        │          └──► Redis (cache)
+   │        ▲
+   ▼        │ webhooks
+ GitLab CE (repos, CI pipelines)
+```
 
-   ```bash
-   docker-compose up -d
-   ```
+The backend is split into Django apps:
 
-   This command will build the required images and start the services in detached mode.
+- `app_api`: courses, assignments, submissions and grading endpoints
+- `app_auth`: authentication and user roles
+- `gitlab_wrapper`: wrapper around the GitLab API and webhook handling
 
-3. Access the GAM web application at [http://localhost:8000](http://localhost:8000)  The default credentials are `admin@admin.com` for username and  `admin` for password.
+## Getting started
 
-4. Access the GAM frontend at [http://localhost:3000](http://localhost:3000).
+**Requirements:** Docker and Docker Compose.
 
-5. Access GitLab at [http://localhost](http://localhost) (HTTP) or [https://localhost](https://localhost) (HTTPS). The default credentials are `root` for both username and password.
+```bash
+git clone https://github.com/mohammad-shahabadi/GAM.git
+cd GAM
+cp server/.env.example server/.env   # then fill in your values
+docker compose up --build
+```
 
-## Rebuilding Services Independently
+This starts the whole stack, including a local GitLab instance:
 
-### Rebuilding the Web Service
+| Service | URL |
+|---|---|
+| Frontend | http://localhost:3000 |
+| Backend API | http://localhost:8000 |
+| GitLab | http://localhost |
+| PostgreSQL | localhost:5439 |
+| Redis | localhost:6379 |
 
-If you need to rebuild the web service independently, follow these steps:
+On startup the backend applies migrations and creates a default admin account (`python manage.py create_default_admin`). The local GitLab container can take a few minutes to become available on first run.
 
-1. Navigate to the root directory of the project.
+## Project structure
 
-2. Run the following command:
-
-   ```bash
-   docker-compose build web
-   ```
-
-3. After the build is complete, restart the web service:
-
-   ```bash
-   docker-compose up -d web
-   ```
-
-### Rebuilding the Frontend Service
-
-To rebuild the frontend service independently, follow these steps:
-
-1. Navigate to the root directory of the project.
-
-2. Run the following command:
-
-   ```bash
-   docker-compose build frontend
-   ```
-
-3. After the build is complete, restart the frontend service:
-
-   ```bash
-   docker-compose up -d frontend
-   ```
-
-### Rebuilding the PostgreSQL Service
-
-If changes are made to the PostgreSQL service configuration or environment variables, follow these steps:
-
-1. Navigate to the root directory of the project.
-
-2. Run the following command:
-
-   ```bash
-   docker-compose build postgres
-   ```
-
-3. After the build is complete, restart the PostgreSQL service:
-
-   ```bash
-   docker-compose up -d postgres
-   ```
-
-### Rebuilding the GitLab Service
-
-To rebuild the GitLab service independently, follow these steps:
-
-1. Navigate to the root directory of the project.
-
-2. Run the following command:
-
-   ```bash
-   docker-compose build gitlab
-   ```
-
-3. After the build is complete, restart the GitLab service:
-
-   ```bash
-   docker-compose up -d gitlab
-   ```
-
-## Troubleshooting
-
-If you encounter any issues or have questions, please refer to the [official Docker documentation](https://t.me/MamaZh_Shadow).
-
-Happy coding!
+```
+GAM/
+├── client/              # Next.js frontend
+│   └── src/
+├── server/              # Django backend
+│   ├── app_api/
+│   ├── app_auth/
+│   ├── gitlab_wrapper/
+│   └── gam/             # project settings and URLs
+└── docker-compose.yml
+```
